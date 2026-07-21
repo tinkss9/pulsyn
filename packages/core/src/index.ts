@@ -2,6 +2,9 @@
 // The AI-Native CDC Platform
 
 export * from './types';
+export * from './api-client';
+export * from './benchmark/engine';
+export * from './benchmark/runner';
 export * from './connectors/base';
 export * from './connectors/postgresql';
 export * from './connectors/mysql';
