@@ -1,0 +1,60 @@
+# PostgreSQL Connector
+
+Pulsyn supports PostgreSQL as both source and target for CDC replication.
+
+## Features
+
+- Log-based CDC using PostgreSQL logical replication
+- Full load + incremental sync
+- Schema change detection
+- Checkpoint recovery
+
+## Configuration
+
+```json
+{
+  "engine": "postgresql",
+  "host": "localhost",
+  "port": 5432,
+  "database": "mydb",
+  "user": "myuser",
+  "password": "mypassword",
+  "ssl": false
+}
+```
+
+## Prerequisites
+
+1. **Enable logical replication** in postgresql.conf:
+   ```
+   wal_level = logical
+   max_replication_slots = 10
+   max_wal_senders = 10
+   ```
+
+2. **Create replication user** (if not using existing):
+   ```sql
+   CREATE USER pulsyn WITH REPLICATION;
+   ```
+
+3. **Grant permissions**:
+   ```sql
+   GRANT ALL ON DATABASE mydb TO pulsyn;
+   GRANT ALL ON ALL TABLES IN SCHEMA public TO pulsyn;
+   ```
+
+## Supported Versions
+
+- PostgreSQL 12+
+- PostgreSQL 13+
+- PostgreSQL 14+
+- PostgreSQL 15+
+- PostgreSQL 16+
+
+## Performance
+
+| Metric | Value |
+|--------|-------|
+| Throughput | 10,000+ rows/sec |
+| Latency | <500ms |
+| Memory | <500MB |

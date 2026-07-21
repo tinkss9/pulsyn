@@ -1,0 +1,51 @@
+# Getting Started
+
+Set up your first Pulsyn pipeline in 5 minutes.
+
+## Prerequisites
+
+- Docker installed
+- PostgreSQL or MySQL database
+
+## Step 1: Install Pulsyn
+
+```bash
+docker pull pulsyn/pulsyn:latest
+```
+
+## Step 2: Start Pulsyn
+
+```bash
+docker run -d -p 8080:8080 pulsyn/pulsyn
+```
+
+## Step 3: Open the Dashboard
+
+Open http://localhost:8080 in your browser.
+
+## Step 4: Add a Connector
+
+1. Click "Add Connector"
+2. Enter your database credentials
+3. Click "Test Connection"
+4. Click "Save"
+
+## Step 5: Create a Pipeline
+
+1. Click "Create Pipeline"
+2. Select your source connector
+3. Select your target connector
+4. Select tables to replicate
+5. Click "Create"
+
+## Step 6: Start Replication
+
+1. Click on your pipeline
+2. Click "Start"
+3. Watch the metrics update in real-time
+
+## What's Next?
+
+- [Connector Documentation](/connectors) — Learn about supported databases
+- [API Reference](/api) — Automate pipeline management
+- [Data Masking](/masking) — Protect sensitive data

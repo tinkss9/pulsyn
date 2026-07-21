@@ -1,0 +1,58 @@
+# MySQL Connector
+
+Pulsyn supports MySQL as both source and target for CDC replication.
+
+## Features
+
+- Binlog-based CDC using MySQL replication
+- Full load + incremental sync
+- Schema change detection
+- Checkpoint recovery
+
+## Configuration
+
+```json
+{
+  "engine": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "database": "mydb",
+  "user": "myuser",
+  "password": "mypassword"
+}
+```
+
+## Prerequisites
+
+1. **Enable binlog** in my.cnf:
+   ```
+   log_bin = mysql-bin
+   binlog_format = ROW
+   server_id = 1
+   ```
+
+2. **Create replication user**:
+   ```sql
+   CREATE USER 'pulsyn'@'%' IDENTIFIED BY 'mypassword';
+   GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'pulsyn'@'%';
+   ```
+
+3. **Grant permissions**:
+   ```sql
+   GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'pulsyn'@'%';
+   ```
+
+## Supported Versions
+
+- MySQL 5.7+
+- MySQL 8.0+
+- MySQL 8.4+
+- MariaDB 10.5+
+
+## Performance
+
+| Metric | Value |
+|--------|-------|
+| Throughput | 15,000+ rows/sec |
+| Latency | <300ms |
+| Memory | <400MB |

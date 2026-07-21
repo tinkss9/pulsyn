@@ -1,0 +1,33 @@
+# Welcome to Pulsyn
+
+**The AI-Native CDC Platform**
+
+Real-time change data capture without the complexity. No Kafka dependency. No vendor lock-in. Just data flowing.
+
+## Features
+
+- **Log-based CDC** — PostgreSQL, MySQL, Oracle, SQL Server
+- **Checkpoint Recovery** — Resume from last known good state
+- **Web UI** — Visual pipeline management and monitoring
+- **CLI** — Command-line interface for automation
+- **MCP Server** — AI agent integration
+- **Data Masking** — In-flight masking during replication
+
+## Quick Start
+
+```bash
+# Install
+docker pull pulsyn/pulsyn:latest
+
+# Run
+docker run -d -p 8080:8080 pulsyn/pulsyn
+
+# Open
+open http://localhost:8080
+```
+
+## Next Steps
+
+- [Getting Started](/getting-started) — Set up your first pipeline
+- [Connectors](/connectors) — Database connector documentation
+- [API Reference](/api) — REST API documentation
