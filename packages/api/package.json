@@ -15,7 +15,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@pulsyn/core": "workspace:*",
     "express": "^4.19.0",
     "cors": "^2.8.0",
     "helmet": "^7.1.0",
