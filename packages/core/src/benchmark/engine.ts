@@ -467,3 +467,45 @@ export function calculateScore(results: BenchmarkTestResult[]): {
     certification,
   };
 }
+
+// Run a full benchmark suite
+export async function runBenchmark(options: { config: BenchmarkConfig; suite?: BenchmarkSuite }): Promise<BenchmarkReport> {
+  const suite = options.suite || DEFAULT_SUITE;
+  const results: BenchmarkTestResult[] = [];
+  const startTime = Date.now();
+
+  for (const test of suite.tests) {
+    try {
+      const result = await test.run(options.config);
+      results.push(result);
+    } catch (error) {
+      results.push({
+        testId: test.id,
+        passed: false,
+        metrics: {},
+        details: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  const score = calculateScore(results);
+
+  return {
+    id: `report-${Date.now()}`,
+    connectorPair: {
+      source: options.config.source.engine,
+      target: options.config.target.engine,
+    },
+    timestamp: new Date(),
+    config: options.config,
+    results,
+    summary: {
+      overallScore: score.overallScore,
+      throughputScore: score.throughputScore,
+      latencyScore: score.latencyScore,
+      correctnessScore: score.correctnessScore,
+      certification: score.certification,
+    },
+    duration: Date.now() - startTime,
+  };
+}

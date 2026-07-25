@@ -15,7 +15,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@pulsyn/core": "workspace:*",
+    "@pulsyn/core": "*",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.0",
     "winston": "^3.13.0"

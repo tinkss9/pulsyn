@@ -1,12 +1,12 @@
-// Pulsyn Usage Metering
-// Tracks and enforces usage limits per subscription
+// Pulsyn Usage Metering — PostgreSQL backed
+
+import { query } from '../db';
 
 export interface UsageRecord {
-  organizationId: string;
+  organization_id: string;
   metric: UsageMetric;
   quantity: number;
-  timestamp: Date;
-  metadata?: Record<string, unknown>;
+  created_at?: Date;
 }
 
 export type UsageMetric =
@@ -17,10 +17,7 @@ export type UsageMetric =
 
 export interface UsageSummary {
   organizationId: string;
-  period: {
-    start: Date;
-    end: Date;
-  };
+  period: { start: Date; end: Date };
   metrics: {
     rowsReplicated: { used: number; limit: number; unit: string };
     apiCalls: { used: number; limit: number; unit: string };
@@ -29,99 +26,67 @@ export interface UsageSummary {
   };
 }
 
-// In-memory usage store (would be Redis/DB in production)
-const usageStore: Map<string, UsageRecord[]> = new Map();
-
-export function recordUsage(record: UsageRecord): void {
-  const key = record.organizationId;
-  if (!usageStore.has(key)) {
-    usageStore.set(key, []);
-  }
-  usageStore.get(key)!.push(record);
+export async function recordUsage(organizationId: string, metric: UsageMetric, quantity: number): Promise<void> {
+  await query(
+    'INSERT INTO usage_records (organization_id, metric, quantity) VALUES ($1, $2, $3)',
+    [organizationId, metric, quantity]
+  );
 }
 
-export function getUsage(organizationId: string, metric: UsageMetric, since: Date): number {
-  const records = usageStore.get(organizationId) || [];
-  return records
-    .filter(r => r.metric === metric && r.timestamp >= since)
-    .reduce((sum, r) => sum + r.quantity, 0);
+export async function getUsage(organizationId: string, metric: UsageMetric, since: Date): Promise<number> {
+  const result = await query(
+    `SELECT COALESCE(SUM(quantity), 0) as total
+     FROM usage_records
+     WHERE organization_id = $1 AND metric = $2 AND created_at >= $3`,
+    [organizationId, metric, since]
+  );
+  return Number(result.rows[0].total);
 }
 
-export function getUsageSummary(organizationId: string, planLimits: {
+export async function getUsageSummary(organizationId: string, planLimits: {
   maxRowsPerDay: number;
   apiCallsPerDay: number;
   pipelineHoursPerMonth: number;
   storageGb: number;
-}): UsageSummary {
+}): Promise<UsageSummary> {
   const now = new Date();
   const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
+  const [rowsReplicated, apiCalls, pipelineHours, storageBytes] = await Promise.all([
+    getUsage(organizationId, 'rows_replicated', dayStart),
+    getUsage(organizationId, 'api_calls', dayStart),
+    getUsage(organizationId, 'pipeline_hours', monthStart),
+    getUsage(organizationId, 'storage_bytes', monthStart),
+  ]);
+
   return {
     organizationId,
-    period: {
-      start: monthStart,
-      end: now,
-    },
+    period: { start: monthStart, end: now },
     metrics: {
-      rowsReplicated: {
-        used: getUsage(organizationId, 'rows_replicated', dayStart),
-        limit: planLimits.maxRowsPerDay,
-        unit: 'rows/day',
-      },
-      apiCalls: {
-        used: getUsage(organizationId, 'api_calls', dayStart),
-        limit: planLimits.apiCallsPerDay,
-        unit: 'calls/day',
-      },
-      pipelineHours: {
-        used: getUsage(organizationId, 'pipeline_hours', monthStart),
-        limit: planLimits.pipelineHoursPerMonth,
-        unit: 'hours/month',
-      },
-      storageBytes: {
-        used: getUsage(organizationId, 'storage_bytes', monthStart),
-        limit: planLimits.storageGb * 1024 * 1024 * 1024,
-        unit: 'bytes',
-      },
+      rowsReplicated: { used: rowsReplicated, limit: planLimits.maxRowsPerDay, unit: 'rows/day' },
+      apiCalls: { used: apiCalls, limit: planLimits.apiCallsPerDay, unit: 'calls/day' },
+      pipelineHours: { used: pipelineHours, limit: planLimits.pipelineHoursPerMonth, unit: 'hours/month' },
+      storageBytes: { used: storageBytes, limit: planLimits.storageGb * 1024 * 1024 * 1024, unit: 'bytes' },
     },
   };
 }
 
-export function checkLimit(
+export async function checkLimit(
   organizationId: string,
   metric: UsageMetric,
   limit: number,
   since: Date
-): { allowed: boolean; current: number; limit: number } {
-  const current = getUsage(organizationId, metric, since);
-  return {
-    allowed: current < limit,
-    current,
-    limit,
-  };
+): Promise<{ allowed: boolean; current: number; limit: number }> {
+  const current = await getUsage(organizationId, metric, since);
+  return { allowed: current < limit, current, limit };
 }
 
-export function incrementUsage(
-  organizationId: string,
-  metric: UsageMetric,
-  quantity: number
-): void {
-  recordUsage({
-    organizationId,
-    metric,
-    quantity,
-    timestamp: new Date(),
-  });
+export async function incrementUsage(organizationId: string, metric: UsageMetric, quantity: number): Promise<void> {
+  await recordUsage(organizationId, metric, quantity);
 }
 
-// Calculate overage charges (in cents)
-export function calculateOverage(
-  used: number,
-  freeAllowance: number,
-  perUnitCents: number,
-  unitSize: number
-): number {
+export function calculateOverage(used: number, freeAllowance: number, perUnitCents: number, unitSize: number): number {
   if (used <= freeAllowance) return 0;
   const overage = used - freeAllowance;
   const units = Math.ceil(overage / unitSize);

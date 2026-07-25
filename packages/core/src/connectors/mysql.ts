@@ -33,7 +33,7 @@ export class MySQLConnector extends BaseConnector {
     this.pool = mysql.createPool(poolConfig);
 
     // Test connection
-    const connection = await this.pool.getConnection();
+    const connection = await this.pool!.getConnection();
     try {
       await connection.ping();
       this.connected = true;

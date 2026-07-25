@@ -12,7 +12,7 @@ export abstract class BaseConnector implements Connector {
   id: string;
   name: string;
   engine: string;
-  protected config: DatabaseConfig;
+  config: DatabaseConfig;
   protected connected: boolean = false;
 
   constructor(id: string, name: string, engine: string, config: DatabaseConfig) {

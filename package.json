@@ -2,6 +2,9 @@
   "name": "pulsyn",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "description": "The AI-Native CDC Platform — Real-time change data capture without the complexity",
   "license": "Apache-2.0",
   "repository": {

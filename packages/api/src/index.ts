@@ -12,13 +12,14 @@ import { billingRoutes } from './routes/billing';
 import { webhookRoutes } from './routes/webhooks';
 import { benchmarkRoutes } from './routes/benchmarks';
 import { openApiSpec } from './openapi';
+import { initDatabase } from './db';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: false, // Allow Swagger UI inline styles
+  contentSecurityPolicy: false,
 }));
 app.use(cors());
 app.use(morgan('combined'));
@@ -37,7 +38,7 @@ app.get('/api/openapi.json', (req, res) => {
   res.json(openApiSpec);
 });
 
-// Swagger UI (served inline — no external CDN dependency)
+// Swagger UI
 app.get('/api/docs', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.send(`<!DOCTYPE html>
@@ -82,11 +83,22 @@ app.get('/', (req, res) => {
   res.redirect('/api/docs');
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`[Pulsyn API] Server running on port ${PORT}`);
-  console.log(`[Pulsyn API] API docs:    http://localhost:${PORT}/api/docs`);
-  console.log(`[Pulsyn API] OpenAPI spec: http://localhost:${PORT}/api/openapi.json`);
-});
+// Initialize database and start server
+async function start() {
+  try {
+    await initDatabase();
+    console.log('[Pulsyn API] Database connected');
+  } catch (err) {
+    console.warn('[Pulsyn API] Database unavailable, running with degraded functionality:', (err as Error).message);
+  }
+
+  app.listen(PORT, () => {
+    console.log(`[Pulsyn API] Server running on port ${PORT}`);
+    console.log(`[Pulsyn API] API docs:    http://localhost:${PORT}/api/docs`);
+    console.log(`[Pulsyn API] OpenAPI spec: http://localhost:${PORT}/api/openapi.json`);
+  });
+}
+
+start();
 
 export default app;

@@ -112,6 +112,7 @@ export interface Connector {
   id: string;
   name: string;
   engine: string;
+  config?: DatabaseConfig;
   connect(config: DatabaseConfig): Promise<void>;
   disconnect(): Promise<void>;
   testConnection(): Promise<boolean>;

@@ -1,8 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/**/*.ts", "use": "@vercel/node" }
-  ],
+  "outputDirectory": "dist",
   "routes": [
     { "src": "/api/health", "dest": "/api/health.ts" },
     { "src": "/api/pipelines", "dest": "/api/pipelines.ts" },

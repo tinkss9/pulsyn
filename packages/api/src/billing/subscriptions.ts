@@ -1,18 +1,19 @@
-// Pulsyn Subscription Management
-// Manages customer subscriptions and billing state
+// Pulsyn Subscription Management — PostgreSQL backed
+
+import { query } from '../db';
 
 export interface Subscription {
   id: string;
-  organizationId: string;
-  planId: string;
+  organization_id: string;
+  plan_id: string;
   status: SubscriptionStatus;
-  stripeSubscriptionId?: string;
-  stripeCustomerId?: string;
-  currentPeriodStart: Date;
-  currentPeriodEnd: Date;
-  cancelAtPeriodEnd: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  stripe_subscription_id?: string;
+  stripe_customer_id?: string;
+  current_period_start: Date;
+  current_period_end: Date;
+  cancel_at_period_end: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export type SubscriptionStatus =
@@ -38,92 +39,86 @@ export interface UpdateSubscriptionInput {
   cancelAtPeriodEnd?: boolean;
 }
 
-// In-memory store (would be database in production)
-const subscriptions: Map<string, Subscription> = new Map();
-const orgIndex: Map<string, string> = new Map(); // orgId -> subscriptionId
-
-export function createSubscription(input: CreateSubscriptionInput): Subscription {
+export async function createSubscription(input: CreateSubscriptionInput): Promise<Subscription> {
   const id = `sub-${Date.now()}`;
-  const now = new Date();
-
-  const subscription: Subscription = {
-    id,
-    organizationId: input.organizationId,
-    planId: input.planId,
-    status: 'active',
-    currentPeriodStart: now,
-    currentPeriodEnd: new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()),
-    cancelAtPeriodEnd: false,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  subscriptions.set(id, subscription);
-  orgIndex.set(input.organizationId, id);
-
-  return subscription;
+  const result = await query(
+    `INSERT INTO subscriptions (id, organization_id, plan_id)
+     VALUES ($1, $2, $3)
+     RETURNING *`,
+    [id, input.organizationId, input.planId]
+  );
+  return result.rows[0];
 }
 
-export function getSubscription(id: string): Subscription | undefined {
-  return subscriptions.get(id);
+export async function getSubscription(id: string): Promise<Subscription | undefined> {
+  const result = await query('SELECT * FROM subscriptions WHERE id = $1', [id]);
+  return result.rows[0] || undefined;
 }
 
-export function getSubscriptionByOrg(organizationId: string): Subscription | undefined {
-  const subId = orgIndex.get(organizationId);
-  return subId ? subscriptions.get(subId) : undefined;
+export async function getSubscriptionByOrg(organizationId: string): Promise<Subscription | undefined> {
+  const result = await query('SELECT * FROM subscriptions WHERE organization_id = $1', [organizationId]);
+  return result.rows[0] || undefined;
 }
 
-export function updateSubscription(id: string, input: UpdateSubscriptionInput): Subscription | undefined {
-  const sub = subscriptions.get(id);
-  if (!sub) return undefined;
+export async function updateSubscription(id: string, input: UpdateSubscriptionInput): Promise<Subscription | undefined> {
+  const sets: string[] = ['updated_at = NOW()'];
+  const params: any[] = [id];
+  let paramIdx = 2;
 
-  if (input.planId) sub.planId = input.planId;
-  if (input.cancelAtPeriodEnd !== undefined) sub.cancelAtPeriodEnd = input.cancelAtPeriodEnd;
-  sub.updatedAt = new Date();
+  if (input.planId) {
+    sets.push(`plan_id = $${paramIdx++}`);
+    params.push(input.planId);
+  }
+  if (input.cancelAtPeriodEnd !== undefined) {
+    sets.push(`cancel_at_period_end = $${paramIdx++}`);
+    params.push(input.cancelAtPeriodEnd);
+  }
 
-  return sub;
+  const result = await query(
+    `UPDATE subscriptions SET ${sets.join(', ')} WHERE id = $1 RETURNING *`,
+    params
+  );
+  return result.rows[0] || undefined;
 }
 
-export function cancelSubscription(id: string, immediate: boolean = false): Subscription | undefined {
-  const sub = subscriptions.get(id);
-  if (!sub) return undefined;
-
+export async function cancelSubscription(id: string, immediate: boolean = false): Promise<Subscription | undefined> {
   if (immediate) {
-    sub.status = 'canceled';
+    const result = await query(
+      `UPDATE subscriptions SET status = 'canceled', updated_at = NOW() WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    return result.rows[0] || undefined;
   } else {
-    sub.cancelAtPeriodEnd = true;
-  }
-  sub.updatedAt = new Date();
-
-  return sub;
-}
-
-export function listSubscriptions(): Subscription[] {
-  return Array.from(subscriptions.values());
-}
-
-export function updateSubscriptionStatus(id: string, status: SubscriptionStatus): void {
-  const sub = subscriptions.get(id);
-  if (sub) {
-    sub.status = status;
-    sub.updatedAt = new Date();
+    const result = await query(
+      `UPDATE subscriptions SET cancel_at_period_end = TRUE, updated_at = NOW() WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    return result.rows[0] || undefined;
   }
 }
 
-export function syncFromStripe(
+export async function listSubscriptions(): Promise<Subscription[]> {
+  const result = await query('SELECT * FROM subscriptions ORDER BY created_at DESC');
+  return result.rows;
+}
+
+export async function updateSubscriptionStatus(id: string, status: SubscriptionStatus): Promise<void> {
+  await query(
+    'UPDATE subscriptions SET status = $2, updated_at = NOW() WHERE id = $1',
+    [id, status]
+  );
+}
+
+export async function syncFromStripe(
   stripeSubscriptionId: string,
   status: SubscriptionStatus,
   currentPeriodStart: Date,
   currentPeriodEnd: Date
-): void {
-  // Find subscription by Stripe ID
-  for (const sub of subscriptions.values()) {
-    if (sub.stripeSubscriptionId === stripeSubscriptionId) {
-      sub.status = status;
-      sub.currentPeriodStart = currentPeriodStart;
-      sub.currentPeriodEnd = currentPeriodEnd;
-      sub.updatedAt = new Date();
-      return;
-    }
-  }
+): Promise<void> {
+  await query(
+    `UPDATE subscriptions
+     SET status = $2, current_period_start = $3, current_period_end = $4, updated_at = NOW()
+     WHERE stripe_subscription_id = $1`,
+    [stripeSubscriptionId, status, currentPeriodStart, currentPeriodEnd]
+  );
 }

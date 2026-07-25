@@ -176,7 +176,7 @@ export class PulsynApiClient {
         return undefined as T;
       }
 
-      return await response.json();
+      return await response.json() as T;
     } catch (error) {
       if (error instanceof ApiError) throw error;
       if (error instanceof Error && error.name === 'AbortError') {

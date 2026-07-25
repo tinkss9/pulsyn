@@ -1,131 +1,120 @@
-// Pipeline Routes
+// Pipeline Routes — PostgreSQL backed
 
 import { Router, Request, Response } from 'express';
+import { query } from '../db';
 
 export const pipelineRoutes = Router();
 
-// In-memory store (would be database in production)
-const pipelines: Map<string, any> = new Map();
-
 // List all pipelines
-pipelineRoutes.get('/', (req: Request, res: Response) => {
-  const list = Array.from(pipelines.values());
-  res.json({
-    data: list,
-    total: list.length,
-  });
+pipelineRoutes.get('/', async (req: Request, res: Response) => {
+  const result = await query(
+    'SELECT * FROM pipelines ORDER BY created_at DESC'
+  );
+  res.json({ data: result.rows, total: result.rowCount });
 });
 
 // Get pipeline by ID
-pipelineRoutes.get('/:id', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.get('/:id', async (req: Request, res: Response) => {
+  const result = await query('SELECT * FROM pipelines WHERE id = $1', [req.params.id]);
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-  res.json({ data: pipeline });
+  res.json({ data: result.rows[0] });
 });
 
 // Create pipeline
-pipelineRoutes.post('/', (req: Request, res: Response) => {
-  const { name, source, target, tables } = req.body;
+pipelineRoutes.post('/', async (req: Request, res: Response) => {
+  const { name, source, target, tables, config } = req.body;
+  const id = `pipeline-${Date.now()}`;
 
-  const pipeline = {
-    id: `pipeline-${Date.now()}`,
-    name,
-    source,
-    target,
-    tables,
-    status: 'idle',
-    stats: {
-      rowsRead: 0,
-      rowsWritten: 0,
-      rowsPerSecond: 0,
-      lagMs: 0,
-      errors: 0,
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  const result = await query(
+    `INSERT INTO pipelines (id, name, source, target, tables, config)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING *`,
+    [id, name, JSON.stringify(source), JSON.stringify(target), JSON.stringify(tables || []), JSON.stringify(config || {})]
+  );
 
-  pipelines.set(pipeline.id, pipeline);
-
-  res.status(201).json({ data: pipeline });
+  res.status(201).json({ data: result.rows[0] });
 });
 
 // Update pipeline
-pipelineRoutes.put('/:id', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.put('/:id', async (req: Request, res: Response) => {
+  const { name, source, target, tables, config } = req.body;
+
+  const result = await query(
+    `UPDATE pipelines
+     SET name = COALESCE($2, name),
+         source = COALESCE($3, source),
+         target = COALESCE($4, target),
+         tables = COALESCE($5, tables),
+         config = COALESCE($6, config),
+         updated_at = NOW()
+     WHERE id = $1
+     RETURNING *`,
+    [req.params.id, name, source ? JSON.stringify(source) : null, target ? JSON.stringify(target) : null, tables ? JSON.stringify(tables) : null, config ? JSON.stringify(config) : null]
+  );
+
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-
-  const updated = {
-    ...pipeline,
-    ...req.body,
-    updatedAt: new Date().toISOString(),
-  };
-
-  pipelines.set(req.params.id, updated);
-
-  res.json({ data: updated });
+  res.json({ data: result.rows[0] });
 });
 
 // Delete pipeline
-pipelineRoutes.delete('/:id', (req: Request, res: Response) => {
-  if (!pipelines.has(req.params.id)) {
+pipelineRoutes.delete('/:id', async (req: Request, res: Response) => {
+  const result = await query('DELETE FROM pipelines WHERE id = $1', [req.params.id]);
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-
-  pipelines.delete(req.params.id);
-
   res.status(204).send();
 });
 
 // Start pipeline
-pipelineRoutes.post('/:id/start', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.post('/:id/start', async (req: Request, res: Response) => {
+  const result = await query(
+    `UPDATE pipelines SET status = 'running', started_at = NOW(), updated_at = NOW()
+     WHERE id = $1 RETURNING *`,
+    [req.params.id]
+  );
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-
-  pipeline.status = 'running';
-  pipeline.startedAt = new Date().toISOString();
-
-  res.json({ data: pipeline });
+  res.json({ data: result.rows[0] });
 });
 
 // Stop pipeline
-pipelineRoutes.post('/:id/stop', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.post('/:id/stop', async (req: Request, res: Response) => {
+  const result = await query(
+    `UPDATE pipelines SET status = 'idle', stopped_at = NOW(), updated_at = NOW()
+     WHERE id = $1 RETURNING *`,
+    [req.params.id]
+  );
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-
-  pipeline.status = 'idle';
-  pipeline.stoppedAt = new Date().toISOString();
-
-  res.json({ data: pipeline });
+  res.json({ data: result.rows[0] });
 });
 
 // Pause pipeline
-pipelineRoutes.post('/:id/pause', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.post('/:id/pause', async (req: Request, res: Response) => {
+  const result = await query(
+    `UPDATE pipelines SET status = 'paused', updated_at = NOW()
+     WHERE id = $1 RETURNING *`,
+    [req.params.id]
+  );
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-
-  pipeline.status = 'paused';
-
-  res.json({ data: pipeline });
+  res.json({ data: result.rows[0] });
 });
 
 // Get pipeline metrics
-pipelineRoutes.get('/:id/metrics', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.get('/:id/metrics', async (req: Request, res: Response) => {
+  const result = await query('SELECT id, status, stats FROM pipelines WHERE id = $1', [req.params.id]);
+  if (result.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
-
+  const pipeline = result.rows[0];
   res.json({
     data: {
       pipelineId: pipeline.id,
@@ -137,22 +126,16 @@ pipelineRoutes.get('/:id/metrics', (req: Request, res: Response) => {
 });
 
 // Get pipeline checkpoints
-pipelineRoutes.get('/:id/checkpoints', (req: Request, res: Response) => {
-  const pipeline = pipelines.get(req.params.id);
-  if (!pipeline) {
+pipelineRoutes.get('/:id/checkpoints', async (req: Request, res: Response) => {
+  const pipelineCheck = await query('SELECT id FROM pipelines WHERE id = $1', [req.params.id]);
+  if (pipelineCheck.rowCount === 0) {
     return res.status(404).json({ error: 'Pipeline not found' });
   }
 
-  // Mock checkpoints (would come from checkpoint manager in production)
-  res.json({
-    data: [
-      {
-        id: `checkpoint-${Date.now()}`,
-        pipelineId: pipeline.id,
-        lsn: '0/1234567',
-        timestamp: new Date().toISOString(),
-        tables: {},
-      },
-    ],
-  });
+  const result = await query(
+    'SELECT * FROM checkpoints WHERE pipeline_id = $1 ORDER BY created_at DESC LIMIT 50',
+    [req.params.id]
+  );
+
+  res.json({ data: result.rows });
 });
