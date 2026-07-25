@@ -35,49 +35,50 @@ const FEATURES = [
 
 const PRICING = [
   {
-    name: 'Starter',
-    price: '$99',
-    interval: '/mo',
-    description: 'For freelancers and solopreneurs',
+    name: 'Community',
+    price: '$0',
+    interval: '',
+    description: 'For individual developers',
     features: [
-      '1 pipeline',
-      '100K rows/day',
-      '5 connectors',
-      'Checkpoint recovery',
-      'Email support',
+      '3 connectors',
+      'Core CDC engine',
+      'CLI access',
+      'Self-hosted',
+      'Community support',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Start Free',
     highlighted: false,
   },
   {
-    name: 'Business',
-    price: '$499',
+    name: 'Pro',
+    price: '$300',
     interval: '/mo',
-    description: 'For mid-market teams',
+    description: 'For growing teams',
     features: [
-      '10 pipelines',
-      '1M rows/day',
+      'Unlimited pipelines',
       'All connectors',
+      'Web dashboard',
+      'MCP server (26 tools)',
+      'API access',
       'In-flight masking',
       'Priority support',
-      'MCP integration',
     ],
     cta: 'Start Free Trial',
     highlighted: true,
   },
   {
-    name: 'Enterprise',
-    price: '$2,499',
+    name: 'Business',
+    price: '$2,000',
     interval: '/mo',
-    description: 'For large organizations',
+    description: 'For production workloads',
     features: [
-      'Unlimited pipelines',
-      '100M rows/day',
-      'All connectors',
-      'SSO & audit logs',
+      'Everything in Pro',
       'SLA guarantee',
+      'SSO & RBAC',
+      'Audit logs',
       'Dedicated support',
-      'White-label option',
+      'Custom connectors',
+      'On-premise option',
     ],
     cta: 'Contact Sales',
     highlighted: false,
@@ -201,6 +202,77 @@ export default function LandingPage() {
                 <p className="text-gray-400">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Pulsyn vs Competitors */}
+      <section className="py-24 px-6 bg-gray-900/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why teams choose Pulsyn</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              The CDC market has three problems: complexity, cost, and vendor lock-in. We solve all three.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+              <div className="text-sm font-medium text-red-400 mb-4">vs. Confluent / Debezium</div>
+              <h3 className="text-xl font-semibold mb-4">No Kafka dependency</h3>
+              <p className="text-gray-400 mb-4">
+                Confluent requires running Kafka clusters. Debezium requires Kafka Connect. 
+                Pulsyn runs standalone — no ZooKeeper, no Kafka brokers, no connector framework.
+              </p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> Zero infrastructure overhead
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> Deploy in minutes, not days
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> 10x lower operational cost
+                </li>
+              </ul>
+            </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+              <div className="text-sm font-medium text-yellow-400 mb-4">vs. Fivetran / Airbyte</div>
+              <h3 className="text-xl font-semibold mb-4">True real-time, not batch</h3>
+              <p className="text-gray-400 mb-4">
+                Fivetran syncs every 15 minutes. Airbyte is batch-first. 
+                Pulsyn streams changes in real-time with sub-second latency.
+              </p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> Sub-second latency
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> 75% cheaper at scale
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> API + CLI + MCP (not just UI)
+                </li>
+              </ul>
+            </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+              <div className="text-sm font-medium text-blue-400 mb-4">vs. Everyone</div>
+              <h3 className="text-xl font-semibold mb-4">AI-native from day one</h3>
+              <p className="text-gray-400 mb-4">
+                Pulsyn is the first CDC platform with an MCP server. 
+                Control pipelines from Claude, Cursor, or any AI agent.
+              </p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> 26 MCP tools for AI agents
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> Natural language pipeline management
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span> Built for the agentic future
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

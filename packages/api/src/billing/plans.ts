@@ -8,7 +8,7 @@ export interface Plan {
   price: number; // cents
   currency: string;
   interval: 'month' | 'year';
-  stripePriceId?: string; // Set after Stripe product creation
+  stripePriceId?: string;
   features: PlanFeatures;
   limits: PlanLimits;
   metered: MeteredPricing;
@@ -20,11 +20,13 @@ export interface PlanFeatures {
   maxConnectors: number;
   masking: boolean;
   checkpointRecovery: boolean;
+  mcpServer: boolean;
+  apiAccess: boolean;
+  webDashboard: boolean;
   prioritySupport: boolean;
   sso: boolean;
   auditLogs: boolean;
   sla: boolean;
-  whiteLabel: boolean;
 }
 
 export interface PlanLimits {
@@ -36,135 +38,101 @@ export interface PlanLimits {
 export interface MeteredPricing {
   rowsReplicated: {
     freePerDay: number;
-    perUnit: number; // cents per 100K rows
-    unitSize: number; // 100_000
+    perUnit: number;
+    unitSize: number;
   };
   apiCalls: {
     freePerDay: number;
-    perUnit: number; // cents per 100 calls
-    unitSize: number; // 100
-  };
-  pipelineHours: {
-    freePerMonth: number;
-    perUnit: number; // cents per hour
-  };
-  storage: {
-    freeGb: number;
-    perGbMonth: number; // cents per GB/month
+    perUnit: number;
+    unitSize: number;
   };
 }
 
 export const PLANS: Record<string, Plan> = {
-  starter: {
-    id: 'starter',
-    name: 'Starter',
-    description: 'For freelancers and solopreneurs getting started with CDC',
-    price: 9900, // $99.00
+  community: {
+    id: 'community',
+    name: 'Community',
+    description: 'For individual developers exploring CDC',
+    price: 0,
     currency: 'usd',
     interval: 'month',
     features: {
-      maxPipelines: 1,
-      maxRowsPerDay: 100_000,
-      maxConnectors: 5,
+      maxPipelines: 3,
+      maxRowsPerDay: 50_000,
+      maxConnectors: 3,
       masking: false,
       checkpointRecovery: true,
+      mcpServer: false,
+      apiAccess: false,
+      webDashboard: false,
       prioritySupport: false,
       sso: false,
       auditLogs: false,
       sla: false,
-      whiteLabel: false,
     },
     limits: {
-      apiCallsPerMinute: 60,
-      pipelineHoursPerMonth: 720, // 24/7
-      storageGb: 10,
+      apiCallsPerMinute: 30,
+      pipelineHoursPerMonth: 720,
+      storageGb: 1,
     },
     metered: {
-      rowsReplicated: {
-        freePerDay: 10_000,
-        perUnit: 50, // $0.50 per 100K rows
-        unitSize: 100_000,
-      },
-      apiCalls: {
-        freePerDay: 1_000,
-        perUnit: 1, // $0.01 per 100 calls
-        unitSize: 100,
-      },
-      pipelineHours: {
-        freePerMonth: 10,
-        perUnit: 10, // $0.10 per hour
-      },
-      storage: {
-        freeGb: 1,
-        perGbMonth: 50, // $0.50 per GB/month
-      },
+      rowsReplicated: { freePerDay: 10_000, perUnit: 100, unitSize: 100_000 },
+      apiCalls: { freePerDay: 500, perUnit: 2, unitSize: 100 },
+    },
+  },
+
+  pro: {
+    id: 'pro',
+    name: 'Pro',
+    description: 'For growing teams running production pipelines',
+    price: 30000, // $300/mo
+    currency: 'usd',
+    interval: 'month',
+    features: {
+      maxPipelines: 999, // unlimited
+      maxRowsPerDay: 5_000_000,
+      maxConnectors: 999, // all
+      masking: true,
+      checkpointRecovery: true,
+      mcpServer: true,
+      apiAccess: true,
+      webDashboard: true,
+      prioritySupport: true,
+      sso: false,
+      auditLogs: false,
+      sla: false,
+    },
+    limits: {
+      apiCallsPerMinute: 600,
+      pipelineHoursPerMonth: 7200,
+      storageGb: 100,
+    },
+    metered: {
+      rowsReplicated: { freePerDay: 500_000, perUnit: 30, unitSize: 100_000 },
+      apiCalls: { freePerDay: 10_000, perUnit: 1, unitSize: 100 },
     },
   },
 
   business: {
     id: 'business',
     name: 'Business',
-    description: 'For mid-market teams running production CDC pipelines',
-    price: 49900, // $499.00
+    description: 'For production workloads with SLA requirements',
+    price: 200000, // $2,000/mo
     currency: 'usd',
     interval: 'month',
     features: {
-      maxPipelines: 10,
-      maxRowsPerDay: 1_000_000,
-      maxConnectors: 999, // all connectors
-      masking: true,
-      checkpointRecovery: true,
-      prioritySupport: true,
-      sso: false,
-      auditLogs: false,
-      sla: false,
-      whiteLabel: false,
-    },
-    limits: {
-      apiCallsPerMinute: 600,
-      pipelineHoursPerMonth: 7200, // 10 pipelines 24/7
-      storageGb: 100,
-    },
-    metered: {
-      rowsReplicated: {
-        freePerDay: 100_000,
-        perUnit: 30, // $0.30 per 100K rows
-        unitSize: 100_000,
-      },
-      apiCalls: {
-        freePerDay: 10_000,
-        perUnit: 1, // $0.01 per 100 calls
-        unitSize: 100,
-      },
-      pipelineHours: {
-        freePerMonth: 100,
-        perUnit: 5, // $0.05 per hour
-      },
-      storage: {
-        freeGb: 10,
-        perGbMonth: 30, // $0.30 per GB/month
-      },
-    },
-  },
-
-  enterprise: {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'For large organizations with SLA, SSO, and unlimited scale',
-    price: 249900, // $2,499.00
-    currency: 'usd',
-    interval: 'month',
-    features: {
-      maxPipelines: 999, // unlimited
+      maxPipelines: 999,
       maxRowsPerDay: 100_000_000,
       maxConnectors: 999,
       masking: true,
       checkpointRecovery: true,
+      mcpServer: true,
+      apiAccess: true,
+      webDashboard: true,
       prioritySupport: true,
       sso: true,
       auditLogs: true,
       sla: true,
-      whiteLabel: false,
     },
     limits: {
       apiCallsPerMinute: 6000,
@@ -172,24 +140,40 @@ export const PLANS: Record<string, Plan> = {
       storageGb: 1000,
     },
     metered: {
-      rowsReplicated: {
-        freePerDay: 10_000_000,
-        perUnit: 20, // $0.20 per 100K rows
-        unitSize: 100_000,
-      },
-      apiCalls: {
-        freePerDay: 100_000,
-        perUnit: 1,
-        unitSize: 100,
-      },
-      pipelineHours: {
-        freePerMonth: 1000,
-        perUnit: 3, // $0.03 per hour
-      },
-      storage: {
-        freeGb: 100,
-        perGbMonth: 20, // $0.20 per GB/month
-      },
+      rowsReplicated: { freePerDay: 10_000_000, perUnit: 15, unitSize: 100_000 },
+      apiCalls: { freePerDay: 100_000, perUnit: 0.5, unitSize: 100 },
+    },
+  },
+
+  enterprise: {
+    id: 'enterprise',
+    name: 'Enterprise',
+    description: 'Custom pricing for large organizations',
+    price: 0, // Custom — contact sales
+    currency: 'usd',
+    interval: 'month',
+    features: {
+      maxPipelines: 999,
+      maxRowsPerDay: 999_999_999,
+      maxConnectors: 999,
+      masking: true,
+      checkpointRecovery: true,
+      mcpServer: true,
+      apiAccess: true,
+      webDashboard: true,
+      prioritySupport: true,
+      sso: true,
+      auditLogs: true,
+      sla: true,
+    },
+    limits: {
+      apiCallsPerMinute: 60000,
+      pipelineHoursPerMonth: 720000,
+      storageGb: 10000,
+    },
+    metered: {
+      rowsReplicated: { freePerDay: 100_000_000, perUnit: 5, unitSize: 100_000 },
+      apiCalls: { freePerDay: 1_000_000, perUnit: 0.1, unitSize: 100 },
     },
   },
 };
@@ -203,5 +187,6 @@ export function listPlans(): Plan[] {
 }
 
 export function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
+  if (cents === 0) return 'Free';
+  return `$${(cents / 100).toLocaleString()}`;
 }
