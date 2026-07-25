@@ -6,6 +6,11 @@
     { "src": "/api/pipelines", "dest": "/api/pipelines.ts" },
     { "src": "/api/connectors", "dest": "/api/connectors.ts" },
     { "src": "/api/billing/plans", "dest": "/api/plans.ts" },
+    { "src": "/api/cdc/start", "dest": "/api/cdc/start.ts" },
+    { "src": "/api/cdc/stop", "dest": "/api/cdc/stop.ts" },
+    { "src": "/api/cdc/status/(.*)", "dest": "/api/cdc/[pipelineId].ts" },
+    { "src": "/api/cdc/engines", "dest": "/api/cdc/engines.ts" },
+    { "src": "/api/cdc/events", "dest": "/api/cdc/events.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1.ts" }
   ]
 }
