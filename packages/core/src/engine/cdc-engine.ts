@@ -1,9 +1,10 @@
 // CDC Engine
-// Orchestrates change data capture from source to target
+// Orchestrates change data capture from source to target with REAL replication
 
 import { EventEmitter } from 'events';
 import { Connector, CDCEvent } from '../types';
 import { CheckpointManager } from '../checkpoint/checkpoint-manager';
+import { Pool } from 'pg';
 
 export interface CDCEngineConfig {
   batchSize: number;
@@ -16,6 +17,7 @@ export interface CDCEngineConfig {
 export class CDCEngine extends EventEmitter {
   private source: Connector | null = null;
   private target: Connector | null = null;
+  private targetPool: Pool | null = null;
   private checkpointManager: CheckpointManager;
   private config: CDCEngineConfig;
   private running: boolean = false;
@@ -27,6 +29,9 @@ export class CDCEngine extends EventEmitter {
     batchesCommitted: 0,
     errors: 0,
     lastEventTime: null as Date | null,
+    rowsInserted: 0,
+    rowsUpdated: 0,
+    rowsDeleted: 0,
   };
 
   constructor(config: Partial<CDCEngineConfig> = {}) {
@@ -49,6 +54,11 @@ export class CDCEngine extends EventEmitter {
     this.target = connector;
   }
 
+  // Set target database pool directly for replication
+  setTargetPool(pool: Pool): void {
+    this.targetPool = pool;
+  }
+
   async start(): Promise<void> {
     if (!this.source || !this.target) {
       throw new Error('Source and target connectors must be set');
@@ -61,6 +71,19 @@ export class CDCEngine extends EventEmitter {
     // Connect to source and target
     await this.source.connect(this.source.config || ({} as any));
     await this.target.connect(this.target.config || ({} as any));
+
+    // Set up target pool for direct writes
+    if (this.target.config) {
+      this.targetPool = new Pool({
+        host: this.target.config.host,
+        port: this.target.config.port,
+        database: this.target.config.database,
+        user: this.target.config.user,
+        password: this.target.config.password,
+        ssl: this.target.config.ssl ? { rejectUnauthorized: false } : false,
+        max: 10,
+      });
+    }
 
     this.running = true;
     this.emit('started');
@@ -94,7 +117,6 @@ export class CDCEngine extends EventEmitter {
 
     this.running = false;
 
-    // Clear timers
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
       this.flushTimer = null;
@@ -104,24 +126,13 @@ export class CDCEngine extends EventEmitter {
       this.checkpointTimer = null;
     }
 
-    // Flush remaining batch
     await this.flushBatch();
-
-    // Stop CDC
-    if (this.source) {
-      await this.source.stopCDC();
-    }
-
-    // Save final checkpoint
     await this.saveCheckpoint();
 
-    // Disconnect
-    if (this.source) {
-      await this.source.disconnect();
-    }
-    if (this.target) {
-      await this.target.disconnect();
-    }
+    if (this.source) await this.source.stopCDC();
+    if (this.targetPool) await this.targetPool.end();
+    if (this.source) await this.source.disconnect();
+    if (this.target) await this.target.disconnect();
 
     this.emit('stopped');
   }
@@ -173,14 +184,19 @@ export class CDCEngine extends EventEmitter {
           this.emit('batch:failed', { error, batch });
           throw error;
         }
-        // Exponential backoff
         await this.sleep(Math.pow(2, retries) * 100);
       }
     }
   }
 
   private async writeBatch(batch: CDCEvent[]): Promise<void> {
-    if (!this.target) throw new Error('Target connector not set');
+    if (!this.targetPool) {
+      // Fallback to event emission if no target pool
+      for (const event of batch) {
+        this.emit('batch:write', { table: event.table, event });
+      }
+      return;
+    }
 
     // Group events by table for efficient writes
     const eventsByTable = new Map<string, CDCEvent[]>();
@@ -190,33 +206,116 @@ export class CDCEngine extends EventEmitter {
       eventsByTable.set(event.table, tableEvents);
     }
 
-    // Apply events to target
-    for (const [table, events] of eventsByTable) {
-      for (const event of events) {
-        await this.applyEvent(table, event);
+    // Apply events to target database
+    const client = await this.targetPool.connect();
+    try {
+      await client.query('BEGIN');
+
+      for (const [table, events] of eventsByTable) {
+        for (const event of events) {
+          await this.applyEvent(client, table, event);
+        }
       }
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
   }
 
-  private async applyEvent(table: string, event: CDCEvent): Promise<void> {
-    // This is where we'd apply the change to the target database
-    // For now, emit the event for listeners to handle
-    this.emit('batch:write', { table, event });
+  private async applyEvent(client: any, table: string, event: CDCEvent): Promise<void> {
+    const data = event.data;
+    const oldData = event.oldData;
 
-    // In a real implementation, this would:
-    // 1. For INSERT: INSERT INTO target_table VALUES (...)
-    // 2. For UPDATE: UPDATE target_table SET ... WHERE pk = ...
-    // 3. For DELETE: DELETE FROM target_table WHERE pk = ...
+    switch (event.operation) {
+      case 'INSERT': {
+        const columns = Object.keys(data);
+        const values = Object.values(data);
+        const placeholders = columns.map((_, i) => `$${i + 1}`);
+
+        const sql = `INSERT INTO "${table}" (${columns.map(c => `"${c}"`).join(', ')})
+                     VALUES (${placeholders.join(', ')})
+                     ON CONFLICT DO NOTHING`;
+
+        await client.query(sql, values);
+        this.stats.rowsInserted++;
+        break;
+      }
+
+      case 'UPDATE': {
+        if (!oldData) {
+          // If no old data, try INSERT instead
+          const columns = Object.keys(data);
+          const values = Object.values(data);
+          const placeholders = columns.map((_, i) => `$${i + 1}`);
+
+          const sql = `INSERT INTO "${table}" (${columns.map(c => `"${c}"`).join(', ')})
+                       VALUES (${placeholders.join(', ')})
+                       ON CONFLICT DO NOTHING`;
+
+          await client.query(sql, values);
+          this.stats.rowsInserted++;
+          break;
+        }
+
+        // Find primary key columns (assume 'id' exists, or use all old data keys)
+        const pkColumns = Object.keys(oldData).filter(k =>
+          k === 'id' || k.endsWith('_id') || k === 'pk'
+        );
+        const pkKeys = pkColumns.length > 0 ? pkColumns : Object.keys(oldData);
+
+        // Build SET clause
+        const setColumns = Object.keys(data).filter(k => !pkKeys.includes(k));
+        const setClauses = setColumns.map((col, i) => `"${col}" = $${i + 1}`);
+        const setValues = setColumns.map(col => data[col]);
+
+        // Build WHERE clause
+        const whereClauses = pkKeys.map((col, i) => `"${col}" = $${setColumns.length + i + 1}`);
+        const whereValues = pkKeys.map(col => oldData[col]);
+
+        const sql = `UPDATE "${table}"
+                     SET ${setClauses.join(', ')}
+                     WHERE ${whereClauses.join(' AND ')}`;
+
+        await client.query(sql, [...setValues, ...whereValues]);
+        this.stats.rowsUpdated++;
+        break;
+      }
+
+      case 'DELETE': {
+        const deleteData = oldData || data;
+
+        // Find primary key columns
+        const delPkColumns = Object.keys(deleteData).filter(k =>
+          k === 'id' || k.endsWith('_id') || k === 'pk'
+        );
+        const delPkKeys = delPkColumns.length > 0 ? delPkColumns : Object.keys(deleteData);
+
+        const delWhereClauses = delPkKeys.map((col, i) => `"${col}" = $${i + 1}`);
+        const delWhereValues = delPkKeys.map(col => deleteData[col]);
+
+        const sql = `DELETE FROM "${table}"
+                     WHERE ${delWhereClauses.join(' AND ')}`;
+
+        await client.query(sql, delWhereValues);
+        this.stats.rowsDeleted++;
+        break;
+      }
+    }
+
+    this.emit('event:applied', { table, operation: event.operation });
   }
 
   private async saveCheckpoint(): Promise<void> {
     try {
-      const lastEvent = this.stats.lastEventTime;
       await this.checkpointManager.saveCheckpoint({
         id: `checkpoint-${Date.now()}`,
         pipelineId: 'current',
         lsn: this.stats.eventsProcessed.toString(),
-        timestamp: lastEvent || new Date(),
+        timestamp: this.stats.lastEventTime || new Date(),
         tables: {},
       });
       this.emit('checkpoint:saved');
@@ -237,6 +336,9 @@ export class CDCEngine extends EventEmitter {
       batchesCommitted: this.stats.batchesCommitted,
       errors: this.stats.errors,
       lastEventTime: this.stats.lastEventTime,
+      rowsInserted: this.stats.rowsInserted,
+      rowsUpdated: this.stats.rowsUpdated,
+      rowsDeleted: this.stats.rowsDeleted,
       config: this.config,
     };
   }

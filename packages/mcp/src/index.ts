@@ -386,6 +386,60 @@ const TOOLS = [
       properties: {},
     },
   },
+  // CDC tools
+  {
+    name: 'pulsyn.cdc.start',
+    description: 'Start CDC (Change Data Capture) engine for a pipeline — begins real-time replication',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        pipelineId: { type: 'string', description: 'Pipeline ID to start CDC on' },
+      },
+      required: ['pipelineId'],
+    },
+  },
+  {
+    name: 'pulsyn.cdc.stop',
+    description: 'Stop CDC engine for a pipeline',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        pipelineId: { type: 'string', description: 'Pipeline ID to stop CDC on' },
+      },
+      required: ['pipelineId'],
+    },
+  },
+  {
+    name: 'pulsyn.cdc.status',
+    description: 'Get CDC engine status, stats, and pending changes for a pipeline',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        pipelineId: { type: 'string', description: 'Pipeline ID' },
+      },
+      required: ['pipelineId'],
+    },
+  },
+  {
+    name: 'pulsyn.cdc.engines',
+    description: 'List all active CDC engines across all pipelines',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
+  {
+    name: 'pulsyn.cdc.events',
+    description: 'Get recent CDC events (INSERT/UPDATE/DELETE) for a pipeline',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        pipelineId: { type: 'string', description: 'Pipeline ID' },
+        limit: { type: 'number', description: 'Max events to return', default: 100 },
+      },
+      required: ['pipelineId'],
+    },
+  },
 ];
 
 // Helper to format success responses
@@ -657,6 +711,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'pulsyn.benchmark.suites': {
         const res = await billingRequest('GET', '/api/benchmarks/suites');
+        return successResponse(res?.data || res);
+      }
+
+      // CDC tools
+      case 'pulsyn.cdc.start': {
+        const res = await billingRequest('POST', '/api/cdc/start', {
+          pipelineId: args?.pipelineId,
+        });
+        return successResponse(res?.data || res);
+      }
+
+      case 'pulsyn.cdc.stop': {
+        const res = await billingRequest('POST', '/api/cdc/stop', {
+          pipelineId: args?.pipelineId,
+        });
+        return successResponse(res?.data || res);
+      }
+
+      case 'pulsyn.cdc.status': {
+        const res = await billingRequest('GET', `/api/cdc/status/${args?.pipelineId}`);
+        return successResponse(res?.data || res);
+      }
+
+      case 'pulsyn.cdc.engines': {
+        const res = await billingRequest('GET', '/api/cdc/engines');
+        return successResponse(res?.data || res);
+      }
+
+      case 'pulsyn.cdc.events': {
+        const limit = args?.limit || 100;
+        const res = await billingRequest('GET', `/api/cdc/events/${args?.pipelineId}?limit=${limit}`);
         return successResponse(res?.data || res);
       }
 
