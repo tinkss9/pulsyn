@@ -1,33 +1,32 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { query } from './_db';
 
-// In-memory store (resets between cold starts in serverless)
-const pipelines: Map<string, any> = new Map();
-
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
 
-  switch (method) {
-    case 'GET': {
-      const list = Array.from(pipelines.values());
-      return res.json({ data: list, total: list.length });
+  try {
+    switch (method) {
+      case 'GET': {
+        const result = await query('SELECT * FROM pipelines ORDER BY created_at DESC');
+        return res.json({ data: result.rows, total: result.rowCount });
+      }
+      case 'POST': {
+        const { name, source, target, tables, config } = req.body;
+        const id = `pipeline-${Date.now()}`;
+
+        const result = await query(
+          `INSERT INTO pipelines (id, name, source, target, tables, config)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING *`,
+          [id, name, JSON.stringify(source), JSON.stringify(target), JSON.stringify(tables || []), JSON.stringify(config || {})]
+        );
+
+        return res.status(201).json({ data: result.rows[0] });
+      }
+      default:
+        return res.status(405).json({ error: 'Method not allowed' });
     }
-    case 'POST': {
-      const { name, source, target, tables } = req.body;
-      const pipeline = {
-        id: `pipeline-${Date.now()}`,
-        name,
-        source,
-        target,
-        tables,
-        status: 'idle',
-        stats: { rowsRead: 0, rowsWritten: 0, rowsPerSecond: 0, lagMs: 0, errors: 0 },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      pipelines.set(pipeline.id, pipeline);
-      return res.status(201).json({ data: pipeline });
-    }
-    default:
-      return res.status(405).json({ error: 'Method not allowed' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
   }
 }
