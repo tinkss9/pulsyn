@@ -11,6 +11,7 @@
     { "src": "/api/cdc/status/(.*)", "dest": "/api/cdc/[pipelineId].ts" },
     { "src": "/api/cdc/engines", "dest": "/api/cdc/engines.ts" },
     { "src": "/api/cdc/events", "dest": "/api/cdc/events.ts" },
+    { "src": "/api/cdc/replicate", "dest": "/api/cdc/replicate.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1.ts" }
   ]
 }
