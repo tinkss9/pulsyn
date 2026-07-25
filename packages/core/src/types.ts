@@ -100,11 +100,11 @@ export interface TableCheckpoint {
 export interface CDCEvent {
   id: string;
   timestamp: Date;
-  operation: 'insert' | 'update' | 'delete';
+  operation: 'INSERT' | 'UPDATE' | 'DELETE';
   table: string;
-  schema: string;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
+  schema?: string;
+  data: Record<string, unknown>;
+  oldData?: Record<string, unknown>;
   lsn: string;
 }
 

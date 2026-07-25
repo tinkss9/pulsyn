@@ -11,6 +11,7 @@ import { healthRoutes } from './routes/health';
 import { billingRoutes } from './routes/billing';
 import { webhookRoutes } from './routes/webhooks';
 import { benchmarkRoutes } from './routes/benchmarks';
+import { cdcRoutes } from './routes/cdc';
 import { openApiSpec } from './openapi';
 import { initDatabase } from './db';
 
@@ -32,6 +33,7 @@ app.use('/api/connectors', connectorRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/benchmarks', benchmarkRoutes);
+app.use('/api/cdc', cdcRoutes);
 
 // OpenAPI spec as JSON
 app.get('/api/openapi.json', (req, res) => {
