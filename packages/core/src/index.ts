@@ -101,6 +101,20 @@ export { DatadogConnector } from './connectors/datadog';
 export { PagerDutyConnector } from './connectors/pagerduty';
 export { ChargebeeConnector } from './connectors/chargebee';
 export { WebflowConnector } from './connectors/webflow';
+export { MicrosoftTeamsConnector } from './connectors/microsoft-teams';
+export { GoogleDriveConnector } from './connectors/google-drive';
+export { OneDriveConnector } from './connectors/onedrive';
+export { VercelConnector } from './connectors/vercel';
+export { NetlifyConnector } from './connectors/netlify';
+export { WordPressConnector } from './connectors/wordpress';
+export { RetoolConnector } from './connectors/retool';
+export { MetabaseConnector } from './connectors/metabase';
+export { CircleConnector } from './connectors/circle';
+export { SquarespaceConnector } from './connectors/squarespace';
+export { NewRelicConnector } from './connectors/newrelic';
+export { GrafanaConnector } from './connectors/grafana';
+export { CirclePaymentsConnector } from './connectors/circle-payments';
+export { LoomConnector } from './connectors/loom';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Connectors — Target
