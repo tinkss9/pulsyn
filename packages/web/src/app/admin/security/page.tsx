@@ -453,13 +453,93 @@ export default function SecurityDashboard() {
 
             {/* Blocked IPs Tab */}
             {activeTab === 'blocked' && (
-              <div className="space-y-4">
+              <div className="space-y-6">
+                {/* Manual Block Form */}
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <h2 className="text-lg font-semibold mb-4">Block IP Address</h2>
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const ip = (form.elements.namedItem('blockIp') as HTMLInputElement).value;
+                    const reason = (form.elements.namedItem('blockReason') as HTMLInputElement).value;
+                    const duration = parseInt((form.elements.namedItem('blockDuration') as HTMLInputElement).value) || 24;
+
+                    if (!ip) return;
+
+                    await fetch(`${API_URL}/api/blocked`, {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ ip, reason: reason || 'Manual block', durationHours: duration }),
+                    });
+                    form.reset();
+                    loadData();
+                  }} className="flex gap-4 items-end">
+                    <div className="flex-1">
+                      <label className="text-sm text-gray-400 mb-1 block">IP Address</label>
+                      <input
+                        name="blockIp"
+                        type="text"
+                        placeholder="192.168.1.1"
+                        required
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-sm text-gray-400 mb-1 block">Reason</label>
+                      <input
+                        name="blockReason"
+                        type="text"
+                        placeholder="Suspicious activity"
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+                    <div className="w-32">
+                      <label className="text-sm text-gray-400 mb-1 block">Hours</label>
+                      <input
+                        name="blockDuration"
+                        type="number"
+                        defaultValue={24}
+                        min={1}
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Block
+                    </button>
+                  </form>
+                </div>
+
+                {/* Blocked IPs List */}
                 {blockedIps.length === 0 ? (
                   <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8 text-center text-gray-400">
                     No blocked IPs
                   </div>
                 ) : (
                   <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+                      <h2 className="text-lg font-semibold">Blocked IPs ({blockedIps.length})</h2>
+                      <button
+                        onClick={async () => {
+                          if (!confirm('Unblock ALL IPs?')) return;
+                          for (const ip of blockedIps) {
+                            await fetch(`${API_URL}/api/blocked?ip=${encodeURIComponent(ip.ip_address)}`, {
+                              method: 'DELETE',
+                              headers: { Authorization: `Bearer ${apiKey}` },
+                            });
+                          }
+                          loadData();
+                        }}
+                        className="text-yellow-400 hover:text-yellow-300 text-sm"
+                      >
+                        Unblock All
+                      </button>
+                    </div>
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-gray-800">
@@ -474,7 +554,7 @@ export default function SecurityDashboard() {
                       </thead>
                       <tbody>
                         {blockedIps.map((ip) => (
-                          <tr key={ip.id} className="border-b border-gray-800/50">
+                          <tr key={ip.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
                             <td className="py-3 px-4 font-mono text-sm">{ip.ip_address}</td>
                             <td className="py-3 px-4 text-sm text-gray-300">{ip.reason}</td>
                             <td className="py-3 px-4 text-sm">{ip.failure_count}</td>
@@ -485,16 +565,23 @@ export default function SecurityDashboard() {
                               {ip.expires_at ? new Date(ip.expires_at).toLocaleString() : 'Never'}
                             </td>
                             <td className="py-3 px-4">
-                              <span className={`text-sm ${
-                                ip.status === 'active' ? 'text-red-400' : 'text-gray-400'
+                              <span className={`text-sm px-2 py-1 rounded ${
+                                ip.status === 'active' ? 'bg-red-900/50 text-red-400' : 'bg-gray-800 text-gray-400'
                               }`}>
                                 {ip.status}
                               </span>
                             </td>
                             <td className="py-3 px-4">
                               <button
-                                onClick={() => unblockIp(ip.ip_address)}
-                                className="text-green-400 hover:text-green-300 text-sm"
+                                onClick={async () => {
+                                  if (!confirm(`Unblock ${ip.ip_address}?`)) return;
+                                  await fetch(`${API_URL}/api/blocked?ip=${encodeURIComponent(ip.ip_address)}`, {
+                                    method: 'DELETE',
+                                    headers: { Authorization: `Bearer ${apiKey}` },
+                                  });
+                                  loadData();
+                                }}
+                                className="bg-green-900/50 hover:bg-green-900 border border-green-800 text-green-400 px-3 py-1 rounded text-sm transition-colors"
                               >
                                 Unblock
                               </button>
