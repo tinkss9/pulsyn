@@ -46,6 +46,14 @@ export { RedisConnector } from './connectors/redis';
 export { DynamoDBConnector } from './connectors/dynamodb';
 export { KafkaConnector } from './connectors/kafka';
 export { ElasticsearchConnector } from './connectors/elasticsearch';
+export { MariaDBConnector } from './connectors/mariadb';
+export { SupabaseConnector } from './connectors/supabase';
+export { RedshiftConnector } from './connectors/redshift';
+export { CassandraConnector } from './connectors/cassandra';
+export { ClickHouseConnector } from './connectors/clickhouse';
+export { DatabricksConnector } from './connectors/databricks';
+export { SAPConnector } from './connectors/sap';
+export { XeroConnector } from './connectors/xero';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Connectors — Target

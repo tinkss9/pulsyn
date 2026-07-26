@@ -5,6 +5,7 @@
     "rootDir": "src",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "noImplicitAny": false,
     "skipLibCheck": true
   },
   "include": ["src/**/*"],
