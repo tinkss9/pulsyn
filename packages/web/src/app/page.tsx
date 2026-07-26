@@ -151,26 +151,30 @@ export default function LandingPage() {
 
       {/* Hero — Globe is fixed background, text floats on top */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.12),transparent_60%)]" />
-        {/* Subtle overlay for text readability — not too dark */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/60 via-transparent to-[#0a0a0f]/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_50%)]" />
+        {/* Dark vignette — suppresses globe behind text */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,8,12,0.7) 0%, rgba(8,8,12,0.3) 50%, transparent 100%)'
+        }} />
+        {/* Top and bottom fade */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/80 via-transparent to-[#0a0a0f]/80 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 mb-8">
+          <div className="inline-flex items-center gap-2 bg-cyan-950/60 border border-cyan-800/50 rounded-full px-4 py-1.5 mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span className="text-cyan-300 text-sm">763 connectors — most in the industry</span>
+            <span className="text-cyan-200 text-sm font-medium">763 connectors — most in the industry</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 40px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.5)' }}>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 60px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.4)' }}>
             <span className="text-white">Real-time data.</span>
             <br />
-            <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.5))' }}>Zero latency.</span>
+            <span className="text-white" style={{ textShadow: '0 0 40px rgba(6,182,212,0.4), 0 2px 8px rgba(0,0,0,0.8)' }}>Zero latency.</span>
           </h1>
 
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
             763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
           </p>
 
@@ -183,7 +187,7 @@ export default function LandingPage() {
             </a>
           </div>
 
-          <p className="text-gray-600 text-sm">No credit card · Free forever · 763 connectors</p>
+          <p className="text-gray-400 text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>No credit card · Free forever · 763 connectors</p>
         </div>
       </section>
 
