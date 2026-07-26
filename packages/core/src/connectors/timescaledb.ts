@@ -52,3 +52,5 @@ export class TimescaleDBConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('TimescaleDB CDC uses PostgreSQL logical replication'); }
   async stopCDC(): Promise<void> {}
 }
+
+

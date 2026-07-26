@@ -44,3 +44,5 @@ export class JiraConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Jira CDC requires webhooks — use polling-based extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

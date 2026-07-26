@@ -22,3 +22,5 @@ export class MetabaseConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Metabase CDC not supported'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -63,3 +63,5 @@ export class SalesforceConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Salesforce CDC requires Streaming API / Platform Events — not yet implemented'); }
   async stopCDC(): Promise<void> {}
 }
+
+

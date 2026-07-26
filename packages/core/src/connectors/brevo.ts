@@ -54,3 +54,5 @@ export class BrevoConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Brevo CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

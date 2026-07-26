@@ -54,3 +54,5 @@ export class SingleStoreConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('SingleStore CDC not supported — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

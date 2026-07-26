@@ -22,3 +22,5 @@ export class GrafanaConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Grafana CDC not supported'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -89,3 +89,5 @@ export class MariaDBConnector extends BaseConnector {
     this.pollingTimer = setInterval(poll, 1000);
   }
 }
+
+

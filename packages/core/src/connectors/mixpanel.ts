@@ -60,3 +60,5 @@ export class MixpanelConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Mixpanel CDC not supported — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

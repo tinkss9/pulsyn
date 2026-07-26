@@ -21,3 +21,5 @@ export class MicrosoftTeamsConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Teams CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -50,3 +50,5 @@ export class AirtableConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Airtable CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

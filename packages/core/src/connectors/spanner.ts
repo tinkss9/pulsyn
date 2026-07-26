@@ -61,3 +61,5 @@ export class SpannerConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Spanner CDC requires Change Streams — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

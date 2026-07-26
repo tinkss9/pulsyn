@@ -53,3 +53,5 @@ export class CockroachDBConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('CockroachDB CDC uses changefeeds — not yet implemented'); }
   async stopCDC(): Promise<void> {}
 }
+
+

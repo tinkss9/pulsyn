@@ -54,3 +54,5 @@ export class FigmaConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Figma CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -22,3 +22,5 @@ export class WordPressConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('WordPress CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -44,3 +44,5 @@ export class SlackConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Slack CDC requires Socket Mode or Events API — not yet implemented'); }
   async stopCDC(): Promise<void> {}
 }
+
+

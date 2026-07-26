@@ -69,3 +69,5 @@ export class GoogleAnalyticsConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Google Analytics CDC not supported — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

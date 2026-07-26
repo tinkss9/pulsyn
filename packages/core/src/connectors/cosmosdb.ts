@@ -55,3 +55,5 @@ export class CosmosDBConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('CosmosDB CDC requires Change Feed — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

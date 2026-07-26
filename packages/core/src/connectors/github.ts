@@ -90,3 +90,5 @@ export class GitHubConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('GitHub CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

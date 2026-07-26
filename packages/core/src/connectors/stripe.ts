@@ -51,3 +51,5 @@ export class StripeConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Stripe CDC requires webhooks — use polling-based extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

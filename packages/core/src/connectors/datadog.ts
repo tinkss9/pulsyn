@@ -59,3 +59,5 @@ export class DatadogConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Datadog CDC requires event streaming — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

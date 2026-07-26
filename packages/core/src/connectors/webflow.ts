@@ -57,3 +57,5 @@ export class WebflowConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Webflow CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

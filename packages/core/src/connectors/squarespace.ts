@@ -22,3 +22,5 @@ export class SquarespaceConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Squarespace CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
+

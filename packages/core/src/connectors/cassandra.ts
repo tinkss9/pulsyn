@@ -53,3 +53,5 @@ export class CassandraConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Cassandra CDC requires Change Data Capture feature — not yet implemented'); }
   async stopCDC(): Promise<void> {}
 }
+
+

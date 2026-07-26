@@ -22,3 +22,5 @@ export class RetoolConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Retool CDC not supported'); }
   async stopCDC(): Promise<void> {}
 }
+
+

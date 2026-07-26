@@ -39,3 +39,5 @@ export class NetSuiteConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('NetSuite CDC requires SuiteScript or RESTlets — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

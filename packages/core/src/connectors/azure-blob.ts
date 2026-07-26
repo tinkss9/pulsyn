@@ -63,3 +63,5 @@ export class AzureBlobConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Azure Blob CDC requires Event Grid — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

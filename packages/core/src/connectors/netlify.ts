@@ -21,3 +21,5 @@ export class NetlifyConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Netlify CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
+

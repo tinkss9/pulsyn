@@ -60,3 +60,5 @@ export class DuckDBConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('DuckDB CDC not supported — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

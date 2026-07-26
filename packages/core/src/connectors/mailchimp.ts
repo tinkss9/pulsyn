@@ -63,3 +63,5 @@ export class MailchimpConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Mailchimp CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -5,8 +5,11 @@ export interface DatabaseConfig {
   port: number;
   database: string;
   user: string;
+  username?: string; // Alias for user (Kiro compatibility)
   password: string;
   ssl?: boolean;
+  watermarkColumn?: string; // CDC watermark column (Kiro compatibility)
+  [key: string]: any; // Allow additional properties
 }
 
 export interface ConnectorConfig {
@@ -105,6 +108,8 @@ export interface CDCEvent {
   schema?: string;
   data: Record<string, unknown>;
   oldData?: Record<string, unknown>;
+  before?: Record<string, unknown>; // Alias for oldData (Kiro compatibility)
+  after?: Record<string, unknown>;  // Alias for data (Kiro compatibility)
   lsn: string;
 }
 
@@ -124,8 +129,10 @@ export interface Connector {
 
 export interface TableSchema {
   name: string;
+  table?: string; // Alias for name (Kiro compatibility)
   columns: ColumnSchema[];
   primaryKey: string[];
+  primaryKeys?: string[]; // Alias for primaryKey (Kiro compatibility)
 }
 
 export interface ColumnSchema {

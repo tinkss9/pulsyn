@@ -57,3 +57,5 @@ export class ZoomConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Zoom CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

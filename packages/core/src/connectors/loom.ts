@@ -21,3 +21,5 @@ export class LoomConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Loom CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
+

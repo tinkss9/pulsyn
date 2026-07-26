@@ -21,3 +21,5 @@ export class GoogleDriveConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Google Drive CDC requires push notifications'); }
   async stopCDC(): Promise<void> {}
 }
+
+

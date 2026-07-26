@@ -21,3 +21,5 @@ export class CirclePaymentsConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Circle CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
+

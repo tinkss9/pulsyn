@@ -55,3 +55,5 @@ export class KlaviyoConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Klaviyo CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

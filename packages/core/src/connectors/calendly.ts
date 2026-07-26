@@ -55,3 +55,5 @@ export class CalendlyConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Calendly CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

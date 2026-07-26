@@ -91,3 +91,5 @@ export class SupabaseConnector extends BaseConnector {
     this.pollingTimer = setInterval(poll, 1000);
   }
 }
+
+

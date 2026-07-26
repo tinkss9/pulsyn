@@ -64,3 +64,5 @@ export class Neo4jConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Neo4j CDC not supported — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

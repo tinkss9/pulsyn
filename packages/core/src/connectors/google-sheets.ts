@@ -54,3 +54,5 @@ export class GoogleSheetsConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Google Sheets CDC requires polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+

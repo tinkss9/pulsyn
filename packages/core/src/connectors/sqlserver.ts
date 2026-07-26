@@ -129,3 +129,5 @@ export class SQLServerConnector extends BaseConnector {
     this.pollingTimer = setInterval(poll, 1000);
   }
 }
+
+

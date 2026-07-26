@@ -50,3 +50,5 @@ export class DynamoDBConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('DynamoDB CDC requires DynamoDB Streams — not yet implemented'); }
   async stopCDC(): Promise<void> {}
 }
+
+

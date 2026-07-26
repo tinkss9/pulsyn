@@ -75,3 +75,5 @@ export class XeroConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Xero CDC not supported — use polling-based incremental extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

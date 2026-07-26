@@ -23,3 +23,5 @@ export class NewRelicConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('New Relic CDC requires NRQL streaming'); }
   async stopCDC(): Promise<void> {}
 }
+
+

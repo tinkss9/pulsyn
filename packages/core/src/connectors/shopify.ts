@@ -50,3 +50,5 @@ export class ShopifyConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Shopify CDC requires webhooks — use polling-based extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

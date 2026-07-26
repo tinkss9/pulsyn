@@ -64,3 +64,5 @@ export class RedshiftConnector extends BaseConnector {
     return written;
   }
 }
+
+

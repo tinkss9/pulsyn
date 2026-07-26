@@ -59,3 +59,5 @@ export class DatabricksConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Databricks CDC not supported — use incremental extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

@@ -49,3 +49,5 @@ export class HubSpotConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('HubSpot CDC requires webhooks — use polling-based extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

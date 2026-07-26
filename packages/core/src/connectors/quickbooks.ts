@@ -47,3 +47,5 @@ export class QuickBooksConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('QuickBooks CDC requires webhooks — use polling-based extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
+

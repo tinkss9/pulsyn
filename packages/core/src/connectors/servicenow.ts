@@ -56,3 +56,5 @@ export class ServiceNowConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('ServiceNow CDC requires Business Rules or webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
+
