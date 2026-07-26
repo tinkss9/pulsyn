@@ -1,14 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { query, authenticate } from '../_db';
 
-const activeEngines: Map<string, any> = new Map();
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Require authentication
   const authenticated = await authenticate(req, res);
   if (!authenticated) return;
 
@@ -29,20 +26,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       [pipelineId]
     );
 
-    const engineId = `engine-${pipelineId}`;
-    activeEngines.set(engineId, {
-      pipelineId,
-      status: 'running',
-      startedAt: new Date().toISOString(),
-      stats: { eventsProcessed: 0, batchesCommitted: 0, errors: 0 },
-    });
-
     return res.json({
       data: {
-        engineId,
+        engineId: `engine-${pipelineId}`,
         pipelineId,
         status: 'running',
-        message: 'CDC engine started.',
+        message: 'CDC engine started. Changes tracked via database triggers.',
       },
     });
   } catch (err: any) {
