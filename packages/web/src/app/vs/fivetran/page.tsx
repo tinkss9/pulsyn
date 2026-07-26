@@ -108,13 +108,24 @@ export default function FivetranComparison() {
       {/* CTA */}
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to switch from Fivetran?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready for real-time CDC?</h2>
           <p className="text-gray-400 text-lg mb-8">
             Get real-time CDC with sub-second latency at a fraction of the cost.
           </p>
-          <Link href="/signup" className="inline-block bg-pulsyn-600 hover:bg-pulsyn-700 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors">
+          <Link href="/signup" className="inline-block bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors">
             Start Free Trial
           </Link>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="py-8 px-6 border-t border-white/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-gray-600 text-xs">
+            Disclaimer: This comparison is based on publicly available information as of July 2026. 
+            Competitor features and pricing may change. All trademarks are the property of their respective owners. 
+            This page is for informational purposes only and does not constitute an endorsement or guarantee of any product.
+          </p>
         </div>
       </section>
     </main>

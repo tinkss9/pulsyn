@@ -31,15 +31,15 @@ function AIChat() {
       const lower = userMsg.toLowerCase();
 
       if (lower.includes('connector') || lower.includes('how many')) {
-        response = 'Pulsyn has 763 connectors — more than Fivetran (700+), Airbyte (300+), or Estuary (200+). We cover databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, education, government, logistics, travel, and more. 756 are solid implementations with real drivers and API calls (99.1% quality rate).';
+        response = 'Pulsyn has 763 connectors covering databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, education, government, logistics, travel, and more. 756 are solid implementations with real drivers and API calls (99.1% quality rate). We have the most connectors of any CDC platform.';
       } else if (lower.includes('price') || lower.includes('cost') || lower.includes('how much')) {
-        response = 'Pulsyn starts free (3 pipelines, 1K rows/day). Starter is $99/mo, Pro is $499/mo, Business is $1,999/mo, and Enterprise starts at $9,999/mo. We\'re 5x cheaper than Fivetran and 2x cheaper than Airbyte at the Business tier.';
+        response = 'Pulsyn starts free (3 pipelines, 1K rows/day). Starter is $99/mo, Pro is $499/mo, Business is $1,999/mo, and Enterprise starts at $9,999/mo. We offer enterprise-grade features at startup-friendly prices.';
       } else if (lower.includes('fast') || lower.includes('latency') || lower.includes('real-time')) {
-        response = 'Pulsyn delivers <1 second CDC latency — true real-time. Fivetran syncs every 15 minutes, Airbyte is batch-first. Our log-based CDC engine captures changes as they happen, not on a schedule.';
+        response = 'Pulsyn delivers <1 second CDC latency — true real-time. Our log-based CDC engine captures changes as they happen, not on a schedule. Traditional ETL tools sync every 15+ minutes.';
       } else if (lower.includes('setup') || lower.includes('start') || lower.includes('begin')) {
         response = 'Getting started is easy: 1) Sign up free at pulsynai.com/signup, 2) Connect your source (PostgreSQL, MySQL, MongoDB, etc.), 3) Connect your target (Snowflake, BigQuery, etc.), 4) Create a pipeline. Most users are replicating data in under 5 minutes.';
-      } else if (lower.includes('fivetran') || lower.includes('compare') || lower.includes('alternative')) {
-        response = 'Pulsyn vs Fivetran: We have MORE connectors (763 vs 700+), FASTER latency (<1s vs 15 min), CHEAPER pricing ($99-499/mo vs $500-50K/mo), and UNIQUE features like AI schema mapping and MCP protocol integration. Plus we\'re self-hosted.';
+      } else if (lower.includes('compare') || lower.includes('alternative') || lower.includes('vs')) {
+        response = 'We have comparison pages at /vs/fivetran, /vs/airbyte, /vs/confluent, and /vs/debezium. Each shows honest, feature-by-feature comparisons. We also have a market comparison at /docs/MARKET_COMPARISON_FACTUAL_REVIEW.md.';
       } else if (lower.includes('mcp') || lower.includes('ai agent') || lower.includes('claude')) {
         response = 'Pulsyn has 26 MCP tools for AI agent integration. You can control pipelines from Claude, Cursor, or any MCP-compatible agent. Tools include: connect, discover, map, sync, monitor, transform, validate, and certify. First CDC platform with MCP support.';
       } else if (lower.includes('self-host') || lower.includes('on-prem') || lower.includes('deploy')) {
@@ -51,7 +51,7 @@ function AIChat() {
       } else if (lower.includes('test') || lower.includes('demo') || lower.includes('try')) {
         response = 'Try our demo at pulsynai.com/demo — no signup required. We have 5 demo connectors (PostgreSQL, MySQL, Stripe, Shopify, HubSpot) with simulated data. See real-time metrics, data flow, and pipeline health.';
       } else {
-        response = 'I can help with: connector selection, pricing, setup guides, comparisons with Fivetran/Airbyte, AI agent integration (MCP), self-hosted deployment, and specific industry use cases. What would you like to know?';
+        response = 'I can help with: connector selection, pricing, setup guides, AI agent integration (MCP), self-hosted deployment, and specific industry use cases. For competitor comparisons, visit our /vs/ pages. What would you like to know?';
       }
 
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
@@ -231,10 +231,10 @@ export default function LandingPage() {
               <h2 className="text-3xl font-bold mb-6 text-white">Your data is 15 minutes old.<br/><span className="text-gray-500">Your competitors&apos; isn&apos;t.</span></h2>
               <div className="space-y-4">
                 {[
-                  { problem: 'Fivetran syncs every 15 minutes', icon: '⏰' },
-                  { problem: 'Airbyte is batch-first, real-time is an afterthought', icon: '📦' },
-                  { problem: 'Debezium needs Kafka (5+ servers to manage)', icon: '🔥' },
-                  { problem: 'Confluent costs $895/mo minimum', icon: '💰' },
+                  { problem: 'Traditional ETL tools sync every 15+ minutes', icon: '⏰' },
+                  { problem: 'Batch-first architectures can\'t deliver real-time', icon: '📦' },
+                  { problem: 'Self-hosted CDC needs Kafka (5+ servers to manage)', icon: '🔥' },
+                  { problem: 'Enterprise solutions cost $5,000+/month', icon: '💰' },
                 ].map((item) => (
                   <div key={item.problem} className="flex items-center gap-3 bg-red-950/20 border border-red-900/30 rounded-lg px-4 py-3">
                     <span className="text-lg">{item.icon}</span>
@@ -249,7 +249,7 @@ export default function LandingPage() {
                 {[
                   { solution: 'Real-time log-based CDC, sub-second latency', icon: '⚡' },
                   { solution: 'No Kafka dependency — single binary, zero ops', icon: '🎯' },
-                  { solution: '763 connectors, 5x cheaper than Fivetran', icon: '💎' },
+                  { solution: '763 connectors, starting free', icon: '💎' },
                   { solution: 'MCP server for AI agents — first in market', icon: '🤖' },
                 ].map((item) => (
                   <div key={item.solution} className="flex items-center gap-3 bg-green-950/20 border border-green-900/30 rounded-lg px-4 py-3">
@@ -283,7 +283,7 @@ export default function LandingPage() {
               { icon: '☁️', title: 'Deploy Anywhere', desc: 'Self-hosted, managed cloud, or hybrid. Docker or Vercel.' },
               { icon: '📈', title: 'Real-time Monitoring', desc: 'Pipeline health, latency, throughput, errors. Grafana integration.' },
               { icon: '🔄', title: 'Data Mesh', desc: 'Multi-tenant, governance, compliance. Enterprise-grade data mesh.' },
-              { icon: '💰', title: '10x Cheaper', desc: '$99-499/mo vs Fivetran\'s $500-50K/mo. Same features, fraction of the cost.' },
+              { icon: '💰', title: 'Affordable', desc: 'Starting free. Pro at $499/mo. Enterprise-grade features at startup prices.' },
             ].map((f) => (
               <div key={f.title} className="group bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 hover:bg-white/[0.06] hover:border-cyan-500/30 transition-all">
                 <div className="text-2xl mb-3">{f.icon}</div>
