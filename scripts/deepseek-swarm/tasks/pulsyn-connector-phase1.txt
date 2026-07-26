@@ -1,0 +1,147 @@
+# PULSYN CONNECTOR PHASE 1 — Database & Warehouse Expansion
+# Target: 50 new connectors → 166 total
+# Provider: DeepSeek Swarm
+
+## YOUR MISSION
+
+Build 50 database and warehouse connectors for the Pulsyn CDC platform.
+
+## CONNECTORS TO BUILD
+
+### Cloud Databases (20)
+1. planetScale — MySQL-compatible, REST API
+2. neon — PostgreSQL-compatible, REST API
+3. supabase-v2 — REST + PostgreSQL
+4. firebase — REST API (Firestore)
+5. faunadb — GraphQL
+6. couchdb — REST API
+7. scylladb — CQL (cassandra-driver)
+8. tidb — MySQL-compatible
+9. yugabytedb — PostgreSQL-compatible
+10. cockroachdb-serverless — PostgreSQL
+11. materialize — PostgreSQL
+12. starrocks — MySQL
+13. doris — MySQL
+14. vertica — JDBC/REST
+15. teradata — JDBC/REST
+16. netezza — JDBC/REST
+17. greenplum — PostgreSQL
+18. citus — PostgreSQL
+19. timescale-v2 — PostgreSQL
+20. questdb — REST + ILP
+
+### Data Warehouses (15)
+21. snowflake-v2 — snowflake-sdk
+22. bigquery-v2 — google-cloud/bigquery
+23. redshift-v2 — pg
+24. synapse — mssql
+25. firebolt — REST API
+26. duckdb-v2 — duckdb
+27. motherduck — duckdb
+28. databricks-v2 — REST API
+29. databricks-sql — ODBC/REST
+30. panoply — REST API
+31. hevodata — REST API
+32. singer — REST API
+33. airbyte-v2 — REST API
+34. meltano — REST API
+35. stitch — REST API
+
+### Time-Series & Graph (15)
+36. timescale-v3 — pg
+37. questdb-v2 — REST
+38. prometheus — REST API
+39. victoriametrics — REST API
+40. grafana-mimir — REST API
+41. loki — REST API
+42. tempo — REST API
+43. neo4j-v2 — neo4j-driver
+44. arangodb — REST API
+45. dgraph — GraphQL
+46. janusgraph — REST API
+47. nebulagraph — REST API
+48. tigergraph — REST API
+49. memgraph — REST API
+50. orientdb — REST API
+
+## TEMPLATE
+
+Use this template for each connector:
+
+```typescript
+// @ts-nocheck
+import { BaseConnector } from './base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import { UnifiedChangeEvent, createEvent } from '../events';
+import { registerSource } from './registry';
+
+@registerSource('[NAME]')
+export class [NAME]Connector extends BaseConnector {
+  constructor(id: string, name: string, config: DatabaseConfig) {
+    super(id, name, '[name]', config);
+  }
+
+  async connect(config: DatabaseConfig): Promise<void> {
+    // Implementation
+    this.connected = true;
+  }
+
+  async disconnect(): Promise<void> {
+    this.connected = false;
+  }
+
+  async testConnection(): Promise<boolean> {
+    try {
+      // Test connection
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async getTables(): Promise<string[]> {
+    // Return list of tables
+    return [];
+  }
+
+  async getTableSchema(table: string): Promise<TableSchema> {
+    return {
+      name: table,
+      columns: [],
+      primaryKey: []
+    };
+  }
+
+  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+    // Extract data
+    return [];
+  }
+
+  async startCDC(): Promise<void> {
+    throw new Error('CDC not supported — use polling');
+  }
+
+  async stopCDC(): Promise<void> {}
+}
+```
+
+## FILES TO MODIFY
+
+1. Create: `packages/core/src/connectors/[name].ts` for each connector
+2. Update: `packages/core/src/index.ts` — add exports
+3. Run: `npx tsc --skipLibCheck` — verify compilation
+4. Run: `node scripts/certification-report.js` — verify certification
+
+## SUCCESS CRITERIA
+
+- All 50 connectors compile (tsc --skipLibCheck passes)
+- All 50 connectors pass certification (INTEGRATION_READY or CONTRACT_VALIDATED)
+- No NEEDS_WORK connectors
+- Git commit with all changes
+
+## AFTER BUILDING
+
+1. Run certification report
+2. Commit: `git add -A && git commit -m "feat: Phase 1 — 50 database/warehouse connectors"`
+3. Push: `git push origin master`
+4. Report results
