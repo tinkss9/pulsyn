@@ -58,10 +58,11 @@ export default function SignupPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* Logo + Back link */}
         <div className="text-center mb-8">
           <Link href="/"><PulsynLogoFull size={32} /></Link>
           <p className="text-gray-400 mt-2">Create your account</p>
+          <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 mt-2 inline-block">&larr; Back to home</Link>
         </div>
 
         {/* Form */}
