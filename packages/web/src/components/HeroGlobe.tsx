@@ -25,9 +25,9 @@ export default function HeroGlobe() {
 
     const W = () => window.innerWidth;
     const H = () => window.innerHeight;
-    const cx = () => W() / 2;
-    const cy = () => H() / 2;
-    const R = () => Math.min(W(), H()) * 0.28;
+    const cx = () => W() * 0.55; // Slightly right of center for asymmetric feel
+    const cy = () => H() * 0.45; // Slightly above center
+    const R = () => Math.min(W(), H()) * 0.38; // 35% bigger
 
     // === PARTICLES (subtle, calm) ===
     interface Particle {

@@ -140,8 +140,7 @@ export default function LandingPage() {
             <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
             <a href="/demo" className="text-sm text-gray-400 hover:text-white transition-colors">Demo</a>
           </nav>
-          <div className="flex items-center gap-4">
-            <MiniGlobe size={28} />
+          <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">Sign In</Link>
             <Link href="/signup" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all">
               Start Free
@@ -153,6 +152,8 @@ export default function LandingPage() {
       {/* Hero — Globe is fixed background, text floats on top */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden min-h-screen flex items-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_50%)]" />
+        {/* Dark gradient overlay for text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/80 via-[#0a0a0f]/40 to-[#0a0a0f]/80 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 mb-8">
@@ -160,16 +161,16 @@ export default function LandingPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span className="text-cyan-300 text-sm">763 connectors — more than Fivetran</span>
+            <span className="text-cyan-300 text-sm">763 connectors — most in the industry</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 40px rgba(6,182,212,0.25), 0 0 80px rgba(6,182,212,0.1)' }}>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 40px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.5)' }}>
             <span className="text-white">Real-time data.</span>
             <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 20px rgba(6,182,212,0.3))' }}>Zero latency.</span>
+            <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.5))' }}>Zero latency.</span>
           </h1>
 
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-4 leading-relaxed">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
             763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
           </p>
 
