@@ -6,564 +6,195 @@
 <title>Pulsyn — Real-time CDC</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
-    width: 1920px;
-    height: 1080px;
-    background: #0a0a0f;
-    color: #f1f5f9;
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
-    position: relative;
+    width: 1920px; height: 1080px;
+    background: #0a0a0f; color: #f1f5f9;
+    font-family: 'Inter', sans-serif; overflow: hidden;
   }
-
-  /* Scenes */
   .scene {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.8s ease;
-    pointer-events: none;
+    position: absolute; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column;
   }
-  .scene.active { opacity: 1; pointer-events: auto; }
-
-  /* Terminal */
+  .scene.active { display: flex; }
   .terminal {
-    background: #0d1117;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    overflow: hidden;
-    width: 900px;
+    background: #0d1117; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; overflow: hidden; width: 900px;
     box-shadow: 0 20px 80px rgba(0,0,0,0.6);
   }
   .terminal-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; gap: 8px;
   }
-  .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
-  .terminal-dot.r { background: #ef4444; }
-  .terminal-dot.y { background: #eab308; }
-  .terminal-dot.g { background: #22c55e; }
-  .terminal-title {
-    margin-left: 12px;
-    color: #64748b;
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
+  .tdot { width: 12px; height: 12px; border-radius: 50%; }
+  .tdot.r { background: #ef4444; } .tdot.y { background: #eab308; } .tdot.g { background: #22c55e; }
+  .ttitle { margin-left: 12px; color: #64748b; font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  .tbody {
+    padding: 24px; font-family: 'JetBrains Mono', monospace;
+    font-size: 15px; line-height: 1.8; min-height: 400px;
   }
-  .terminal-body {
-    padding: 24px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    line-height: 1.8;
-    min-height: 400px;
+  .p { color: #64748b; } .c { color: #22d3ee; } .s { color: #4ade80; } .v { color: #22d3ee; font-weight: 600; }
+  .st { font-size: 72px; font-weight: 800; color: #ef4444; font-family: 'JetBrains Mono', monospace; }
+  .sl { font-size: 24px; color: #94a3b8; margin-top: 12px; }
+  .s1t { text-align: center; }
+  .s1t h1 { font-size: 56px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+  .s1t h1 .r { color: #ef4444; }
+  .s1t p { font-size: 24px; color: #64748b; }
+  .ais { display: flex; gap: 32px; width: 1400px; }
+  .aic {
+    flex: 1; background: #1e293b; border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 16px; overflow: hidden;
   }
-  .terminal-body .prompt { color: #64748b; }
-  .terminal-body .cmd { color: #22d3ee; }
-  .terminal-body .success { color: #4ade80; }
-  .terminal-body .stat { color: #94a3b8; }
-  .terminal-body .val { color: #22d3ee; font-weight: 600; }
-  .terminal-body .cursor {
-    display: inline-block;
-    width: 10px;
-    height: 20px;
-    background: #22d3ee;
-    animation: blink 1s step-end infinite;
-    vertical-align: text-bottom;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  /* Typing animation */
-  .type-line {
-    opacity: 0;
-    transform: translateY(5px);
-    transition: opacity 0.3s, transform 0.3s;
-  }
-  .type-line.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Scene 1 - Problem */
-  .scene-1 { flex-direction: column; gap: 40px; }
-  .stale-dashboard {
-    background: #1e293b;
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 16px;
-    padding: 40px 60px;
-    text-align: center;
-    box-shadow: 0 0 60px rgba(239,68,68,0.1);
-  }
-  .stale-time {
-    font-size: 72px;
-    font-weight: 800;
-    color: #ef4444;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .stale-label {
-    font-size: 24px;
-    color: #94a3b8;
-    margin-top: 12px;
-  }
-  .warning-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    animation: pulse-warn 2s ease-in-out infinite;
-  }
-  @keyframes pulse-warn {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
-  }
-  .scene-1-text {
-    text-align: center;
-    max-width: 800px;
-  }
-  .scene-1-text h1 {
-    font-size: 56px;
-    font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 16px;
-  }
-  .scene-1-text h1 .red { color: #ef4444; }
-  .scene-1-text p {
-    font-size: 24px;
-    color: #64748b;
-  }
-
-  /* Scene 3 - AI Chat */
-  .ai-split {
-    display: flex;
-    gap: 32px;
-    width: 1400px;
-  }
-  .ai-chat {
-    flex: 1;
-    background: #1e293b;
-    border: 1px solid rgba(139,92,246,0.3);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-  .ai-chat-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .aih {
+    padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; gap: 10px;
     background: rgba(139,92,246,0.1);
   }
-  .ai-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+  .aia {
+    width: 32px; height: 32px; border-radius: 8px;
     background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
   }
-  .ai-chat-body { padding: 20px; }
-  .chat-msg {
-    margin-bottom: 16px;
-    display: flex;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.4s ease;
+  .aib { padding: 20px; }
+  .cm { margin-bottom: 16px; display: flex; }
+  .cm.u { justify-content: flex-end; } .cm.b { justify-content: flex-start; }
+  .cb {
+    max-width: 80%; padding: 12px 16px; border-radius: 12px;
+    font-size: 14px; line-height: 1.6; white-space: pre-line;
   }
-  .chat-msg.visible { opacity: 1; transform: translateY(0); }
-  .chat-msg.user { justify-content: flex-end; }
-  .chat-msg.bot { justify-content: flex-start; }
-  .chat-bubble {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 14px;
-    line-height: 1.6;
+  .cb.u { background: linear-gradient(135deg, #06b6d4, #2563eb); color: white; border-bottom-right-radius: 4px; }
+  .cb.b { background: rgba(255,255,255,0.05); color: #e2e8f0; border-bottom-left-radius: 4px; }
+  .dash {
+    background: #0d1117; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 32px; width: 1400px;
   }
-  .chat-bubble.user {
-    background: linear-gradient(135deg, #06b6d4, #2563eb);
-    color: white;
-    border-bottom-right-radius: 4px;
+  .dh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .dsc { display: flex; gap: 24px; }
+  .dcard {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 20px 28px; text-align: center; min-width: 160px;
   }
-  .chat-bubble.bot {
-    background: rgba(255,255,255,0.05);
-    color: #e2e8f0;
-    border-bottom-left-radius: 4px;
+  .dv { font-size: 36px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .dv.cy { color: #22d3ee; } .dv.gn { color: #4ade80; } .dv.pu { color: #a78bfa; }
+  .dl { font-size: 13px; color: #64748b; margin-top: 4px; }
+  .dp { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px; margin-top: 24px; }
+  .pbar { height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 16px 0; overflow: hidden; }
+  .pfill { height: 100%; background: linear-gradient(90deg, #06b6d4, #2563eb); border-radius: 4px; width: 0; }
+  .comp { display: flex; gap: 60px; align-items: center; }
+  .cc { width: 400px; padding: 48px; border-radius: 20px; text-align: center; }
+  .cc.old { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+  .cc.new { background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.3); }
+  .cn { font-size: 28px; font-weight: 700; margin-bottom: 32px; }
+  .cn.r { color: #ef4444; } .cn.cy { color: #22d3ee; }
+  .cr { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 18px; }
+  .cr .l { color: #94a3b8; } .cr .v { font-weight: 600; }
+  .cr .v.bad { color: #ef4444; } .cr .v.good { color: #4ade80; }
+  .vs { font-size: 48px; font-weight: 900; color: #334155; }
+  .ctext { text-align: center; margin-top: 48px; }
+  .ctext h2 { font-size: 40px; font-weight: 800; }
+  .ctext h2 .cy { color: #22d3ee; }
+  .cgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; max-width: 1000px; }
+  .ci {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 20px; text-align: center; font-size: 14px; font-weight: 500;
   }
-  .ai-terminal {
-    flex: 1;
-  }
-
-  /* Scene 4 - Dashboard */
-  .dashboard {
-    background: #0d1117;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 32px;
-    width: 1400px;
-  }
-  .dash-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .dash-title {
-    font-size: 24px;
-    font-weight: 700;
-  }
-  .dash-stats {
-    display: flex;
-    gap: 24px;
-  }
-  .dash-stat-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 20px 28px;
-    text-align: center;
-    min-width: 160px;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: all 0.4s ease;
-  }
-  .dash-stat-card.visible { opacity: 1; transform: scale(1); }
-  .dash-stat-val {
-    font-size: 36px;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .dash-stat-val.cyan { color: #22d3ee; }
-  .dash-stat-val.green { color: #4ade80; }
-  .dash-stat-val.purple { color: #a78bfa; }
-  .dash-stat-label {
-    font-size: 13px;
-    color: #64748b;
-    margin-top: 4px;
-  }
-  .dash-pipeline {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 24px;
-    margin-top: 24px;
-    opacity: 0;
-    transition: opacity 0.5s;
-  }
-  .dash-pipeline.visible { opacity: 1; }
-  .pipeline-bar {
-    height: 8px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 4px;
-    margin: 16px 0;
-    overflow: hidden;
-  }
-  .pipeline-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #06b6d4, #2563eb);
-    border-radius: 4px;
-    width: 0%;
-    transition: width 2s ease;
-  }
-  .pipeline-fill.visible { width: 98%; }
-
-  /* Scene 5 - Comparison */
-  .comparison {
-    display: flex;
-    gap: 60px;
-    align-items: center;
-  }
-  .compare-card {
-    width: 400px;
-    padding: 48px;
-    border-radius: 20px;
-    text-align: center;
-  }
-  .compare-card.old {
-    background: rgba(239,68,68,0.08);
-    border: 1px solid rgba(239,68,68,0.2);
-    opacity: 0;
-    transform: translateX(-30px);
-    transition: all 0.6s ease;
-  }
-  .compare-card.old.visible { opacity: 1; transform: translateX(0); }
-  .compare-card.new {
-    background: rgba(6,182,212,0.08);
-    border: 1px solid rgba(6,182,212,0.3);
-    opacity: 0;
-    transform: translateX(30px);
-    transition: all 0.6s ease;
-  }
-  .compare-card.new.visible { opacity: 1; transform: translateX(0); }
-  .compare-name {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 32px;
-  }
-  .compare-name.red { color: #ef4444; }
-  .compare-name.cyan { color: #22d3ee; }
-  .compare-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    font-size: 18px;
-  }
-  .compare-row .label { color: #94a3b8; }
-  .compare-row .val { font-weight: 600; }
-  .compare-row .val.bad { color: #ef4444; }
-  .compare-row .val.good { color: #4ade80; }
-  .vs-badge {
-    font-size: 48px;
-    font-weight: 900;
-    color: #334155;
-  }
-  .comparison-text {
-    text-align: center;
-    margin-top: 48px;
-    opacity: 0;
-    transition: opacity 0.5s;
-  }
-  .comparison-text.visible { opacity: 1; }
-  .comparison-text h2 {
-    font-size: 40px;
-    font-weight: 800;
-  }
-  .comparison-text h2 .cyan { color: #22d3ee; }
-
-  /* Scene 6 - Connectors */
-  .connector-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 20px;
-    max-width: 1000px;
-  }
-  .conn-item {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-  }
-  .conn-item.visible { opacity: 1; transform: scale(1); }
-  .conn-icon { font-size: 28px; margin-bottom: 8px; }
-  .conn-item.pg { border-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.08); }
-  .conn-item.mysql { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.08); }
-  .conn-item.more { border-style: dashed; border-color: #334155; color: #64748b; }
-
-  /* Scene 7 - CTA */
-  .cta-scene {
-    flex-direction: column;
-    gap: 32px;
-    text-align: center;
-  }
-  .cta-logo {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: all 0.6s ease;
-  }
-  .cta-logo.visible { opacity: 1; transform: scale(1); }
+  .ci.pg { border-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.08); }
+  .ci.my { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.08); }
+  .ci.mr { border-style: dashed; border-color: #334155; color: #64748b; }
+  .ci .ico { font-size: 28px; margin-bottom: 8px; }
+  .cta { text-align: center; }
+  .cta-logo { display: flex; align-items: center; gap: 16px; justify-content: center; margin-bottom: 24px; }
   .cta-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
+    width: 64px; height: 64px; border-radius: 16px;
     background: linear-gradient(135deg, #06b6d4, #2563eb);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
   }
   .cta-icon svg { width: 32px; height: 32px; }
-  .cta-name {
-    font-size: 48px;
-    font-weight: 800;
-  }
-  .cta-tagline {
-    font-size: 28px;
-    color: #94a3b8;
-    opacity: 0;
-    transition: opacity 0.5s 0.3s;
-  }
-  .cta-tagline.visible { opacity: 1; }
-  .cta-button {
+  .cta-name { font-size: 48px; font-weight: 800; }
+  .cta-tag { font-size: 28px; color: #94a3b8; margin-bottom: 32px; }
+  .cta-btn {
     background: linear-gradient(135deg, #06b6d4, #2563eb);
-    color: white;
-    border: none;
-    padding: 18px 48px;
-    border-radius: 12px;
-    font-size: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.4s 0.6s;
+    color: white; border: none; padding: 18px 48px; border-radius: 12px;
+    font-size: 20px; font-weight: 600; cursor: pointer; margin-bottom: 16px;
   }
-  .cta-button.visible { opacity: 1; transform: translateY(0); }
-  .cta-sub {
-    font-size: 16px;
-    color: #475569;
-    opacity: 0;
-    transition: opacity 0.5s 0.8s;
+  .cta-sub { font-size: 16px; color: #475569; }
+  .prog { position: absolute; bottom: 0; left: 0; height: 4px; background: linear-gradient(90deg, #06b6d4, #2563eb); }
+  .slabel {
+    position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 8px 20px; font-size: 14px; color: #94a3b8;
   }
-  .cta-sub.visible { opacity: 1; }
-
-  /* Progress bar at bottom */
-  .progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #06b6d4, #2563eb);
-    transition: width 0.3s linear;
+  #playBtn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #06b6d4, #2563eb);
+    color: white; border: none; padding: 24px 48px; border-radius: 16px;
+    font-size: 24px; font-weight: 700; cursor: pointer; z-index: 100;
+    box-shadow: 0 8px 32px rgba(6,182,212,0.3);
   }
-
-  /* Scene label */
-  .scene-label {
-    position: absolute;
-    top: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 8px 20px;
-    font-size: 14px;
-    color: #94a3b8;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .scene-label.visible { opacity: 1; }
-
-  /* Counter animation */
-  .counter { font-variant-numeric: tabular-nums; }
-
-  /* Glow effect */
-  .glow { text-shadow: 0 0 20px rgba(34,211,238,0.5); }
 </style>
 </head>
 <body>
 
-<!-- Progress bar -->
-<div class="progress" id="progress"></div>
+<button id="playBtn" onclick="startVideo()">▶ Play Video</button>
+<div class="prog" id="prog" style="width:0"></div>
+<div class="slabel" id="slabel"></div>
 
-<!-- Scene label -->
-<div class="scene-label" id="sceneLabel"></div>
-
-<!-- SCENE 1: THE PROBLEM -->
-<div class="scene scene-1 active" id="scene1">
-  <div class="stale-dashboard" id="staleDash">
-    <div class="warning-icon">⚠️</div>
-    <div class="stale-time" id="staleTime">15:00</div>
-    <div class="stale-label">minutes since last sync</div>
+<!-- SCENE 1 -->
+<div class="scene" id="s1">
+  <div style="text-align:center;margin-bottom:40px;">
+    <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+    <div class="st">15:00</div>
+    <div class="sl">minutes since last sync</div>
   </div>
-  <div class="scene-1-text">
-    <h1>Your data is <span class="red">15 minutes old.</span></h1>
+  <div class="s1t">
+    <h1>Your data is <span class="r">15 minutes old.</span></h1>
     <p>Your competitors' isn't.</p>
   </div>
 </div>
 
-<!-- SCENE 2: TERMINAL DEMO -->
-<div class="scene" id="scene2">
+<!-- SCENE 2 -->
+<div class="scene" id="s2">
   <div class="terminal">
-    <div class="terminal-header">
-      <div class="terminal-dot r"></div>
-      <div class="terminal-dot y"></div>
-      <div class="terminal-dot g"></div>
-      <span class="terminal-title">Terminal — pulsyn</span>
+    <div class="terminal-header"><div class="tdot r"></div><div class="tdot y"></div><div class="tdot g"></div><span class="ttitle">Terminal — pulsyn</span></div>
+    <div class="tbody" id="t2"></div>
+  </div>
+</div>
+
+<!-- SCENE 3 -->
+<div class="scene" id="s3">
+  <div class="ais">
+    <div class="aic">
+      <div class="aih"><div class="aia">🤖</div><div><div style="font-weight:600;font-size:14px;">Pulsyn AI</div><div style="font-size:11px;color:#64748b;">MCP Connected</div></div></div>
+      <div class="aib" id="chat"></div>
     </div>
-    <div class="terminal-body" id="termBody">
-      <!-- Lines added by JS -->
+    <div class="terminal">
+      <div class="terminal-header"><div class="tdot r"></div><div class="tdot y"></div><div class="tdot g"></div><span class="ttitle">Terminal</span></div>
+      <div class="tbody" id="t3"></div>
     </div>
   </div>
 </div>
 
-<!-- SCENE 3: AI SETUP -->
-<div class="scene" id="scene3">
-  <div class="ai-split">
-    <div class="ai-chat">
-      <div class="ai-chat-header">
-        <div class="ai-avatar">🤖</div>
-        <div>
-          <div style="font-weight:600;font-size:14px;">Pulsyn AI</div>
-          <div style="font-size:11px;color:#64748b;">MCP Connected</div>
-        </div>
-      </div>
-      <div class="ai-chat-body" id="chatBody">
-        <!-- Chat messages added by JS -->
-      </div>
+<!-- SCENE 4 -->
+<div class="scene" id="s4">
+  <div class="dash">
+    <div class="dh">
+      <div style="font-size:24px;font-weight:700;">Pulsyn Dashboard</div>
+      <div style="color:#4ade80;display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#4ade80;"></span>All systems operational</div>
     </div>
-    <div class="terminal ai-terminal">
-      <div class="terminal-header">
-        <div class="terminal-dot r"></div>
-        <div class="terminal-dot y"></div>
-        <div class="terminal-dot g"></div>
-        <span class="terminal-title">Terminal</span>
-      </div>
-      <div class="terminal-body" id="aiTermBody">
-        <!-- Terminal output added by JS -->
-      </div>
+    <div class="dsc" id="dsc">
+      <div class="dcard" id="d1"><div class="dv cy" id="c1">0</div><div class="dl">Active Pipelines</div></div>
+      <div class="dcard" id="d2"><div class="dv gn" id="c2">0</div><div class="dl">Rows/sec</div></div>
+      <div class="dcard" id="d3"><div class="dv cy">0.3s</div><div class="dl">Latency</div></div>
+      <div class="dcard" id="d4"><div class="dv gn">0</div><div class="dl">Errors</div></div>
+      <div class="dcard" id="d5"><div class="dv pu" id="c5">0</div><div class="dl">Total Rows</div></div>
     </div>
-  </div>
-</div>
-
-<!-- SCENE 4: DASHBOARD -->
-<div class="scene" id="scene4">
-  <div class="dashboard">
-    <div class="dash-header">
-      <div class="dash-title">Pulsyn Dashboard</div>
-      <div style="color:#4ade80;display:flex;align-items:center;gap:8px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
-        All systems operational
-      </div>
-    </div>
-    <div class="dash-stats" id="dashStats">
-      <div class="dash-stat-card" id="stat1">
-        <div class="dash-stat-val cyan counter" data-target="3">0</div>
-        <div class="dash-stat-label">Active Pipelines</div>
-      </div>
-      <div class="dash-stat-card" id="stat2">
-        <div class="dash-stat-val green counter" data-target="12847">0</div>
-        <div class="dash-stat-label">Rows/sec</div>
-      </div>
-      <div class="dash-stat-card" id="stat3">
-        <div class="dash-stat-val cyan">0.3s</div>
-        <div class="dash-stat-label">Latency</div>
-      </div>
-      <div class="dash-stat-card" id="stat4">
-        <div class="dash-stat-val green">0</div>
-        <div class="dash-stat-label">Errors</div>
-      </div>
-      <div class="dash-stat-card" id="stat5">
-        <div class="dash-stat-val purple counter" data-target="1247893">0</div>
-        <div class="dash-stat-label">Total Rows</div>
-      </div>
-    </div>
-    <div class="dash-pipeline" id="dashPipeline">
+    <div class="dp" id="dp">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-weight:600;font-size:18px;">pg-to-snowflake</div>
-          <div style="color:#64748b;font-size:14px;margin-top:4px;">PostgreSQL → Snowflake · 2h 34m uptime</div>
-        </div>
+        <div><div style="font-weight:600;font-size:18px;">pg-to-snowflake</div><div style="color:#64748b;font-size:14px;margin-top:4px;">PostgreSQL → Snowflake · 2h 34m uptime</div></div>
         <div style="background:rgba(74,222,128,0.15);color:#4ade80;padding:6px 16px;border-radius:8px;font-size:14px;font-weight:600;">streaming</div>
       </div>
-      <div class="pipeline-bar">
-        <div class="pipeline-fill" id="pipelineFill"></div>
-      </div>
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
       <div style="display:flex;justify-content:space-between;color:#64748b;font-size:13px;">
         <span>Rows: <span style="color:#22d3ee;">1,247,893</span></span>
         <span>Masked: <span style="color:#a78bfa;">email → SHA-256</span></span>
@@ -573,326 +204,239 @@
   </div>
 </div>
 
-<!-- SCENE 5: COMPARISON -->
-<div class="scene" id="scene5">
+<!-- SCENE 5 -->
+<div class="scene" id="s5">
   <div>
-    <div class="comparison">
-      <div class="compare-card old" id="compareOld">
-        <div class="compare-name red">Fivetran</div>
-        <div class="compare-row"><span class="label">Latency</span><span class="val bad">15 min</span></div>
-        <div class="compare-row"><span class="label">Price</span><span class="val bad">$895/mo</span></div>
-        <div class="compare-row"><span class="label">Mode</span><span class="val bad">Batch only</span></div>
-        <div class="compare-row"><span class="label">CLI</span><span class="val bad">No</span></div>
-        <div class="compare-row"><span class="label">MCP</span><span class="val bad">No</span></div>
+    <div class="comp">
+      <div class="cc old" id="cold">
+        <div class="cn r">Fivetran</div>
+        <div class="cr"><span class="l">Latency</span><span class="v bad">15 min</span></div>
+        <div class="cr"><span class="l">Price</span><span class="v bad">$895/mo</span></div>
+        <div class="cr"><span class="l">Mode</span><span class="v bad">Batch only</span></div>
+        <div class="cr"><span class="l">CLI</span><span class="v bad">No</span></div>
+        <div class="cr"><span class="l">MCP</span><span class="v bad">No</span></div>
       </div>
-      <div class="vs-badge">VS</div>
-      <div class="compare-card new" id="compareNew">
-        <div class="compare-name cyan">Pulsyn</div>
-        <div class="compare-row"><span class="label">Latency</span><span class="val good">0.3s</span></div>
-        <div class="compare-row"><span class="label">Price</span><span class="val good">$300/mo</span></div>
-        <div class="compare-row"><span class="label">Mode</span><span class="val good">Real-time</span></div>
-        <div class="compare-row"><span class="label">CLI</span><span class="val good">35+ commands</span></div>
-        <div class="compare-row"><span class="label">MCP</span><span class="val good">31 tools</span></div>
+      <div class="vs">VS</div>
+      <div class="cc new" id="cnew">
+        <div class="cn cy">Pulsyn</div>
+        <div class="cr"><span class="l">Latency</span><span class="v good">0.3s</span></div>
+        <div class="cr"><span class="l">Price</span><span class="v good">$300/mo</span></div>
+        <div class="cr"><span class="l">Mode</span><span class="v good">Real-time</span></div>
+        <div class="cr"><span class="l">CLI</span><span class="v good">35+ commands</span></div>
+        <div class="cr"><span class="l">MCP</span><span class="v good">31 tools</span></div>
       </div>
     </div>
-    <div class="comparison-text" id="compareText">
-      <h2>Same data. <span class="cyan">50x faster.</span> 66% cheaper.</h2>
-    </div>
+    <div class="ctext" id="ctext"><h2>Same data. <span class="cy">50x faster.</span> 66% cheaper.</h2></div>
   </div>
 </div>
 
-<!-- SCENE 6: CONNECTORS -->
-<div class="scene" id="scene6">
+<!-- SCENE 6 -->
+<div class="scene" id="s6">
   <div style="text-align:center;">
     <h2 style="font-size:36px;font-weight:800;margin-bottom:48px;">Growing connector ecosystem</h2>
-    <div class="connector-grid" id="connGrid">
-      <div class="conn-item pg" data-delay="0"><div class="conn-icon">🐘</div>PostgreSQL</div>
-      <div class="conn-item mysql" data-delay="100"><div class="conn-icon">🐬</div>MySQL</div>
-      <div class="conn-item more" data-delay="200"><div class="conn-icon">🔮</div>Oracle</div>
-      <div class="conn-item more" data-delay="300"><div class="conn-icon">📊</div>SQL Server</div>
-      <div class="conn-item more" data-delay="400"><div class="conn-icon">🍃</div>MongoDB</div>
-      <div class="conn-item more" data-delay="500"><div class="conn-icon">❄️</div>Snowflake</div>
-      <div class="conn-item more" data-delay="600"><div class="conn-icon">🔍</div>BigQuery</div>
-      <div class="conn-item more" data-delay="700"><div class="conn-icon">📡</div>Kafka</div>
-      <div class="conn-item more" data-delay="800"><div class="conn-icon">⚡</div>Redis</div>
-      <div class="conn-item more" data-delay="900"><div class="conn-icon">☁️</div>AWS RDS</div>
-      <div class="conn-item more" data-delay="1000"><div class="conn-icon">🔵</div>Azure SQL</div>
-      <div class="conn-item more" data-delay="1100"><div class="conn-icon">➕</div>More soon</div>
+    <div class="cgrid" id="cgrid">
+      <div class="ci pg"><div class="ico">🐘</div>PostgreSQL</div>
+      <div class="ci my"><div class="ico">🐬</div>MySQL</div>
+      <div class="ci mr"><div class="ico">🔮</div>Oracle</div>
+      <div class="ci mr"><div class="ico">📊</div>SQL Server</div>
+      <div class="ci mr"><div class="ico">🍃</div>MongoDB</div>
+      <div class="ci mr"><div class="ico">❄️</div>Snowflake</div>
+      <div class="ci mr"><div class="ico">🔍</div>BigQuery</div>
+      <div class="ci mr"><div class="ico">📡</div>Kafka</div>
+      <div class="ci mr"><div class="ico">⚡</div>Redis</div>
+      <div class="ci mr"><div class="ico">☁️</div>AWS RDS</div>
+      <div class="ci mr"><div class="ico">🔵</div>Azure SQL</div>
+      <div class="ci mr"><div class="ico">➕</div>More soon</div>
     </div>
-    <p style="margin-top:32px;color:#64748b;font-size:20px;">PostgreSQL & MySQL production-ready. More coming via Connector Certification Lab.</p>
+    <p style="margin-top:32px;color:#64748b;font-size:20px;">PostgreSQL & MySQL production-ready. More via Certification Lab.</p>
   </div>
 </div>
 
-<!-- SCENE 7: CTA -->
-<div class="scene scene-7" id="scene7">
-  <div class="cta-scene">
-    <div class="cta-logo" id="ctaLogo">
-      <div class="cta-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-        </svg>
-      </div>
+<!-- SCENE 7 -->
+<div class="scene" id="s7">
+  <div class="cta">
+    <div class="cta-logo">
+      <div class="cta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
       <span class="cta-name">Pulsyn</span>
     </div>
-    <div class="cta-tagline" id="ctaTagline">Real-time CDC without the complexity.</div>
-    <button class="cta-button" id="ctaButton">Start Free at pulsyn.io →</button>
-    <div class="cta-sub" id="ctaSub">No credit card required · Free tier forever</div>
+    <div class="cta-tag">Real-time CDC without the complexity.</div>
+    <button class="cta-btn">Start Free at pulsyn.io →</button>
+    <div class="cta-sub">No credit card required · Free tier forever</div>
   </div>
 </div>
 
 <script>
-// Timeline controller
-const TOTAL_DURATION = 75000; // 75 seconds
 const SCENES = [
-  { id: 'scene1', start: 0, end: 8000, label: 'The Problem' },
-  { id: 'scene2', start: 8000, end: 22000, label: 'Terminal Demo' },
-  { id: 'scene3', start: 22000, end: 38000, label: 'AI Setup' },
-  { id: 'scene4', start: 38000, end: 50000, label: 'Dashboard' },
-  { id: 'scene5', start: 50000, end: 60000, label: 'Comparison' },
-  { id: 'scene6', start: 60000, end: 67000, label: 'Connectors' },
-  { id: 'scene7', start: 67000, end: 75000, label: 'Start Free' },
+  { id:'s1', start:0, end:8000, label:'The Problem' },
+  { id:'s2', start:8000, end:22000, label:'Terminal Demo' },
+  { id:'s3', start:22000, end:38000, label:'AI Setup' },
+  { id:'s4', start:38000, end:50000, label:'Dashboard' },
+  { id:'s5', start:50000, end:60000, label:'Comparison' },
+  { id:'s6', start:60000, end:67000, label:'Connectors' },
+  { id:'s7', start:67000, end:75000, label:'Start Free' },
 ];
 
-let startTime = null;
-let currentScene = -1;
+let playing = false;
+let start = 0;
+let cur = -1;
 
-function animate(timestamp) {
-  if (!startTime) startTime = timestamp;
-  const elapsed = timestamp - startTime;
-  const progress = Math.min(elapsed / TOTAL_DURATION, 1);
+function startVideo() {
+  document.getElementById('playBtn').style.display = 'none';
+  playing = true;
+  start = performance.now();
+  requestAnimationFrame(tick);
+}
 
-  // Update progress bar
-  document.getElementById('progress').style.width = (progress * 100) + '%';
+function tick(now) {
+  if (!playing) return;
+  const t = now - start;
+  const pct = Math.min(t / 75000, 1);
+  document.getElementById('prog').style.width = (pct*100)+'%';
 
-  // Find current scene
-  const sceneIndex = SCENES.findIndex(s => elapsed >= s.start && elapsed < s.end);
-
-  if (sceneIndex !== currentScene) {
-    // Deactivate old scene
-    if (currentScene >= 0) {
-      document.getElementById(SCENES[currentScene].id).classList.remove('active');
+  const idx = SCENES.findIndex(s => t >= s.start && t < s.end);
+  if (idx !== cur) {
+    if (cur >= 0) document.getElementById(SCENES[cur].id).classList.remove('active');
+    if (idx >= 0) {
+      document.getElementById(SCENES[idx].id).classList.add('active');
+      document.getElementById('slabel').textContent = SCENES[idx].label;
+      trigger(idx, t - SCENES[idx].start);
     }
-    // Activate new scene
-    if (sceneIndex >= 0) {
-      document.getElementById(SCENES[sceneIndex].id).classList.add('active');
-      document.getElementById('sceneLabel').textContent = SCENES[sceneIndex].label;
-      document.getElementById('sceneLabel').classList.add('visible');
-
-      // Trigger scene-specific animations
-      triggerSceneAnimations(sceneIndex, elapsed - SCENES[sceneIndex].start);
-    }
-    currentScene = sceneIndex;
+    cur = idx;
   }
-
-  // Continuous animations
-  if (currentScene >= 0) {
-    updateSceneAnimations(currentScene, elapsed - SCENES[currentScene].start);
-  }
-
-  if (progress < 1) {
-    requestAnimationFrame(animate);
-  }
+  if (pct < 1) requestAnimationFrame(tick);
 }
 
-function triggerSceneAnimations(sceneIndex, sceneTime) {
-  switch(sceneIndex) {
-    case 0: // Problem
-      document.getElementById('staleDash').style.opacity = '1';
-      break;
-    case 1: // Terminal
-      startTerminalAnimation();
-      break;
-    case 2: // AI Setup
-      startAIAnimation();
-      break;
-    case 3: // Dashboard
-      startDashboardAnimation();
-      break;
-    case 4: // Comparison
-      startComparisonAnimation();
-      break;
-    case 5: // Connectors
-      startConnectorAnimation();
-      break;
-    case 6: // CTA
-      startCTAAnimation();
-      break;
-  }
+function trigger(i, t) {
+  if (i===0) s1();
+  if (i===1) s2();
+  if (i===2) s3();
+  if (i===3) s4();
+  if (i===4) s5();
+  if (i===5) s6();
+  if (i===6) s7();
 }
 
-// Scene 2: Terminal typing
-const TERMINAL_LINES = [
-  { text: '$ pulsyn pipeline create --source postgres --target snowflake', type: 'cmd', delay: 0 },
-  { text: '✓ Pipeline created: pg-to-snowflake', type: 'success', delay: 800 },
-  { text: '', type: 'blank', delay: 1200 },
-  { text: '$ pulsyn pipeline start pg-to-snowflake', type: 'cmd', delay: 1600 },
-  { text: '✓ CDC engine started', type: 'success', delay: 2400 },
-  { text: '  ├─ Latency: 0.3s', type: 'stat', delay: 2800 },
-  { text: '  ├─ Rows/sec: 12,847', type: 'stat', delay: 3000 },
-  { text: '  ├─ Status: streaming', type: 'stat', delay: 3200 },
-  { text: '  └─ Masking: email → SHA-256', type: 'stat', delay: 3400 },
-  { text: '', type: 'blank', delay: 3800 },
-  { text: '$ pulsyn status', type: 'cmd', delay: 4200 },
-  { text: 'Pipeline: pg-to-snowflake', type: 'stat', delay: 5000 },
-  { text: '├─ Source: PostgreSQL (orders_db)', type: 'stat', delay: 5200 },
-  { text: '├─ Target: Snowflake (analytics)', type: 'stat', delay: 5400 },
-  { text: '├─ Rows: 1,247,893', type: 'val', delay: 5600 },
-  { text: '├─ Uptime: 2h 34m', type: 'stat', delay: 5800 },
-  { text: '└─ Errors: 0', type: 'success', delay: 6000 },
-];
+function el(id) { return document.getElementById(id); }
 
-function startTerminalAnimation() {
-  const body = document.getElementById('termBody');
-  body.innerHTML = '';
+// Scene 1
+function s1() {}
 
-  TERMINAL_LINES.forEach((line, i) => {
+// Scene 2 - Terminal
+function s2() {
+  const lines = [
+    ['$ ','pulsyn pipeline create --source postgres --target snowflake','c'],
+    ['','✓ Pipeline created: pg-to-snowflake','s'],
+    ['','',''],
+    ['$ ','pulsyn pipeline start pg-to-snowflake','c'],
+    ['','✓ CDC engine started','s'],
+    ['  ','├─ Latency: 0.3s','s'],
+    ['  ','├─ Rows/sec: 12,847','s'],
+    ['  ','├─ Status: streaming','s'],
+    ['  ','└─ Masking: email → SHA-256','s'],
+    ['','',''],
+    ['$ ','pulsyn status','c'],
+    ['','Pipeline: pg-to-snowflake','s'],
+    ['  ','├─ Source: PostgreSQL (orders_db)','s'],
+    ['  ','├─ Target: Snowflake (analytics)','s'],
+    ['  ','├─ Rows: 1,247,893','v'],
+    ['  ','├─ Uptime: 2h 34m','s'],
+    ['  ','└─ Errors: 0','s'],
+  ];
+  el('t2').innerHTML = '';
+  lines.forEach((l,i) => {
     setTimeout(() => {
-      const div = document.createElement('div');
-      div.className = 'type-line';
-      if (line.type === 'blank') {
-        div.innerHTML = '&nbsp;';
-      } else if (line.type === 'cmd') {
-        div.innerHTML = `<span class="prompt">$ </span><span class="cmd">${line.text.substring(2)}</span>`;
-      } else if (line.type === 'success') {
-        div.innerHTML = `<span class="success">${line.text}</span>`;
-      } else if (line.type === 'val') {
-        div.innerHTML = `<span class="stat">${line.text.split(':')[0]}:</span> <span class="val">${line.text.split(':')[1]}</span>`;
-      } else {
-        div.innerHTML = `<span class="stat">${line.text}</span>`;
-      }
-      body.appendChild(div);
-      requestAnimationFrame(() => div.classList.add('visible'));
-    }, line.delay);
+      const d = document.createElement('div');
+      if (l[2]==='c') d.innerHTML='<span class="p">'+l[0]+'</span><span class="c">'+l[1]+'</span>';
+      else if (l[2]==='s') d.innerHTML='<span class="s">'+l[0]+l[1]+'</span>';
+      else if (l[2]==='v') d.innerHTML='<span class="s">'+l[0]+'</span><span class="v">'+l[1]+'</span>';
+      else d.innerHTML='&nbsp;';
+      el('t2').appendChild(d);
+    }, i*400);
   });
 }
 
-// Scene 3: AI Chat
-const CHAT_MESSAGES = [
-  { type: 'user', text: 'Set up PostgreSQL to Snowflake pipeline with email masking', delay: 0 },
-  { type: 'bot', text: 'I\'ll create that pipeline for you.\n\n• Source: PostgreSQL\n• Target: Snowflake\n• Masking: email → SHA-256\n\nShall I proceed?', delay: 1500 },
-  { type: 'user', text: 'Yes, go ahead', delay: 3500 },
-  { type: 'bot', text: '✓ Pipeline created\n✓ Email masking enabled\n✓ CDC streaming\n\nLatency: 0.3s | Rows/sec: 8,247', delay: 5000 },
-];
-
-const AI_TERMINAL_LINES = [
-  { text: '$ pulsyn pipeline create --source pg --target snowflake', delay: 2000 },
-  { text: '✓ Pipeline created: pg-to-snowflake', delay: 2800 },
-  { text: '$ pulsyn pipeline start pg-to-snowflake', delay: 3500 },
-  { text: '✓ CDC engine started (masking: email)', delay: 4200 },
-  { text: '  Latency: 0.3s | Rows/sec: 8,247', delay: 4800 },
-];
-
-function startAIAnimation() {
-  const chatBody = document.getElementById('chatBody');
-  const termBody = document.getElementById('aiTermBody');
-  chatBody.innerHTML = '';
-  termBody.innerHTML = '';
-
-  CHAT_MESSAGES.forEach((msg) => {
+// Scene 3 - AI
+function s3() {
+  const msgs = [
+    ['u','Set up PostgreSQL to Snowflake pipeline with email masking'],
+    ['b',"I'll create that pipeline for you.\n\n• Source: PostgreSQL\n• Target: Snowflake\n• Masking: email → SHA-256\n\nShall I proceed?"],
+    ['u','Yes, go ahead'],
+    ['b','✓ Pipeline created\n✓ Email masking enabled\n✓ CDC streaming\n\nLatency: 0.3s | Rows/sec: 8,247'],
+  ];
+  const terms = [
+    '$ pulsyn pipeline create --source pg --target snowflake',
+    '✓ Pipeline created: pg-to-snowflake',
+    '$ pulsyn pipeline start pg-to-snowflake',
+    '✓ CDC engine started (masking: email)',
+    '  Latency: 0.3s | Rows/sec: 8,247',
+  ];
+  el('chat').innerHTML = '';
+  el('t3').innerHTML = '';
+  msgs.forEach((m,i) => {
     setTimeout(() => {
-      const div = document.createElement('div');
-      div.className = `chat-msg ${msg.type}`;
-      const bubble = document.createElement('div');
-      bubble.className = `chat-bubble ${msg.type}`;
-      bubble.textContent = msg.text;
-      div.appendChild(bubble);
-      chatBody.appendChild(div);
-      requestAnimationFrame(() => div.classList.add('visible'));
-    }, msg.delay);
+      const d = document.createElement('div');
+      d.className = 'cm '+(m[0]==='u'?'u':'b');
+      const b = document.createElement('div');
+      b.className = 'cb '+(m[0]==='u'?'u':'b');
+      b.textContent = m[1];
+      d.appendChild(b);
+      el('chat').appendChild(d);
+    }, i*2500);
   });
-
-  AI_TERMINAL_LINES.forEach((line) => {
+  terms.forEach((t,i) => {
     setTimeout(() => {
-      const div = document.createElement('div');
-      div.className = 'type-line';
-      div.innerHTML = `<span style="color:#64748b">$ </span><span style="color:#22d3ee">${line.text.substring(2)}</span>`;
-      termBody.appendChild(div);
-      requestAnimationFrame(() => div.classList.add('visible'));
-    }, line.delay);
+      const d = document.createElement('div');
+      d.innerHTML = '<span class="p">$ </span><span class="c">'+t.substring(2)+'</span>';
+      el('t3').appendChild(d);
+    }, 1000+i*1200);
   });
 }
 
-// Scene 4: Dashboard
-function startDashboardAnimation() {
-  const cards = ['stat1', 'stat2', 'stat3', 'stat4', 'stat5'];
-  cards.forEach((id, i) => {
-    setTimeout(() => {
-      document.getElementById(id).classList.add('visible');
-      animateCounters();
-    }, i * 200);
+// Scene 4 - Dashboard
+function s4() {
+  ['d1','d2','d3','d4','d5'].forEach((id,i) => {
+    setTimeout(() => el(id).style.opacity='1', i*200);
   });
-
-  setTimeout(() => {
-    document.getElementById('dashPipeline').classList.add('visible');
-  }, 1200);
-
-  setTimeout(() => {
-    document.getElementById('pipelineFill').classList.add('visible');
-  }, 1500);
+  setTimeout(() => el('dp').style.opacity='1', 1200);
+  setTimeout(() => el('pfill').style.width='98%', 1500);
+  // Counters
+  animateVal('c1',0,3,800);
+  animateVal('c2',0,12847,1200);
+  animateVal('c5',0,1247893,1500);
 }
 
-function animateCounters() {
-  document.querySelectorAll('.counter').forEach(el => {
-    const target = parseInt(el.dataset.target);
-    if (!target) return;
-    let current = 0;
-    const step = target / 60;
-    const interval = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        current = target;
-        clearInterval(interval);
-      }
-      el.textContent = Math.floor(current).toLocaleString();
-    }, 16);
-  });
-}
-
-// Scene 5: Comparison
-function startComparisonAnimation() {
-  setTimeout(() => document.getElementById('compareOld').classList.add('visible'), 200);
-  setTimeout(() => document.getElementById('compareNew').classList.add('visible'), 600);
-  setTimeout(() => document.getElementById('compareText').classList.add('visible'), 1200);
-}
-
-// Scene 6: Connectors
-function startConnectorAnimation() {
-  document.querySelectorAll('.conn-item').forEach((el, i) => {
-    setTimeout(() => el.classList.add('visible'), i * 100);
-  });
-}
-
-// Scene 7: CTA
-function startCTAAnimation() {
-  setTimeout(() => document.getElementById('ctaLogo').classList.add('visible'), 200);
-  setTimeout(() => document.getElementById('ctaTagline').classList.add('visible'), 600);
-  setTimeout(() => document.getElementById('ctaButton').classList.add('visible'), 1000);
-  setTimeout(() => document.getElementById('ctaSub').classList.add('visible'), 1400);
-}
-
-// Start animation on load
-window.addEventListener('load', () => {
-  // Add a 1 second delay before starting
-  setTimeout(() => requestAnimationFrame(animate), 1000);
-});
-
-// Keyboard controls
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space') {
-    e.preventDefault();
-    if (startTime) {
-      startTime = null; // Pause
-    } else {
-      requestAnimationFrame(animate); // Resume
-    }
+function animateVal(id,from,to,dur) {
+  const el = document.getElementById(id);
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min((now-start)/dur,1);
+    el.textContent = Math.floor(from+(to-from)*t).toLocaleString();
+    if(t<1) requestAnimationFrame(step);
   }
-  if (e.code === 'KeyR') {
-    startTime = null;
-    currentScene = -1;
-    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-    document.getElementById('scene1').classList.add('active');
-    setTimeout(() => requestAnimationFrame(animate), 100);
-  }
+  requestAnimationFrame(step);
+}
+
+// Scene 5 - Comparison
+function s5() {
+  el('cold').style.opacity='1';
+  setTimeout(()=>el('cnew').style.opacity='1',400);
+  setTimeout(()=>el('ctext').style.opacity='1',1000);
+}
+
+// Scene 6 - Connectors
+function s6() {
+  document.querySelectorAll('.ci').forEach((c,i) => {
+    setTimeout(()=>c.style.opacity='1', i*80);
+  });
+}
+
+// Scene 7 - CTA
+function s7() {}
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();playing=!playing;if(playing){start=performance.now()-(75000*(parseFloat(document.getElementById('prog').style.width)/100));requestAnimationFrame(tick);}}
+  if(e.code==='KeyR'){playing=false;cur=-1;document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));document.getElementById('prog').style.width='0';document.getElementById('playBtn').style.display='block';}
 });
 </script>
 </body>
