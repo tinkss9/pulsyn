@@ -76,6 +76,21 @@ export { LinearConnector } from './connectors/linear';
 export { Neo4jConnector } from './connectors/neo4j';
 export { InfluxDBConnector } from './connectors/influxdb';
 export { DuckDBConnector } from './connectors/duckdb';
+export { AmplitudeConnector } from './connectors/amplitude';
+export { MixpanelConnector } from './connectors/mixpanel';
+export { GoogleAnalyticsConnector } from './connectors/google-analytics';
+export { PostHogConnector } from './connectors/posthog';
+export { S3Connector } from './connectors/s3';
+export { AzureBlobConnector } from './connectors/azure-blob';
+export { GCSConnector } from './connectors/gcs';
+export { CosmosDBConnector } from './connectors/cosmosdb';
+export { SpannerConnector } from './connectors/spanner';
+export { SingleStoreConnector } from './connectors/singlestore';
+export { TimescaleDBConnector } from './connectors/timescaledb';
+export { CockroachDBConnector } from './connectors/cockroachdb';
+export { MailchimpConnector } from './connectors/mailchimp';
+export { BrevoConnector } from './connectors/brevo';
+export { KlaviyoConnector } from './connectors/klaviyo';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Connectors — Target
