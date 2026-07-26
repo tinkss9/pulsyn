@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query, authenticate } from '../_db';
+import { query, authenticate } from './_db';
 
 // Security events and audit log viewer
 export default async function handler(req: VercelRequest, res: VercelResponse) {
