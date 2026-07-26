@@ -1,6 +1,12 @@
 {
   "version": 2,
   "outputDirectory": "dist",
+  "crons": [
+    {
+      "path": "/api/cron/replicate",
+      "schedule": "*/1 * * * *"
+    }
+  ],
   "routes": [
     { "src": "/api/health", "dest": "/api/health.ts" },
     { "src": "/api/pipelines", "dest": "/api/pipelines.ts" },
@@ -12,6 +18,7 @@
     { "src": "/api/cdc/engines", "dest": "/api/cdc/engines.ts" },
     { "src": "/api/cdc/events", "dest": "/api/cdc/events.ts" },
     { "src": "/api/cdc/replicate", "dest": "/api/cdc/replicate.ts" },
+    { "src": "/api/cron/replicate", "dest": "/api/cron/replicate.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1.ts" }
   ]
 }
