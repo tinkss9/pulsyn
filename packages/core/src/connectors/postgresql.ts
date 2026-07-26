@@ -12,23 +12,27 @@ export class PostgreSQLConnector extends BaseConnector {
   private cdcActive = false;
 
   async connect(config?: DatabaseConfig): Promise<void> {
-    try {
-      if (config) this.config = config;
-      const cfg = this.config;
-      this.pool = new Pool({
-        host: cfg.host,
-        port: cfg.port || 5432,
-        database: cfg.database,
-        user: cfg.username,
-        password: cfg.password,
-        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined,
-        max: 10,
-      });
-      await this.pool.query('SELECT 1');
-      this.connected = true;
-    } catch (error) {
-      throw new Error(`PostgreSQL connection failed: ${(error as Error).message}`);
-    }
+    return this.withRetry(async () => {
+      try {
+        if (config) this.config = config;
+        const cfg = this.config;
+        const connectTimeout = (cfg as any).connectTimeout || 30000;
+        this.pool = new Pool({
+          host: cfg.host,
+          port: cfg.port || 5432,
+          database: cfg.database,
+          user: cfg.username,
+          password: cfg.password,
+          ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined,
+          max: 10,
+          connectionTimeoutMillis: connectTimeout,
+        });
+        await this.pool.query('SELECT 1');
+        this.connected = true;
+      } catch (error) {
+        throw new Error(`PostgreSQL connection failed: ${(error as Error).message}`);
+      }
+    });
   }
 
   async disconnect(): Promise<void> {

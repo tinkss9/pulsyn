@@ -8,6 +8,9 @@ import { ConnectorRegistry } from '../../connectors/registry';
 
 // Mock database drivers so conformance tests don't need real connections
 vi.mock('pg', () => {
+  let failCount = 0;
+  let failRemaining = 0;
+
   const mockClient = {
     query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
     release: vi.fn(),
@@ -15,7 +18,12 @@ vi.mock('pg', () => {
   const mockPool = {
     connect: vi.fn().mockResolvedValue(mockClient),
     query: vi.fn((sql: string, params?: any[]) => {
-      // Return realistic data based on query
+      // Check if we should simulate failure
+      if (failRemaining > 0) {
+        failRemaining--;
+        return Promise.reject(new Error('ECONNRESET: transient failure'));
+      }
+
       if (sql.includes('information_schema.tables')) {
         return Promise.resolve({ rows: [{ full_name: 'public.conformance_test_table' }], rowCount: 1 });
       }
@@ -35,19 +43,19 @@ vi.mock('pg', () => {
       if (sql.includes('SELECT 1')) {
         return Promise.resolve({ rows: [{ ok: 1 }], rowCount: 1 });
       }
-      // SELECT * queries (extractFull / extractIncremental)
       if (sql.includes('SELECT *')) {
         const rows = Array.from({ length: 5 }, (_, i) => ({
           id: i + 1, name: `record_${i + 1}`, created_at: new Date().toISOString(),
         }));
         return Promise.resolve({ rows, rowCount: 5 });
       }
-      // Default: return empty
       return Promise.resolve({ rows: [], rowCount: 0 });
     }),
     end: vi.fn(),
+    __setFailRemaining: (n: number) => { failRemaining = n; },
+    __resetFailures: () => { failRemaining = 0; },
   };
-  return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient) };
+  return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient), __mockPool: mockPool };
 });
 
 vi.mock('mysql2/promise', () => {
@@ -72,12 +80,15 @@ vi.mock('mysql2/promise', () => {
       if (sql.includes('SHOW INDEX') || sql.includes('PRIMARY')) {
         return Promise.resolve([[{ Column_name: 'id', Key_name: 'PRIMARY' }]]);
       }
+      if (sql.includes('SELECT 1')) {
+        return Promise.resolve([[{ '1': 1 }]]);
+      }
       return Promise.resolve([[]]);
     }),
     end: vi.fn(),
   };
   const mod = { createPool: vi.fn(() => mockPool) };
-  return { default: mod, ...mod };
+  return { default: mod, ...mod, __mockPool: mockPool };
 });
 
 // Import connector modules so @registerSource/@registerTarget decorators run

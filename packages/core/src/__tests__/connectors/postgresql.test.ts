@@ -1,6 +1,6 @@
 // @ts-nocheck
 // PostgreSQL Connector Unit Tests
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock pg module with query-aware mock
 vi.mock('pg', () => {
@@ -36,15 +36,16 @@ vi.mock('pg', () => {
     }),
     end: vi.fn(),
   };
-  return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient) };
+  return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient), __mockPool: mockPool };
 });
 
 import { PostgreSQLConnector } from '../../connectors/postgresql';
 
 describe('PostgreSQLConnector', () => {
   let connector: PostgreSQLConnector;
+  let originalQuery: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     connector = new PostgreSQLConnector('pg-1', 'test-pg', 'postgresql', {
       host: 'localhost',
       port: 5432,
@@ -52,6 +53,14 @@ describe('PostgreSQLConnector', () => {
       user: 'testuser',
       password: 'testpass',
     });
+    const pg = await import('pg');
+    originalQuery = (pg as any).__mockPool.query;
+  });
+
+  afterEach(async () => {
+    const pg = await import('pg');
+    (pg as any).__mockPool.query = originalQuery;
+    try { await connector.disconnect(); } catch {}
   });
 
   describe('connect', () => {
@@ -61,9 +70,15 @@ describe('PostgreSQLConnector', () => {
     });
 
     it('should throw on connection failure', async () => {
-      const { Pool } = await import('pg');
-      const poolInstance = (Pool as any).mock.results[0]?.value;
-      poolInstance.query.mockRejectedValueOnce(new Error('Connection refused'));
+      const pg = await import('pg');
+      const mockPool = (pg as any).__mockPool;
+
+      mockPool.query = vi.fn(async (sql: string) => {
+        if (sql.includes('SELECT 1')) {
+          throw new Error('Connection refused');
+        }
+        return originalQuery(sql);
+      });
 
       await expect(connector.connect()).rejects.toThrow('Connection refused');
     });

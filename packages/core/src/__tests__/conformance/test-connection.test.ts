@@ -6,9 +6,14 @@ import { getTestConnector, TEST_CONFIG } from './conftest';
 
 describe('Connection Conformance', () => {
   let connector: BaseConnector;
+  let originalPgQuery: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     connector = getTestConnector();
+    // Save the original mock query
+    const pg = await import('pg');
+    const mockPool = (pg as any).__mockPool;
+    originalPgQuery = mockPool.query;
   });
 
   afterEach(async () => {
@@ -17,6 +22,10 @@ describe('Connection Conformance', () => {
     } catch {
       // already disconnected
     }
+    // Restore original mock
+    const pg = await import('pg');
+    const mockPool = (pg as any).__mockPool;
+    mockPool.query = originalPgQuery;
   });
 
   it('should connect with valid credentials', async () => {
@@ -32,8 +41,17 @@ describe('Connection Conformance', () => {
     expect(connector.isConnected()).toBe(false);
   });
 
-  // TODO: Requires mock to reject on bad credentials — not yet implemented
-  it.skip('should throw on invalid credentials', async () => {
+  it('should throw on invalid credentials', async () => {
+    const pg = await import('pg');
+    const mockPool = (pg as any).__mockPool;
+
+    mockPool.query = vi.fn(async (sql: string) => {
+      if (sql.includes('SELECT 1')) {
+        throw new Error('password authentication failed for user "invalid_user"');
+      }
+      return originalPgQuery(sql);
+    });
+
     const badConnector = ConnectorRegistry.getSource('postgresql', 'bad-id', {
       host: TEST_CONFIG.host,
       port: TEST_CONFIG.port,
@@ -46,8 +64,17 @@ describe('Connection Conformance', () => {
     expect(badConnector.isConnected()).toBe(false);
   });
 
-  // TODO: Requires mock to reject on unreachable host — not yet implemented
-  it.skip('should throw on unreachable host', async () => {
+  it('should throw on unreachable host', async () => {
+    const pg = await import('pg');
+    const mockPool = (pg as any).__mockPool;
+
+    mockPool.query = vi.fn(async (sql: string) => {
+      if (sql.includes('SELECT 1')) {
+        throw new Error('connect ETIMEDOUT 192.0.2.1:5432');
+      }
+      return originalPgQuery(sql);
+    });
+
     const unreachableConnector = ConnectorRegistry.getSource('postgresql', 'unreach-id', {
       host: '192.0.2.1',
       port: 5432,

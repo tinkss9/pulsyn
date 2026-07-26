@@ -119,4 +119,21 @@ export abstract class BaseConnector implements Connector {
   isConnected(): boolean {
     return this.connected;
   }
+
+  // Retry wrapper with exponential backoff
+  protected async withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+    let lastError: Error | undefined;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (err) {
+        lastError = err as Error;
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 100;
+          await new Promise(r => setTimeout(r, delay));
+        }
+      }
+    }
+    throw lastError;
+  }
 }
