@@ -35,11 +35,22 @@ export type { BenchmarkConfig, BenchmarkSuite, BenchmarkTest, BenchmarkTestResul
 export { createEvent, eventKey, eventToDict, dictToEvent } from './events';
 export type { UnifiedChangeEvent, Operation } from './events';
 
-// Connectors
+// Connectors — Source
 export { BaseConnector } from './connectors/base';
 export { PostgreSQLConnector } from './connectors/postgresql';
 export { MySQLConnector } from './connectors/mysql';
+export { SQLServerConnector } from './connectors/sqlserver';
+export { OracleConnector } from './connectors/oracle';
+export { MongoDBConnector } from './connectors/mongodb';
+export { RedisConnector } from './connectors/redis';
+export { DynamoDBConnector } from './connectors/dynamodb';
+export { KafkaConnector } from './connectors/kafka';
+export { ElasticsearchConnector } from './connectors/elasticsearch';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
+
+// Connectors — Target
+export { SnowflakeTargetConnector } from './targets/snowflake';
+export { BigQueryTargetConnector } from './targets/bigquery';
 
 // Engine
 export { CDCEngine } from './engine/cdc-engine';
