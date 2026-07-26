@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import HeroGlobe from '@/components/HeroGlobe';
+import MiniGlobe from '@/components/MiniGlobe';
 import { PulsynLogoFull } from '@/components/PulsynLogo';
 
 
@@ -139,7 +140,8 @@ export default function LandingPage() {
             <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
             <a href="/demo" className="text-sm text-gray-400 hover:text-white transition-colors">Demo</a>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <MiniGlobe size={28} />
             <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">Sign In</Link>
             <Link href="/signup" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all">
               Start Free
@@ -161,13 +163,13 @@ export default function LandingPage() {
             <span className="text-cyan-300 text-sm">763 connectors — more than Fivetran</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 60px rgba(6,182,212,0.4), 0 0 120px rgba(6,182,212,0.2)' }}>
             <span className="text-white">Real-time data.</span>
             <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Zero latency.</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 30px rgba(6,182,212,0.5))' }}>Zero latency.</span>
           </h1>
 
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-4 leading-relaxed">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 0 40px rgba(6,182,212,0.3)' }}>
             763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
           </p>
 

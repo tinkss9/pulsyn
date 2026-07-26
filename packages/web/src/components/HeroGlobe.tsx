@@ -41,14 +41,14 @@ export default function HeroGlobe() {
     }
 
     const particles: Particle[] = [];
-    for (let i = 0; i < 2000; i++) {
-      const phi = Math.acos(1 - 2 * (i + 0.5) / 2000);
+    for (let i = 0; i < 3000; i++) {
+      const phi = Math.acos(1 - 2 * (i + 0.5) / 3000);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
       particles.push({
         theta,
         phi,
-        size: 0.4 + Math.random() * 1.2,
-        brightness: 0.2 + Math.random() * 0.8,
+        size: 0.3 + Math.random() * 1.4,
+        brightness: 0.15 + Math.random() * 0.85,
         pulsePhase: Math.random() * Math.PI * 2,
         pulseSpeed: 0.3 + Math.random() * 1.5,
       });
