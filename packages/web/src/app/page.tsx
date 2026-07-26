@@ -163,13 +163,13 @@ export default function LandingPage() {
             <span className="text-cyan-300 text-sm">763 connectors — more than Fivetran</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 60px rgba(6,182,212,0.4), 0 0 120px rgba(6,182,212,0.2)' }}>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 40px rgba(6,182,212,0.25), 0 0 80px rgba(6,182,212,0.1)' }}>
             <span className="text-white">Real-time data.</span>
             <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 30px rgba(6,182,212,0.5))' }}>Zero latency.</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 20px rgba(6,182,212,0.3))' }}>Zero latency.</span>
           </h1>
 
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 0 40px rgba(6,182,212,0.3)' }}>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-4 leading-relaxed">
             763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
           </p>
 
