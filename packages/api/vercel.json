@@ -21,6 +21,7 @@
     { "src": "/api/cdc/errors", "dest": "/api/cdc/errors.ts" },
     { "src": "/api/cdc/reset", "dest": "/api/cdc/reset.ts" },
     { "src": "/api/keys", "dest": "/api/keys.ts" },
+    { "src": "/api/security", "dest": "/api/security.ts" },
     { "src": "/api/cron/replicate", "dest": "/api/cron/replicate.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1.ts" }
   ]

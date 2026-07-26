@@ -1,4 +1,4 @@
-// Vercel serverless helper — PostgreSQL connection + authentication + rate limiting
+// Vercel serverless helper — PostgreSQL connection + authentication + rate limiting + security logging
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Pool } from 'pg';
 import crypto from 'crypto';
@@ -15,11 +15,48 @@ export async function query(text: string, params?: any[]) {
 }
 
 // Rate limit configuration
-const RATE_LIMIT_WINDOW_SECONDS = 60; // 1 minute window
-const DEFAULT_RATE_LIMIT = 100; // requests per minute
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+const DEFAULT_RATE_LIMIT = 100;
 
-// API Key authentication with rate limiting
+// Extract IP address from request
+function getClientIp(req: VercelRequest): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+// Log security event
+async function logSecurityEvent(
+  eventType: string,
+  apiKeyId: string | null,
+  req: VercelRequest,
+  details: Record<string, any> = {}
+): Promise<void> {
+  try {
+    await query(
+      `SELECT log_security_event($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        eventType,
+        apiKeyId,
+        getClientIp(req),
+        req.headers['user-agent'] || 'unknown',
+        req.url || 'unknown',
+        req.method || 'unknown',
+        JSON.stringify(details),
+      ]
+    );
+  } catch (err) {
+    // Don't fail the request if logging fails
+    console.error('Failed to log security event:', err);
+  }
+}
+
+// API Key authentication with rate limiting and security logging
 export async function authenticate(req: VercelRequest, res: VercelResponse): Promise<boolean> {
+  const startTime = Date.now();
+
   // Check for API key in header
   const authHeader = req.headers.authorization;
   const apiKeyHeader = req.headers['x-api-key'] as string;
@@ -38,9 +75,16 @@ export async function authenticate(req: VercelRequest, res: VercelResponse): Pro
     if (cronSecret) {
       const cronAuth = req.headers.authorization;
       if (cronAuth === `Bearer ${cronSecret}` || req.headers['x-vercel-cron']) {
-        return true; // Valid cron request — skip rate limiting
+        return true; // Valid cron request
       }
     }
+
+    // Log auth failure
+    await logSecurityEvent('auth_failure', null, req, {
+      reason: 'no_api_key',
+      hasAuthHeader: !!authHeader,
+      hasApiKeyHeader: !!apiKeyHeader,
+    });
 
     res.status(401).json({
       error: 'Authentication required',
@@ -57,6 +101,12 @@ export async function authenticate(req: VercelRequest, res: VercelResponse): Pro
     );
 
     if (result.rowCount === 0) {
+      // Log invalid key attempt
+      await logSecurityEvent('invalid_key', null, req, {
+        reason: 'key_not_found',
+        keyPrefix: apiKey.substring(0, 12) + '...',
+      });
+
       res.status(401).json({ error: 'Invalid API key' });
       return false;
     }
@@ -77,6 +127,14 @@ export async function authenticate(req: VercelRequest, res: VercelResponse): Pro
     res.setHeader('X-RateLimit-Reset', new Date(reset_at).toISOString());
 
     if (!allowed) {
+      // Log rate limit violation
+      await logSecurityEvent('rate_limit_exceeded', keyInfo.id, req, {
+        limit: limit_val,
+        remaining,
+        windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+        resetAt: new Date(reset_at).toISOString(),
+      });
+
       res.setHeader('Retry-After', RATE_LIMIT_WINDOW_SECONDS.toString());
       res.status(429).json({
         error: 'Rate limit exceeded',
@@ -93,10 +151,21 @@ export async function authenticate(req: VercelRequest, res: VercelResponse): Pro
       [apiKey]
     );
 
+    // Log successful auth
+    await logSecurityEvent('auth_success', keyInfo.id, req, {
+      keyName: keyInfo.name,
+      durationMs: Date.now() - startTime,
+    });
+
     // Attach key info to request for downstream use
     (req as any).apiKeyInfo = keyInfo;
     return true;
   } catch (err: any) {
+    await logSecurityEvent('auth_failure', null, req, {
+      reason: 'database_error',
+      error: err.message,
+    });
+
     res.status(500).json({ error: 'Authentication failed', details: err.message });
     return false;
   }
