@@ -54,6 +54,18 @@ export { ClickHouseConnector } from './connectors/clickhouse';
 export { DatabricksConnector } from './connectors/databricks';
 export { SAPConnector } from './connectors/sap';
 export { XeroConnector } from './connectors/xero';
+export { HubSpotConnector } from './connectors/hubspot';
+export { StripeConnector } from './connectors/stripe';
+export { QuickBooksConnector } from './connectors/quickbooks';
+export { ShopifyConnector } from './connectors/shopify';
+export { SlackConnector } from './connectors/slack';
+export { JiraConnector } from './connectors/jira';
+export { SalesforceConnector } from './connectors/salesforce';
+export { ServiceNowConnector } from './connectors/servicenow';
+export { NetSuiteConnector } from './connectors/netsuite';
+export { WorkdayConnector } from './connectors/workday';
+export { NotionConnector } from './connectors/notion';
+export { AirtableConnector } from './connectors/airtable';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Connectors — Target
