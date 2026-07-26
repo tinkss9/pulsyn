@@ -34,16 +34,20 @@ for (const file of files) {
   
   const hasRealAPI = content.includes('https://') || content.includes('http://') || content.includes('api.');
   
-  const hasAllMethods = [
+  // Check for required methods — targets need writeBatch, sources need extractFull
+  const isTarget = name.includes('-target');
+  const baseMethods = [
     'async connect(',
     'async disconnect(',
     'async testConnection(',
     'async getTables(',
     'async getTableSchema(',
-    'async extractFull(',
     'async startCDC(',
     'async stopCDC('
-  ].every(m => content.includes(m));
+  ];
+  const sourceMethods = [...baseMethods, 'async extractFull('];
+  const targetMethods = [...baseMethods, 'async writeBatch('];
+  const hasAllMethods = (isTarget ? targetMethods : sourceMethods).every(m => content.includes(m));
   
   const hasErrorHandling = content.includes('try {') || content.includes('catch');
   
