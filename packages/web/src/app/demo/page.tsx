@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Database, CreditCard, ShoppingCart, Users, Activity, Clock, Zap, AlertCircle, ChevronRight, Download, Plus } from 'lucide-react';
+import { Database, CreditCard, ShoppingCart, Users, Activity, Clock, Zap, AlertCircle, ChevronRight, Download, Plus, Menu, X } from 'lucide-react';
 
 // Demo data generator
 function generateDemoData(type: string, count: number) {
@@ -51,6 +51,7 @@ const DEMO_CONNECTORS = [
 ];
 
 export default function DemoLabPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedConnector, setSelectedConnector] = useState(DEMO_CONNECTORS[0]);
   const [selectedTable, setSelectedTable] = useState('');
   const [data, setData] = useState<any[]>([]);
@@ -97,18 +98,37 @@ export default function DemoLabPage() {
               </div>
               <span className="text-lg font-bold text-white">Pulsyn</span>
             </Link>
-            <span className="text-gray-600 mx-2">|</span>
-            <span className="text-gray-400 text-sm">Demo Lab</span>
+            <span className="text-gray-600 mx-2 hidden md:inline">|</span>
+            <span className="text-gray-400 text-sm hidden md:inline">Demo Lab</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1.5 bg-green-950/50 border border-green-800/50 rounded-full text-green-400 text-xs font-medium">
+            <span className="px-3 py-1.5 bg-green-950/50 border border-green-800/50 rounded-full text-green-400 text-xs font-medium hidden md:inline">
               Free Tier
             </span>
-            <Link href="/pricing" className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-lg text-sm font-medium transition-all">
+            <Link href="/pricing" className="hidden md:inline px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-lg text-sm font-medium transition-all">
               Upgrade
             </Link>
+            <button className="md:hidden text-gray-400 hover:text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-white/5 pt-4">
+            <nav className="flex flex-col gap-3 mb-4">
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Home</Link>
+              <Link href="/#features" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Features</Link>
+              <Link href="/#connectors" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Connectors</Link>
+              <Link href="/#ai" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">AI</Link>
+              <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Pricing</Link>
+            </nav>
+            <div className="flex flex-col gap-3">
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Sign In</Link>
+              <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium text-center">Start Free</Link>
+            </div>
+          </div>
+        )}
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
