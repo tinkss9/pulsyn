@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Header from '@/components/Header';
 
 export const metadata: Metadata = {
   title: 'Pulsyn vs Fivetran — Real-time CDC vs Batch ETL',
@@ -28,15 +29,7 @@ const COMPARISON = [
 export default function FivetranComparison() {
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
-      <header className="fixed top-0 w-full bg-gray-950/80 backdrop-blur-xl border-b border-gray-800 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-pulsyn-500">Pulsyn</Link>
-          <Link href="/signup" className="bg-pulsyn-600 hover:bg-pulsyn-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-            Start Free Trial
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-6">

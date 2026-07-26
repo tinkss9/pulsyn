@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { PulsynLogoFull } from '@/components/PulsynLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-pulsyn-500">Pulsyn</Link>
+          <Link href="/"><PulsynLogoFull size={32} /></Link>
           <p className="text-gray-400 mt-2">Sign in to your account</p>
         </div>
 

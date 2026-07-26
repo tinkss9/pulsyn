@@ -175,7 +175,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl text-white/80 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-            763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
+            763 connectors. &lt;1 second CDC. AI-powered schema mapping. Starting free.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
