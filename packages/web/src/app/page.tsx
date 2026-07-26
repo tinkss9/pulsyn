@@ -72,23 +72,21 @@ export default function LandingPage() {
 
           <p className="text-gray-600 text-sm">No credit card · Free tier forever · Upgrade when ready</p>
 
-          {/* Terminal preview */}
-          <div className="mt-16 max-w-2xl mx-auto">
+          {/* Hero Video */}
+          <div className="mt-16 max-w-4xl mx-auto">
             <div className="bg-[#0d1117] border border-white/10 rounded-xl overflow-hidden shadow-2xl shadow-black/50">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
-                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                <span className="ml-3 text-gray-500 text-xs font-mono">Terminal</span>
-              </div>
-              <div className="p-5 text-left font-mono text-sm leading-relaxed">
-                <div className="text-gray-500">$ <span className="text-cyan-400">pulsyn pipeline create</span> --source postgres --target snowflake</div>
-                <div className="text-green-400 mt-2">✓ Pipeline created: pg-to-snowflake</div>
-                <div className="text-gray-500 mt-1">$ <span className="text-cyan-400">pulsyn pipeline start</span> pg-to-snowflake</div>
-                <div className="text-green-400 mt-2">✓ CDC engine started</div>
-                <div className="text-gray-400 mt-1">  Latency: <span className="text-cyan-300">0.3s</span> | Rows/sec: <span className="text-cyan-300">12,847</span> | Status: <span className="text-green-400">streaming</span></div>
-              </div>
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto"
+                poster="/hero-poster.png"
+              >
+                <source src="/hero-video.mp4" type="video/mp4" />
+              </video>
             </div>
+            <p className="text-center text-gray-600 text-sm mt-3">75-second demo: Real-time CDC from PostgreSQL to Snowflake</p>
           </div>
         </div>
       </section>
