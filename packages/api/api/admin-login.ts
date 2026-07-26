@@ -4,7 +4,7 @@ import { query } from './_db';
 
 // Admin password hash (SHA-256 of the password)
 // Change this to your own password hash
-const ADMIN_PASSWORD_HASH = 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f'; // SHA-256 of "pulsyn-admin-2026"
+const ADMIN_PASSWORD_HASH = 'ae9b22bb3eb704c36ec0a80032b5b088b932c571faa5c0a501787bf3002dcbf5'; // SHA-256 of "pulsyn-admin-2026"
 
 // Auto-block threshold for admin login failures
 const ADMIN_FAILURE_THRESHOLD = 5;
