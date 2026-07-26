@@ -1,13 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_db';
+import { query, authenticate } from '../_db';
 
-// Active CDC engines (in-memory for serverless — resets on cold start)
 const activeEngines: Map<string, any> = new Map();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  // Require authentication
+  const authenticated = await authenticate(req, res);
+  if (!authenticated) return;
 
   const { pipelineId } = req.body;
 
@@ -16,21 +19,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Check pipeline exists
     const pipelineResult = await query('SELECT * FROM pipelines WHERE id = $1', [pipelineId]);
     if (pipelineResult.rowCount === 0) {
       return res.status(404).json({ error: 'Pipeline not found' });
     }
 
-    const pipeline = pipelineResult.rows[0];
-
-    // Update pipeline status
     await query(
       `UPDATE pipelines SET status = 'running', started_at = NOW(), updated_at = NOW() WHERE id = $1`,
       [pipelineId]
     );
 
-    // Register engine
     const engineId = `engine-${pipelineId}`;
     activeEngines.set(engineId, {
       pipelineId,
@@ -44,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         engineId,
         pipelineId,
         status: 'running',
-        message: 'CDC engine started. Changes tracked via database triggers.',
+        message: 'CDC engine started.',
       },
     });
   } catch (err: any) {

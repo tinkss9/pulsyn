@@ -1,13 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_db';
+import { query, authenticate } from '../_db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const authenticated = await authenticate(req, res);
+  if (!authenticated) return;
+
   try {
-    // Process changes with retry logic
     const result = await query('SELECT * FROM process_pulsyn_changes()');
     const row = result.rows[0];
     const processed = parseInt(row.processed_count);
@@ -15,7 +17,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const skipped = parseInt(row.skipped_count);
     const errorDetails = row.error_details || [];
 
-    // Get remaining counts
     const pendingResult = await query(
       'SELECT COUNT(*) as count FROM _pulsyn_changes WHERE processed = FALSE AND retry_count < max_retries'
     );
@@ -26,7 +27,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     const failed = parseInt(failedResult.rows[0].count);
 
-    // Get recent errors if requested
     let recentErrors: any[] = [];
     if (req.query.includeErrors === 'true') {
       const errorsResult = await query(
@@ -52,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
 
     if (recentErrors.length > 0) {
-      data.recentErrors = recentErrors;
+      response.data.recentErrors = recentErrors;
     }
 
     return res.json(response);

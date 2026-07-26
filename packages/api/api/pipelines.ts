@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from './_db';
+import { query, authenticate } from './_db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
@@ -7,10 +7,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET': {
+        // Public: List pipelines (no auth required for read)
         const result = await query('SELECT * FROM pipelines ORDER BY created_at DESC');
         return res.json({ data: result.rows, total: result.rowCount });
       }
       case 'POST': {
+        // Protected: Create pipeline requires auth
+        const authenticated = await authenticate(req, res);
+        if (!authenticated) return;
+
         const { name, source, target, tables, config } = req.body;
         const id = `pipeline-${Date.now()}`;
 

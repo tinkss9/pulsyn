@@ -1,11 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_db';
+import { query, authenticate } from '../_db';
 
-// Reset failed changes for retry
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const authenticated = await authenticate(req, res);
+  if (!authenticated) return;
 
   try {
     const result = await query('SELECT reset_failed_changes() as count');

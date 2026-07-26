@@ -1,14 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_db';
+import { query, authenticate } from '../_db';
 
-// View failed changes and error logs
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const authenticated = await authenticate(req, res);
+  if (!authenticated) return;
+
   try {
-    // Get failed changes (max retries exceeded)
     const failedResult = await query(
       `SELECT id, table_name, operation, row_data, retry_count, max_retries, error_message, failed_at, changed_at
        FROM _pulsyn_changes
@@ -17,7 +18,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
        LIMIT 50`
     );
 
-    // Get recent errors
     const errorsResult = await query(
       `SELECT e.id, e.change_id, e.error_message, e.error_detail, e.retry_count, e.created_at,
               c.table_name, c.operation
@@ -27,7 +27,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
        LIMIT 50`
     );
 
-    // Get summary stats
     const statsResult = await query(`
       SELECT
         COUNT(*) FILTER (WHERE processed = TRUE) as total_processed,

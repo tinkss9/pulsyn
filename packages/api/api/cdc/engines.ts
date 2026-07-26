@@ -1,13 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_db';
+import { query, authenticate } from '../_db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const authenticated = await authenticate(req, res);
+  if (!authenticated) return;
+
   try {
-    // Get all running pipelines as "active engines"
     const result = await query(
       `SELECT id, name, status, started_at, stats FROM pipelines WHERE status = 'running'`
     );

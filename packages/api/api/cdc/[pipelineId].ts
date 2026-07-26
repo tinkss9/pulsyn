@@ -1,12 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_db';
+import { query, authenticate } from '../_db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Extract pipelineId from path: /api/cdc/status/[pipelineId]
+  const authenticated = await authenticate(req, res);
+  if (!authenticated) return;
+
   const pipelineId = req.query.pipelineId as string;
 
   if (!pipelineId) {
@@ -21,7 +23,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const pipeline = pipelineResult.rows[0];
 
-    // Get pending change count
     let pendingChanges = 0;
     try {
       const changeResult = await query(
@@ -29,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
       pendingChanges = parseInt(changeResult.rows[0]?.count || '0');
     } catch {
-      // Change tracking table may not exist yet
+      // Table may not exist
     }
 
     return res.json({
