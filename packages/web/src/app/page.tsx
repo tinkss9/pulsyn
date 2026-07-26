@@ -2,256 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import HeroGlobe from '@/components/HeroGlobe';
+import { PulsynLogoFull } from '@/components/PulsynLogo';
 
-// Animated Globe Component
-function AnimatedGlobe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>();
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    const W = 600, H = 600;
-    canvas.width = W;
-    canvas.height = H;
-    const cx = W / 2, cy = H / 2, R = 200;
 
-    // Dots on the globe
-    const dots: { lat: number; lon: number; phase: number }[] = [];
-    for (let i = 0; i < 200; i++) {
-      dots.push({
-        lat: Math.acos(2 * Math.random() - 1),
-        lon: Math.random() * Math.PI * 2,
-        phase: Math.random() * Math.PI * 2,
-      });
-    }
-
-    // Data flow lines
-    const flows = [
-      { from: { lat: 0.5, lon: -1.2 }, to: { lat: 0.8, lon: 2.5 } }, // US → EU
-      { from: { lat: 0.6, lon: 2.1 }, to: { lat: 1.0, lon: 0.8 } },   // EU → Asia
-      { from: { lat: 1.2, lon: 0.3 }, to: { lat: 0.4, lon: -0.5 } },  // Asia → SA
-      { from: { lat: 0.3, lon: -0.8 }, to: { lat: 0.9, lon: 1.8 } },  // SA → Africa
-      { from: { lat: 1.1, lon: 1.5 }, to: { lat: 0.5, lon: -1.0 } },  // Africa → US
-    ];
-
-    let t = 0;
-    const project = (lat: number, lon: number, rot: number) => {
-      const x = Math.sin(lat) * Math.cos(lon + rot);
-      const y = Math.cos(lat);
-      const z = Math.sin(lat) * Math.sin(lon + rot);
-      return { x: cx + R * x * 0.8, y: cy - R * y * 0.8, z };
-    };
-
-    const draw = () => {
-      t += 0.003;
-      ctx.fillStyle = 'rgba(10, 10, 15, 0.15)';
-      ctx.fillRect(0, 0, W, H);
-
-      // Globe outline
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Grid lines
-      for (let i = 0; i < 12; i++) {
-        const a = (i / 12) * Math.PI;
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.05)';
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, R * Math.sin(a), R * 0.3, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Dots
-      for (const dot of dots) {
-        const p = project(dot.lat, dot.lon, t);
-        if (p.z > 0) {
-          const brightness = 0.2 + 0.8 * (p.z / R);
-          const pulse = 0.5 + 0.5 * Math.sin(t * 2 + dot.phase);
-          ctx.fillStyle = `rgba(6, 182, 212, ${brightness * pulse * 0.8})`;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 1.5 + brightness, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // Data flow lines
-      for (const flow of flows) {
-        const p1 = project(flow.from.lat, flow.from.lon, t);
-        const p2 = project(flow.to.lat, flow.to.lon, t);
-        if (p1.z > 0 && p2.z > 0) {
-          const progress = (t * 2) % 1;
-          const mx = p1.x + (p2.x - p1.x) * progress;
-          const my = p1.y + (p2.y - p1.y) * progress;
-
-          ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-
-          // Traveling dot
-          ctx.fillStyle = 'rgba(34, 211, 238, 0.9)';
-          ctx.beginPath();
-          ctx.arc(mx, my, 3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = 'rgba(34, 211, 238, 0.3)';
-          ctx.beginPath();
-          ctx.arc(mx, my, 8, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      animRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, []);
-
-  return <canvas ref={canvasRef} className="w-full h-full" style={{ maxWidth: 600, maxHeight: 600 }} />;
-}
-
-// Data Flow Animation Component
-function DataFlowAnimation() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>();
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const W = 900, H = 200;
-    canvas.width = W;
-    canvas.height = H;
-
-    const sources = [
-      { x: 80, y: 60, label: 'PostgreSQL', color: '#336791' },
-      { x: 80, y: 100, label: 'MongoDB', color: '#47A248' },
-      { x: 80, y: 140, label: 'Stripe', color: '#635BFF' },
-    ];
-
-    const targets = [
-      { x: 780, y: 60, label: 'Snowflake', color: '#29B5E8' },
-      { x: 780, y: 100, label: 'BigQuery', color: '#4285F4' },
-      { x: 780, y: 140, label: 'Data Warehouse', color: '#FF6B35' },
-    ];
-
-    const engine = { x: 430, y: 100, label: 'Pulsyn CDC Engine', color: '#06B6D4' };
-
-    let t = 0;
-    const draw = () => {
-      t += 0.015;
-      ctx.fillStyle = 'rgba(10, 10, 15, 0.1)';
-      ctx.fillRect(0, 0, W, H);
-
-      // Draw connections
-      for (const src of sources) {
-        // Source → Engine
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(src.x + 60, src.y);
-        ctx.lineTo(engine.x - 60, engine.y);
-        ctx.stroke();
-
-        // Traveling data packet
-        const prog1 = (t + sources.indexOf(src) * 0.3) % 1;
-        const x1 = src.x + 60 + (engine.x - 60 - src.x - 60) * prog1;
-        const y1 = src.y + (engine.y - src.y) * prog1;
-        ctx.fillStyle = src.color;
-        ctx.beginPath();
-        ctx.arc(x1, y1, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = src.color + '40';
-        ctx.beginPath();
-        ctx.arc(x1, y1, 10, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      for (const tgt of targets) {
-        // Engine → Target
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(engine.x + 60, engine.y);
-        ctx.lineTo(tgt.x - 60, tgt.y);
-        ctx.stroke();
-
-        // Traveling data packet
-        const prog2 = (t + targets.indexOf(tgt) * 0.3) % 1;
-        const x2 = engine.x + 60 + (tgt.x - 60 - engine.x - 60) * prog2;
-        const y2 = engine.y + (tgt.y - engine.y) * prog2;
-        ctx.fillStyle = tgt.color;
-        ctx.beginPath();
-        ctx.arc(x2, y2, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = tgt.color + '40';
-        ctx.beginPath();
-        ctx.arc(x2, y2, 10, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Source boxes
-      for (const src of sources) {
-        ctx.fillStyle = src.color + '20';
-        ctx.strokeStyle = src.color + '60';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(src.x - 50, src.y - 15, 100, 30, 8);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#fff';
-        ctx.font = '11px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(src.label, src.x, src.y + 4);
-      }
-
-      // Engine box
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.15)';
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.5)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(engine.x - 70, engine.y - 25, 140, 50, 12);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 12px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(engine.label, engine.x, engine.y + 4);
-
-      // Target boxes
-      for (const tgt of targets) {
-        ctx.fillStyle = tgt.color + '20';
-        ctx.strokeStyle = tgt.color + '60';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(tgt.x - 50, tgt.y - 15, 100, 30, 8);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#fff';
-        ctx.font = '11px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(tgt.label, tgt.x, tgt.y + 4);
-      }
-
-      animRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, []);
-
-  return <canvas ref={canvasRef} className="w-full h-auto rounded-xl" style={{ maxWidth: 900 }} />;
-}
 
 // AI Chat Component
 function AIChat() {
@@ -370,11 +126,8 @@ export default function LandingPage() {
       {/* Header */}
       <header className="fixed top-0 w-full bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/5 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <span className="text-lg font-bold text-white">Pulsyn</span>
+          <Link href="/">
+            <PulsynLogoFull size={32} />
           </Link>
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
@@ -430,19 +183,11 @@ export default function LandingPage() {
               <p className="text-gray-600 text-sm">No credit card · Free forever · 763 connectors</p>
             </div>
 
-            {/* Right: Animated Globe */}
-            <div className="flex justify-center">
-              <AnimatedGlobe />
+            {/* Right: Hero Globe */}
+            <div className="flex justify-center h-[500px]">
+              <HeroGlobe />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Data Flow Animation */}
-      <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-8">See your data flow in real-time</h2>
-          <DataFlowAnimation />
         </div>
       </section>
 
