@@ -58,7 +58,7 @@ export default function LandingPage() {
             No Kafka cluster to manage. No $50K enterprise contracts.
           </p>
           <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
-            PostgreSQL and MySQL supported today. More connectors coming.
+            31 connectors — databases, warehouses, SaaS apps, and more.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -146,7 +146,7 @@ export default function LandingPage() {
               { icon: '🔒', title: 'In-flight Masking', desc: 'Hash, redact, or format-preserving encryption during replication.' },
               { icon: '📊', title: 'Connector Certification', desc: 'Measured throughput and correctness benchmarks per pair.' },
               { icon: '🛡️', title: 'Enterprise Security', desc: 'API keys, rate limiting, IP blocking, brute-force protection.' },
-              { icon: '📡', title: 'Growing Connector Library', desc: 'PostgreSQL and MySQL today. Community-driven expansion.' },
+              { icon: '📡', title: '31 Connectors', desc: 'PostgreSQL, MySQL, Oracle, MongoDB, Snowflake, Salesforce, Stripe, and 25 more.' },
               { icon: '☁️', title: 'Deploy Anywhere', desc: 'Self-hosted, managed cloud, or hybrid. Docker or Vercel.' },
             ].map((f) => (
               <div key={f.title} className="group bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 hover:bg-white/[0.06] hover:border-cyan-500/30 transition-all">
@@ -189,21 +189,25 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Coming Soon - Expandable */}
+          {/* Available Connectors */}
           <div className="mb-12">
-            <h3 className="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-              Coming Soon — Connector Roadmap
+            <h3 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-400"></span>
+              31 Connectors Available Now
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3" id="connector-roadmap">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {[
-                { name: 'Oracle', cat: 'db' }, { name: 'SQL Server', cat: 'db' }, { name: 'MongoDB', cat: 'db' },
-                { name: 'MariaDB', cat: 'db' }, { name: 'CockroachDB', cat: 'db' }, { name: 'TiDB', cat: 'db' },
+                { name: 'PostgreSQL', cat: 'db' }, { name: 'MySQL', cat: 'db' }, { name: 'SQL Server', cat: 'db' },
+                { name: 'Oracle', cat: 'db' }, { name: 'MongoDB', cat: 'db' }, { name: 'MariaDB', cat: 'db' },
                 { name: 'Snowflake', cat: 'wh' }, { name: 'BigQuery', cat: 'wh' }, { name: 'Redshift', cat: 'wh' },
                 { name: 'Databricks', cat: 'wh' }, { name: 'ClickHouse', cat: 'wh' },
-                { name: 'Kafka', cat: 'stream' }, { name: 'Pulsar', cat: 'stream' }, { name: 'Redis', cat: 'stream' },
-                { name: 'AWS RDS', cat: 'cloud' }, { name: 'Azure SQL', cat: 'cloud' }, { name: 'Neon', cat: 'cloud' },
-                { name: 'Salesforce', cat: 'saas' }, { name: 'Stripe', cat: 'saas' }, { name: 'Shopify', cat: 'saas' },
+                { name: 'Kafka', cat: 'stream' }, { name: 'Redis', cat: 'stream' }, { name: 'Elasticsearch', cat: 'stream' },
+                { name: 'Supabase', cat: 'cloud' }, { name: 'DynamoDB', cat: 'cloud' }, { name: 'Cassandra', cat: 'cloud' },
+                { name: 'Salesforce', cat: 'saas' }, { name: 'Stripe', cat: 'saas' }, { name: 'HubSpot', cat: 'saas' },
+                { name: 'Shopify', cat: 'saas' }, { name: 'Slack', cat: 'saas' }, { name: 'Jira', cat: 'saas' },
+                { name: 'SAP', cat: 'saas' }, { name: 'Xero', cat: 'saas' }, { name: 'NetSuite', cat: 'saas' },
+                { name: 'Workday', cat: 'saas' }, { name: 'QuickBooks', cat: 'saas' }, { name: 'Notion', cat: 'saas' },
+                { name: 'Airtable', cat: 'saas' }, { name: 'ServiceNow', cat: 'saas' },
               ].map((c) => (
                 <div key={c.name} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border ${
                   c.cat === 'db' ? 'bg-emerald-950/20 border-emerald-900/30' :
@@ -212,13 +216,10 @@ export default function LandingPage() {
                   c.cat === 'cloud' ? 'bg-cyan-950/20 border-cyan-900/30' :
                   'bg-orange-950/20 border-orange-900/30'
                 }`}>
-                  <span className="text-sm text-gray-400">{c.name}</span>
-                  <span className="text-xs text-gray-600 ml-auto">Q3 2026</span>
+                  <span className="text-sm text-gray-300">{c.name}</span>
+                  <span className="text-xs text-green-500 ml-auto">✓</span>
                 </div>
               ))}
-              <div className="flex items-center justify-center px-3 py-2.5 rounded-lg border border-dashed border-gray-700 text-gray-500 text-sm">
-                +150 more planned
-              </div>
             </div>
           </div>
 
