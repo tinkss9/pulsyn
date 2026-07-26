@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
-import { query } from '../_db';
+import { query } from './_db';
 
 // Admin password hash (SHA-256 of the password)
 // Change this to your own password hash
