@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import crypto from 'crypto';
 
 interface SecurityEvent {
   id: number;
@@ -30,10 +29,6 @@ interface SecuritySummary {
   blockedIps: number;
 }
 
-// Admin password hash (SHA-256 of "pulsyn-admin-2026")
-// Change this to your own password hash
-const ADMIN_PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
-
 export default function SecurityDashboard() {
   const [summary, setSummary] = useState<SecuritySummary | null>(null);
   const [recentEvents, setRecentEvents] = useState<SecurityEvent[]>([]);
@@ -45,11 +40,12 @@ export default function SecurityDashboard() {
   const [apiAuthenticated, setApiAuthenticated] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [error, setError] = useState('');
+  const [blockedMessage, setBlockedMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'blocked' | 'failures'>('overview');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api-67qhpgy5i-1inai.vercel.app';
 
-  // Check if admin password was previously entered (stored in sessionStorage)
+  // Check if admin was previously authenticated (stored in sessionStorage)
   useEffect(() => {
     const stored = sessionStorage.getItem('pulsyn_admin_auth');
     if (stored === 'true') {
@@ -57,24 +53,37 @@ export default function SecurityDashboard() {
     }
   }, []);
 
-  const hashPassword = async (password: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  };
-
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setBlockedMessage('');
 
-    const hash = await hashPassword(adminPassword);
-    if (hash === ADMIN_PASSWORD_HASH) {
-      setAdminAuthenticated(true);
-      sessionStorage.setItem('pulsyn_admin_auth', 'true');
-    } else {
-      setError('Invalid admin password');
+    try {
+      const res = await fetch(`${API_URL}/api/admin-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 403) {
+        // IP blocked
+        setBlockedMessage(data.message || 'Your IP has been blocked due to too many failed attempts.');
+        return;
+      }
+
+      if (res.status === 401) {
+        setError(data.message || 'Invalid password');
+        return;
+      }
+
+      if (data.data?.authenticated) {
+        setAdminAuthenticated(true);
+        sessionStorage.setItem('pulsyn_admin_auth', 'true');
+      }
+    } catch (err) {
+      setError('Connection failed. Please try again.');
     }
   };
 
@@ -160,33 +169,51 @@ export default function SecurityDashboard() {
 
   const getEventColor = (type: string) => {
     switch (type) {
-      case 'auth_success': return 'text-green-400';
-      case 'auth_failure': return 'text-yellow-400';
-      case 'invalid_key': return 'text-orange-400';
-      case 'rate_limit_exceeded': return 'text-red-400';
-      case 'suspicious_activity': return 'text-red-500';
-      default: return 'text-gray-400';
+      case 'auth_success':
+      case 'admin_login_success':
+        return 'text-green-400';
+      case 'auth_failure':
+      case 'admin_login_failure':
+        return 'text-yellow-400';
+      case 'invalid_key':
+        return 'text-orange-400';
+      case 'rate_limit_exceeded':
+      case 'admin_login_blocked':
+        return 'text-red-400';
+      case 'suspicious_activity':
+        return 'text-red-500';
+      default:
+        return 'text-gray-400';
     }
   };
 
   const getEventIcon = (type: string) => {
     switch (type) {
-      case 'auth_success': return '✓';
-      case 'auth_failure': return '⚠';
-      case 'invalid_key': return '✗';
-      case 'rate_limit_exceeded': return '⊘';
-      case 'suspicious_activity': return '⛔';
-      default: return '•';
+      case 'auth_success':
+      case 'admin_login_success':
+        return '✓';
+      case 'auth_failure':
+      case 'admin_login_failure':
+        return '⚠';
+      case 'invalid_key':
+        return '✗';
+      case 'rate_limit_exceeded':
+        return '⊘';
+      case 'suspicious_activity':
+      case 'admin_login_blocked':
+        return '⛔';
+      default:
+        return '•';
     }
   };
 
-  // Step 1: Admin password gate
+  // Step 1: Admin password gate (server-side verification)
   if (!adminAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 w-full max-w-md">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-xl">
               🔒
             </div>
             <div>
@@ -201,6 +228,13 @@ export default function SecurityDashboard() {
             </div>
           )}
 
+          {blockedMessage && (
+            <div className="bg-red-950/80 border border-red-700 rounded-lg p-4 mb-4">
+              <div className="text-red-400 font-semibold mb-1">⛔ IP Blocked</div>
+              <div className="text-red-300 text-sm">{blockedMessage}</div>
+            </div>
+          )}
+
           <form onSubmit={handleAdminLogin}>
             <input
               type="password"
@@ -209,19 +243,27 @@ export default function SecurityDashboard() {
               placeholder="Admin password"
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white mb-4 focus:outline-none focus:border-red-500"
               autoFocus
+              disabled={!!blockedMessage}
             />
 
             <button
               type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium transition-colors"
+              disabled={!!blockedMessage}
+              className={`w-full py-3 rounded-lg font-medium transition-colors ${
+                blockedMessage
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700 text-white'
+              }`}
             >
-              Authenticate
+              {blockedMessage ? 'Blocked' : 'Authenticate'}
             </button>
           </form>
 
-          <p className="text-gray-500 text-xs mt-4 text-center">
-            This page is monitored. Unauthorized access attempts are logged.
-          </p>
+          <div className="mt-4 p-3 bg-gray-800/50 rounded-lg">
+            <p className="text-gray-500 text-xs">
+              ⚠️ This page is monitored. Failed login attempts are logged and may result in IP blocking.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -393,7 +435,7 @@ export default function SecurityDashboard() {
                           {new Date(event.created_at).toLocaleString()}
                         </td>
                         <td className="py-3 px-4">
-                          {event.event_type !== 'auth_success' && (
+                          {event.event_type !== 'auth_success' && event.event_type !== 'admin_login_success' && (
                             <button
                               onClick={() => blockIp(event.ip_address)}
                               className="text-red-400 hover:text-red-300 text-sm"
