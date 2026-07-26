@@ -76,15 +76,18 @@ export default function HeroGlobe() {
       phi: Math.PI / 2,
       speed: 0.002,        // Starts slow
       baseSpeed: 0.002,
-      maxSpeed: 0.015,      // Gets fast
+      maxSpeed: 0.012,      // Gets fast (reduced for smoother)
       direction: 1,         // 1 or -1
-      size: 4,              // Bigger than other particles
+      size: 3.5,            // Slightly smaller
       bouncePhase: 0,       // For bounce animation
-      hitRadius: 0.3,       // How close to energize particles
-      energizeAmount: 1.0,  // How much energy to transfer
+      hitRadius: 0.25,      // Tighter hit radius
+      energizeAmount: 0.8,  // Less energy (more subtle)
       // Bounce path — sine wave on phi
-      bounceAmplitude: 0.8,
-      bounceFrequency: 0.3,
+      bounceAmplitude: 0.7,
+      bounceFrequency: 0.25,
+      // Trail history
+      trail: [] as { theta: number; phi: number; age: number }[],
+      maxTrail: 40,         // Trail length
     };
 
     // === DATA FLOW ARCS (subtle) ===
@@ -118,16 +121,16 @@ export default function HeroGlobe() {
     };
 
     const draw = () => {
-      time += 0.006; // Slower overall
+      time += 0.004; // Even slower — more hypnotic
       const w = W();
       const h = H();
 
       // Very slow fade
-      ctx.fillStyle = 'rgba(8, 8, 12, 0.06)';
+      ctx.fillStyle = 'rgba(8, 8, 12, 0.04)';
       ctx.fillRect(0, 0, w, h);
 
-      const rotY = time * 0.2;
-      const rotX = Math.sin(time * 0.08) * 0.12;
+      const rotY = time * 0.15;
+      const rotX = Math.sin(time * 0.06) * 0.1;
 
       // === UPDATE CATALYST ===
       catalyst.bouncePhase += 0.02;
@@ -144,6 +147,11 @@ export default function HeroGlobe() {
 
       // Catalyst position in 3D
       const catalystPos = project(catalyst.theta, catalyst.phi, rotY, rotX);
+
+      // === UPDATE TRAIL ===
+      catalyst.trail.unshift({ theta: catalyst.theta, phi: catalyst.phi, age: 0 });
+      if (catalyst.trail.length > catalyst.maxTrail) catalyst.trail.pop();
+      for (const t of catalyst.trail) t.age++;
 
       // === ENERGIZE NEARBY PARTICLES ===
       for (const p of particles) {
@@ -223,19 +231,41 @@ export default function HeroGlobe() {
         }
       }
 
+      // === DRAW CATALYST TRAIL ===
+      for (let i = 0; i < catalyst.trail.length; i++) {
+        const t = catalyst.trail[i];
+        const tPos = project(t.theta, t.phi, rotY, rotX);
+        if (tPos.z > -R() * 0.2) {
+          const alpha = (1 - t.age / catalyst.maxTrail) * 0.4 * (tPos.z / R() + 0.3);
+          const size = catalyst.size * (1 - t.age / catalyst.maxTrail) * 0.8;
+          
+          // Trail glow
+          ctx.fillStyle = `rgba(6, 182, 212, ${alpha * 0.3})`;
+          ctx.beginPath();
+          ctx.arc(tPos.x, tPos.y, size * 3, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Trail dot
+          ctx.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(tPos.x, tPos.y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
       // === DRAW CATALYST (dark dot with glow) ===
       if (catalystPos.z > -R() * 0.2) {
         // Catalyst glow (energy aura)
         const catalystGlow = ctx.createRadialGradient(
           catalystPos.x, catalystPos.y, 0,
-          catalystPos.x, catalystPos.y, 20
+          catalystPos.x, catalystPos.y, 15
         );
-        catalystGlow.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-        catalystGlow.addColorStop(0.5, 'rgba(6, 182, 212, 0.08)');
+        catalystGlow.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+        catalystGlow.addColorStop(0.5, 'rgba(6, 182, 212, 0.06)');
         catalystGlow.addColorStop(1, 'rgba(6, 182, 212, 0)');
         ctx.fillStyle = catalystGlow;
         ctx.beginPath();
-        ctx.arc(catalystPos.x, catalystPos.y, 20, 0, Math.PI * 2);
+        ctx.arc(catalystPos.x, catalystPos.y, 15, 0, Math.PI * 2);
         ctx.fill();
 
         // Catalyst core (dark)
@@ -245,8 +275,8 @@ export default function HeroGlobe() {
         ctx.fill();
 
         // Catalyst rim (bright)
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.8)';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(34, 211, 238, 0.7)';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.arc(catalystPos.x, catalystPos.y, catalyst.size, 0, Math.PI * 2);
         ctx.stroke();
