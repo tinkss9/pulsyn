@@ -1,6 +1,0 @@
-{
-  "framework": "nextjs",
-  "buildCommand": "cd ../.. && npm install && npx turbo build --filter=@pulsyn/web...",
-  "installCommand": "cd ../.. && npm install",
-  "outputDirectory": ".next"
-}
