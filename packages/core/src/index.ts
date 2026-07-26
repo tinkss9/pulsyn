@@ -31,16 +31,22 @@ export { DEFAULT_SUITE, CERTIFICATION_THRESHOLDS, calculateScore, runBenchmark }
 export { generateReportSummary, generateReportMarkdown } from './benchmark/runner';
 export type { BenchmarkConfig, BenchmarkSuite, BenchmarkTest, BenchmarkTestResult, BenchmarkReport, CertificationLevel } from './benchmark/engine';
 
+// Events (DMS-ported)
+export { createEvent, eventKey, eventToDict, dictToEvent } from './events';
+export type { UnifiedChangeEvent, Operation } from './events';
+
 // Connectors
 export { BaseConnector } from './connectors/base';
 export { PostgreSQLConnector } from './connectors/postgresql';
 export { MySQLConnector } from './connectors/mysql';
+export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Engine
 export { CDCEngine } from './engine/cdc-engine';
 
 // Checkpoint
 export { CheckpointManager } from './checkpoint/checkpoint-manager';
+export { WatermarkTracker } from './checkpoint/watermark';
 
 // Version
 export const VERSION = '0.1.0';
