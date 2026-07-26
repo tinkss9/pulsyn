@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
-// Pulsyn Hero Globe — Apple-style minimal with concentric rings and data flow
+// Pulsyn Hero Globe — Particle sphere with data flow, concentric rings, and depth
+// Inspired by TikTok "Mathematic Poetry" sphere but elevated for a data platform
 export default function HeroGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>();
@@ -28,9 +29,9 @@ export default function HeroGlobe() {
     const H = () => canvas.getBoundingClientRect().height;
     const cx = () => W() / 2;
     const cy = () => H() / 2;
-    const R = () => Math.min(W(), H()) * 0.35;
+    const R = () => Math.min(W(), H()) * 0.32;
 
-    // Mouse tracking for parallax
+    // Mouse parallax
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
@@ -39,108 +40,188 @@ export default function HeroGlobe() {
       };
     });
 
-    // Concentric rings configuration
-    const rings = [
-      { radius: 0.3, speed: 0.008, tilt: 0.3, opacity: 0.15 },
-      { radius: 0.5, speed: -0.006, tilt: -0.2, opacity: 0.12 },
-      { radius: 0.7, speed: 0.004, tilt: 0.5, opacity: 0.10 },
-      { radius: 0.85, speed: -0.003, tilt: -0.4, opacity: 0.08 },
-      { radius: 1.0, speed: 0.002, tilt: 0.1, opacity: 0.06 },
-    ];
-
-    // Data flow particles
-    interface Particle {
-      ring: number;
-      angle: number;
-      speed: number;
+    // === PARTICLE SPHERE ===
+    // 1500 particles on sphere surface (like TikTok video but more)
+    interface SphereParticle {
+      theta: number; // longitude
+      phi: number;   // latitude
       size: number;
-      opacity: number;
-      hue: number;
+      brightness: number;
+      pulsePhase: number;
+      pulseSpeed: number;
     }
 
-    const particles: Particle[] = [];
-    for (let i = 0; i < 80; i++) {
-      particles.push({
-        ring: Math.floor(Math.random() * rings.length),
-        angle: Math.random() * Math.PI * 2,
-        speed: 0.002 + Math.random() * 0.008,
-        size: 1 + Math.random() * 2,
-        opacity: 0.3 + Math.random() * 0.7,
-        hue: 180 + Math.random() * 40, // Cyan to blue
+    const sphereParticles: SphereParticle[] = [];
+    for (let i = 0; i < 1500; i++) {
+      // Fibonacci sphere distribution for even coverage
+      const phi = Math.acos(1 - 2 * (i + 0.5) / 1500);
+      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      sphereParticles.push({
+        theta,
+        phi,
+        size: 0.5 + Math.random() * 1.5,
+        brightness: 0.3 + Math.random() * 0.7,
+        pulsePhase: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.5 + Math.random() * 2,
       });
     }
 
-    // Connection lines between particles
-    const connections: { from: number; to: number; opacity: number }[] = [];
-    for (let i = 0; i < 15; i++) {
-      connections.push({
-        from: Math.floor(Math.random() * particles.length),
-        to: Math.floor(Math.random() * particles.length),
-        opacity: 0.05 + Math.random() * 0.1,
-      });
-    }
-
-    // Orbiting data points (representing connectors)
-    const orbitPoints: { angle: number; radius: number; speed: number; size: number; label: string; color: string }[] = [
-      { angle: 0, radius: 1.15, speed: 0.003, size: 4, label: 'PG', color: '#336791' },
-      { angle: Math.PI * 0.4, radius: 1.2, speed: -0.002, size: 3, label: 'SF', color: '#00A1E0' },
-      { angle: Math.PI * 0.8, radius: 1.1, speed: 0.004, size: 3.5, label: 'SN', color: '#29B5E8' },
-      { angle: Math.PI * 1.2, radius: 1.25, speed: -0.003, size: 3, label: 'ST', color: '#635BFF' },
-      { angle: Math.PI * 1.6, radius: 1.15, speed: 0.002, size: 4, label: 'MY', color: '#47A248' },
-      { angle: Math.PI * 2.0, radius: 1.2, speed: -0.004, size: 3, label: 'RD', color: '#DC382D' },
+    // === CONCENTRIC RINGS (inside the sphere) ===
+    const rings = [
+      { radius: 0.25, speed: 0.012, tilt: 0.4, opacity: 0.25, width: 1.5 },
+      { radius: 0.45, speed: -0.008, tilt: -0.3, opacity: 0.20, width: 1.2 },
+      { radius: 0.65, speed: 0.006, tilt: 0.6, opacity: 0.15, width: 1.0 },
+      { radius: 0.85, speed: -0.004, tilt: -0.5, opacity: 0.12, width: 0.8 },
+      { radius: 1.0, speed: 0.003, tilt: 0.2, opacity: 0.08, width: 0.6 },
     ];
 
-    // Glow pulse
-    let glowPhase = 0;
+    // === DATA FLOW ARCS ===
+    // These are the "wow" factor — data packets traveling along curved paths
+    interface DataFlow {
+      startTheta: number;
+      startPhi: number;
+      endTheta: number;
+      endPhi: number;
+      progress: number;
+      speed: number;
+      color: string;
+      size: number;
+    }
+
+    const dataFlows: DataFlow[] = [
+      // US → Europe
+      { startTheta: -1.2, startPhi: 0.5, endTheta: 2.5, endPhi: 0.8, progress: 0, speed: 0.003, color: '#22D3EE', size: 3 },
+      // Europe → Asia
+      { startTheta: 2.1, startPhi: 0.6, endTheta: 0.8, endPhi: 1.0, progress: 0.3, speed: 0.002, color: '#06B6D4', size: 2.5 },
+      // Asia → South America
+      { startTheta: 0.3, startPhi: 1.2, endTheta: -0.5, endPhi: 0.4, progress: 0.6, speed: 0.004, color: '#0891B2', size: 2 },
+      // South America → Africa
+      { startTheta: -0.8, startPhi: 0.3, endTheta: 1.8, endPhi: 0.9, progress: 0.1, speed: 0.0025, color: '#22D3EE', size: 2.5 },
+      // Africa → US (completing the circle)
+      { startTheta: 1.5, startPhi: 1.1, endTheta: -1.0, endPhi: 0.5, progress: 0.8, speed: 0.003, color: '#06B6D4', size: 3 },
+      // Extra flows for density
+      { startTheta: 0.5, startPhi: 0.2, endTheta: -0.3, endPhi: 1.3, progress: 0.4, speed: 0.0035, color: '#0E7490', size: 2 },
+      { startTheta: -0.5, startPhi: 1.0, endTheta: 1.2, endPhi: 0.1, progress: 0.7, speed: 0.002, color: '#155E75', size: 1.5 },
+      { startTheta: 2.0, startPhi: 0.4, endTheta: -0.8, endPhi: 1.1, progress: 0.2, speed: 0.003, color: '#22D3EE', size: 2 },
+    ];
+
+    // === ORBITING CONNECTOR DOTS ===
+    interface OrbitDot {
+      theta: number;
+      phi: number;
+      orbitRadius: number;
+      orbitSpeed: number;
+      size: number;
+      color: string;
+      label: string;
+    }
+
+    const orbitDots: OrbitDot[] = [
+      { theta: 0, phi: 0.5, orbitRadius: 1.15, orbitSpeed: 0.004, size: 5, color: '#336791', label: 'PG' },
+      { theta: Math.PI * 0.4, phi: 0.8, orbitRadius: 1.2, orbitSpeed: -0.003, size: 4, color: '#00A1E0', label: 'SF' },
+      { theta: Math.PI * 0.8, phi: 1.0, orbitRadius: 1.1, orbitSpeed: 0.005, size: 4.5, color: '#29B5E8', label: 'SN' },
+      { theta: Math.PI * 1.2, phi: 0.4, orbitRadius: 1.25, orbitSpeed: -0.004, size: 4, color: '#635BFF', label: 'ST' },
+      { theta: Math.PI * 1.6, phi: 0.6, orbitRadius: 1.15, orbitSpeed: 0.003, size: 5, color: '#47A248', label: 'MY' },
+      { theta: Math.PI * 2.0, phi: 0.9, orbitRadius: 1.2, orbitSpeed: -0.005, size: 4, color: '#DC382D', label: 'RD' },
+    ];
+
     let time = 0;
 
+    // Project 3D point to 2D
+    const project = (theta: number, phi: number, rotY: number, rotX: number) => {
+      const x = Math.sin(phi) * Math.cos(theta + rotY);
+      const y = Math.cos(phi) * Math.cos(rotX);
+      const z = Math.sin(phi) * Math.sin(theta + rotY) * Math.cos(rotX) + Math.cos(phi) * Math.sin(rotX);
+      return { x: cx() + R() * x, y: cy() - R() * y, z };
+    };
+
     const draw = () => {
-      time += 0.016;
-      glowPhase += 0.02;
+      time += 0.012;
       const w = W();
       const h = H();
 
-      // Clear with fade (creates motion blur)
-      ctx.fillStyle = 'rgba(10, 10, 15, 0.15)';
+      // Clear with subtle fade (motion blur)
+      ctx.fillStyle = 'rgba(8, 8, 12, 0.12)';
       ctx.fillRect(0, 0, w, h);
 
-      // Mouse parallax offset
-      const mx = mouseRef.current.x * 20;
-      const my = mouseRef.current.y * 20;
+      const mx = mouseRef.current.x * 15;
+      const my = mouseRef.current.y * 15;
+      const rotY = time * 0.3;
+      const rotX = Math.sin(time * 0.15) * 0.2 + my * 0.01;
 
-      // Draw outer sphere outline (subtle)
-      const gradient = ctx.createRadialGradient(
-        cx() + mx * 0.5, cy() + my * 0.5, R() * 0.8,
-        cx() + mx * 0.5, cy() + my * 0.5, R() * 1.1
+      // === 1. DRAW OUTER GLOW (volumetric) ===
+      const outerGlow = ctx.createRadialGradient(
+        cx() + mx, cy() + my, R() * 0.6,
+        cx() + mx, cy() + my, R() * 1.4
       );
-      gradient.addColorStop(0, 'rgba(6, 182, 212, 0.02)');
-      gradient.addColorStop(0.5, 'rgba(6, 182, 212, 0.05)');
-      gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
-      ctx.fillStyle = gradient;
+      outerGlow.addColorStop(0, 'rgba(6, 182, 212, 0.06)');
+      outerGlow.addColorStop(0.5, 'rgba(6, 182, 212, 0.03)');
+      outerGlow.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      ctx.fillStyle = outerGlow;
       ctx.beginPath();
-      ctx.arc(cx() + mx * 0.5, cy() + my * 0.5, R() * 1.1, 0, Math.PI * 2);
+      ctx.arc(cx() + mx, cy() + my, R() * 1.4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Draw concentric rings
+      // === 2. DRAW SPHERE PARTICLES ===
+      // Sort by depth for proper layering
+      const projected: { x: number; y: number; z: number; size: number; brightness: number; pulse: number }[] = [];
+
+      for (const p of sphereParticles) {
+        const pos = project(p.theta, p.phi, rotY, rotX);
+        const pulse = 0.7 + 0.3 * Math.sin(time * p.pulseSpeed + p.pulsePhase);
+        projected.push({
+          x: pos.x + mx * 0.5,
+          y: pos.y + my * 0.5,
+          z: pos.z,
+          size: p.size * (0.5 + pos.z / R() * 0.5),
+          brightness: p.brightness * pulse * (0.4 + pos.z / R() * 0.6),
+          pulse,
+        });
+      }
+
+      // Sort back-to-front
+      projected.sort((a, b) => a.z - b.z);
+
+      // Draw particles
+      for (const p of projected) {
+        if (p.z > -R() * 0.3) {
+          const alpha = p.brightness * 0.9;
+          // Core particle
+          ctx.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Glow around brighter particles
+          if (p.brightness > 0.6) {
+            ctx.fillStyle = `rgba(6, 182, 212, ${alpha * 0.15})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // === 3. DRAW CONCENTRIC RINGS (inside sphere) ===
       for (const ring of rings) {
         const r = R() * ring.radius;
-        const tilt = ring.tilt + Math.sin(time * 0.5) * 0.1;
+        const tilt = ring.tilt + Math.sin(time * 0.4) * 0.08;
         const rot = time * ring.speed;
 
         ctx.save();
         ctx.translate(cx() + mx * 0.3, cy() + my * 0.3);
         ctx.rotate(rot);
 
-        // Ring ellipse
-        ctx.strokeStyle = `rgba(6, 182, 212, ${ring.opacity})`;
-        ctx.lineWidth = 1;
+        // Ring glow
+        ctx.strokeStyle = `rgba(6, 182, 212, ${ring.opacity * 0.4})`;
+        ctx.lineWidth = ring.width * 3;
         ctx.beginPath();
         ctx.ellipse(0, 0, r, r * Math.abs(Math.cos(tilt)), tilt, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Ring glow
-        ctx.strokeStyle = `rgba(6, 182, 212, ${ring.opacity * 0.3})`;
-        ctx.lineWidth = 4;
+        // Ring line
+        ctx.strokeStyle = `rgba(6, 182, 212, ${ring.opacity})`;
+        ctx.lineWidth = ring.width;
         ctx.beginPath();
         ctx.ellipse(0, 0, r, r * Math.abs(Math.cos(tilt)), tilt, 0, Math.PI * 2);
         ctx.stroke();
@@ -148,120 +229,107 @@ export default function HeroGlobe() {
         ctx.restore();
       }
 
-      // Draw particles on rings
-      for (const p of particles) {
-        p.angle += p.speed;
-        const ring = rings[p.ring];
-        const r = R() * ring.radius;
-        const tilt = ring.tilt + Math.sin(time * 0.5) * 0.1;
-        const rot = time * ring.speed;
+      // === 4. DRAW DATA FLOW ARCS ===
+      for (const flow of dataFlows) {
+        flow.progress = (flow.progress + flow.speed) % 1;
 
-        // Position on ring
-        const x = cx() + mx * 0.3 + r * Math.cos(p.angle + rot) * Math.cos(tilt);
-        const y = cy() + my * 0.3 + r * Math.sin(p.angle + rot);
+        // Interpolate position on sphere
+        const theta = flow.startTheta + (flow.endTheta - flow.startTheta) * flow.progress;
+        const phi = flow.startPhi + (flow.endPhi - flow.startPhi) * flow.progress;
+        const pos = project(theta, phi, rotY, rotX);
 
-        // Only draw if "facing" us (simple depth simulation)
-        const depth = Math.sin(p.angle + rot) * Math.sin(tilt);
-        if (depth > -0.3) {
-          const alpha = p.opacity * (0.5 + depth * 0.5);
-          ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${alpha})`;
+        if (pos.z > 0) {
+          // Data packet
+          const alpha = 0.8 * (pos.z / R());
+          ctx.fillStyle = flow.color + Math.round(alpha * 255).toString(16).padStart(2, '0');
           ctx.beginPath();
-          ctx.arc(x, y, p.size, 0, Math.PI * 2);
+          ctx.arc(pos.x + mx * 0.5, pos.y + my * 0.5, flow.size, 0, Math.PI * 2);
           ctx.fill();
 
-          // Glow
-          ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${alpha * 0.2})`;
+          // Trail
+          ctx.fillStyle = flow.color + '20';
           ctx.beginPath();
-          ctx.arc(x, y, p.size * 4, 0, Math.PI * 2);
+          ctx.arc(pos.x + mx * 0.5, pos.y + my * 0.5, flow.size * 6, 0, Math.PI * 2);
           ctx.fill();
+
+          // Arc trail (showing path)
+          const trailLength = 0.15;
+          for (let t = 0; t < trailLength; t += 0.02) {
+            const trailProg = (flow.progress - t + 1) % 1;
+            const trailTheta = flow.startTheta + (flow.endTheta - flow.startTheta) * trailProg;
+            const trailPhi = flow.startPhi + (flow.endPhi - flow.startPhi) * trailProg;
+            const trailPos = project(trailTheta, trailPhi, rotY, rotX);
+            if (trailPos.z > 0) {
+              const trailAlpha = alpha * (1 - t / trailLength) * 0.5;
+              ctx.fillStyle = flow.color + Math.round(trailAlpha * 255).toString(16).padStart(2, '0');
+              ctx.beginPath();
+              ctx.arc(trailPos.x + mx * 0.5, trailPos.y + my * 0.5, flow.size * 0.6, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
         }
       }
 
-      // Draw connection lines
-      for (const conn of connections) {
-        const p1 = particles[conn.from];
-        const p2 = particles[conn.to];
-        const r1 = R() * rings[p1.ring].radius;
-        const r2 = R() * rings[p2.ring].radius;
-        const t1 = rings[p1.ring].tilt + Math.sin(time * 0.5) * 0.1;
-        const t2 = rings[p2.ring].tilt + Math.sin(time * 0.5) * 0.1;
-        const rot1 = time * rings[p1.ring].speed;
-        const rot2 = time * rings[p2.ring].speed;
+      // === 5. DRAW ORBITING CONNECTOR DOTS ===
+      for (const dot of orbitDots) {
+        dot.theta += dot.orbitSpeed;
+        const r = R() * dot.orbitRadius;
+        const pos = project(dot.theta, dot.phi, rotY, rotX);
 
-        const x1 = cx() + mx * 0.3 + r1 * Math.cos(p1.angle + rot1) * Math.cos(t1);
-        const y1 = cy() + my * 0.3 + r1 * Math.sin(p1.angle + rot1);
-        const x2 = cx() + mx * 0.3 + r2 * Math.cos(p2.angle + rot2) * Math.cos(t2);
-        const y2 = cy() + my * 0.3 + r2 * Math.sin(p2.angle + rot2);
+        if (pos.z > -R() * 0.2) {
+          // Connection line to sphere center
+          ctx.strokeStyle = dot.color + '15';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(cx() + mx * 0.5, cy() + my * 0.5);
+          ctx.lineTo(pos.x + mx * 0.5, pos.y + my * 0.5);
+          ctx.stroke();
 
-        const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-        grad.addColorStop(0, `rgba(6, 182, 212, ${conn.opacity})`);
-        grad.addColorStop(0.5, `rgba(99, 102, 241, ${conn.opacity * 1.5})`);
-        grad.addColorStop(1, `rgba(6, 182, 212, ${conn.opacity})`);
+          // Dot glow
+          const glowSize = dot.size * 8 + Math.sin(time * 2) * 2;
+          const glow = ctx.createRadialGradient(
+            pos.x + mx * 0.5, pos.y + my * 0.5, 0,
+            pos.x + mx * 0.5, pos.y + my * 0.5, glowSize
+          );
+          glow.addColorStop(0, dot.color + '40');
+          glow.addColorStop(1, dot.color + '00');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(pos.x + mx * 0.5, pos.y + my * 0.5, glowSize, 0, Math.PI * 2);
+          ctx.fill();
 
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
+          // Dot
+          ctx.fillStyle = dot.color;
+          ctx.beginPath();
+          ctx.arc(pos.x + mx * 0.5, pos.y + my * 0.5, dot.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Label
+          ctx.fillStyle = dot.color + 'cc';
+          ctx.font = '10px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(dot.label, pos.x + mx * 0.5, pos.y + my * 0.5 - dot.size - 5);
+        }
       }
 
-      // Draw orbiting connector points
-      for (const point of orbitPoints) {
-        point.angle += point.speed;
-        const r = R() * point.radius;
-        const x = cx() + mx * 0.5 + r * Math.cos(point.angle);
-        const y = cy() + my * 0.5 + r * Math.sin(point.angle);
-
-        // Connection line to globe center
-        ctx.strokeStyle = `${point.color}20`;
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(cx() + mx * 0.5, cy() + my * 0.5);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-
-        // Point glow
-        const glowSize = point.size * 6 + Math.sin(time * 3 + point.angle) * 2;
-        const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, glowSize);
-        glowGrad.addColorStop(0, `${point.color}40`);
-        glowGrad.addColorStop(1, `${point.color}00`);
-        ctx.fillStyle = glowGrad;
-        ctx.beginPath();
-        ctx.arc(x, y, glowSize, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Point dot
-        ctx.fillStyle = point.color;
-        ctx.beginPath();
-        ctx.arc(x, y, point.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Label
-        ctx.fillStyle = `${point.color}cc`;
-        ctx.font = '9px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(point.label, x, y - point.size - 4);
-      }
-
-      // Center glow pulse
-      const centerGlow = 20 + Math.sin(glowPhase) * 5;
-      const centerGrad = ctx.createRadialGradient(
+      // === 6. CENTER GLOW (breathing) ===
+      const breathe = 25 + Math.sin(time * 1.5) * 8;
+      const centerGlow = ctx.createRadialGradient(
         cx() + mx * 0.5, cy() + my * 0.5, 0,
-        cx() + mx * 0.5, cy() + my * 0.5, centerGlow
+        cx() + mx * 0.5, cy() + my * 0.5, breathe
       );
-      centerGrad.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
-      centerGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.1)');
-      centerGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
-      ctx.fillStyle = centerGrad;
+      centerGlow.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
+      centerGlow.addColorStop(0.5, 'rgba(6, 182, 212, 0.15)');
+      centerGlow.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      ctx.fillStyle = centerGlow;
       ctx.beginPath();
-      ctx.arc(cx() + mx * 0.5, cy() + my * 0.5, centerGlow, 0, Math.PI * 2);
+      ctx.arc(cx() + mx * 0.5, cy() + my * 0.5, breathe, 0, Math.PI * 2);
       ctx.fill();
 
       // Center dot
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.8)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.beginPath();
-      ctx.arc(cx() + mx * 0.5, cy() + my * 0.5, 3, 0, Math.PI * 2);
+      ctx.arc(cx() + mx * 0.5, cy() + my * 0.5, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
       animRef.current = requestAnimationFrame(draw);
