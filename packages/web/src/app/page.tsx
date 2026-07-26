@@ -123,6 +123,9 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0f]">
+      {/* Globe Background — fixed, behind everything */}
+      <HeroGlobe />
+
       {/* Header */}
       <header className="fixed top-0 w-full bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/5 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -145,49 +148,39 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero with Animated Globe */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_50%)]" />
+      {/* Hero — Globe is fixed background, text floats on top */}
+      <section className="relative pt-32 pb-24 px-6 overflow-hidden min-h-screen flex items-center">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_50%)]" />
 
-        <div className="max-w-7xl mx-auto relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text */}
-            <div>
-              <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 mb-8">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                </span>
-                <span className="text-cyan-300 text-sm">763 connectors — more than Fivetran</span>
-              </div>
-
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-[1.1]">
-                <span className="text-white">Real-time data.</span>
-                <br />
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Zero latency.</span>
-              </h1>
-
-              <p className="text-xl text-gray-400 max-w-xl mb-4 leading-relaxed">
-                763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Link href="/signup" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3.5 rounded-xl text-lg font-semibold transition-all shadow-lg shadow-cyan-500/20">
-                  Start Free →
-                </Link>
-                <a href="/demo" className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3.5 rounded-xl text-lg font-medium transition-all">
-                  Try Demo
-                </a>
-              </div>
-
-              <p className="text-gray-600 text-sm">No credit card · Free forever · 763 connectors</p>
-            </div>
-
-            {/* Right: Hero Globe */}
-            <div className="flex justify-center h-[500px]">
-              <HeroGlobe />
-            </div>
+        <div className="max-w-4xl mx-auto relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span className="text-cyan-300 text-sm">763 connectors — more than Fivetran</span>
           </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]">
+            <span className="text-white">Real-time data.</span>
+            <br />
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Zero latency.</span>
+          </h1>
+
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-4 leading-relaxed">
+            763 connectors. &lt;1 second CDC. AI-powered schema mapping. 10x cheaper than Fivetran.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <Link href="/signup" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3.5 rounded-xl text-lg font-semibold transition-all shadow-lg shadow-cyan-500/20">
+              Start Free →
+            </Link>
+            <a href="/demo" className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3.5 rounded-xl text-lg font-medium transition-all">
+              Try Demo
+            </a>
+          </div>
+
+          <p className="text-gray-600 text-sm">No credit card · Free forever · 763 connectors</p>
         </div>
       </section>
 
