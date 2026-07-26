@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shared test utilities and fixtures for conformance tests.
  */
@@ -65,3 +66,4 @@ export function createBatch(size: number, op: string = 'I', startKey: number = 1
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+

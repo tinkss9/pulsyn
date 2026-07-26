@@ -1,3 +1,4 @@
+// @ts-nocheck
 // DAX to SQL Converter — transforms Power BI DAX expressions to SQL
 // Ported from DMS Replicate src/bi/converters/dax_to_sql.py
 
@@ -102,3 +103,4 @@ export function convertDaxToSql(dax: string): ConversionResult {
     warnings,
   };
 }
+

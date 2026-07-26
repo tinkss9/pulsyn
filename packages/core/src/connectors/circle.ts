@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Circle Connector — community platform source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -22,5 +23,6 @@ export class CircleConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Circle CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

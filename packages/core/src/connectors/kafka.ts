@@ -1,6 +1,5 @@
 // @ts-nocheck
-import { Kafka, Consumer, Admin } from 'kafkajs';
-type EachMessagePayload = { topic: string; partition: number; message: any };
+import { Kafka, Consumer, Admin, EachMessagePayload } from 'kafkajs';
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -74,13 +73,13 @@ export class KafkaConnector extends BaseConnector {
       return {
         table,
         columns: [
-          { name: 'key', type: 'string', nullable: true, defaultValue: undefined },
-          { name: 'value', type: 'json', nullable: false, defaultValue: undefined },
-          { name: 'partition', type: 'integer', nullable: false, defaultValue: undefined },
-          { name: 'offset', type: 'bigint', nullable: false, defaultValue: undefined },
-          { name: 'timestamp', type: 'timestamp', nullable: true, defaultValue: undefined },
+          { name: 'key', type: 'string', nullable: true, defaultValue: null },
+          { name: 'value', type: 'json', nullable: false, defaultValue: null },
+          { name: 'partition', type: 'integer', nullable: false, defaultValue: null },
+          { name: 'offset', type: 'bigint', nullable: false, defaultValue: null },
+          { name: 'timestamp', type: 'timestamp', nullable: true, defaultValue: null },
         ],
-        primaryKey: ['partition', 'offset'],
+        primaryKeys: ['partition', 'offset'],
       };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
@@ -102,11 +101,11 @@ export class KafkaConnector extends BaseConnector {
       await this.consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
           if (!this.cdcActive) return;
-          const value = message.value ? JSON.parse(message.value.toString()) : undefined;
+          const value = message.value ? JSON.parse(message.value.toString()) : null;
           const key = message.key?.toString() || null;
           callback({
-            op: 'I', name: topic,
-            before: undefined,
+            op: 'I', table: topic,
+            before: null,
             after: { key, value, partition, offset: message.offset },
             ts: message.timestamp ? new Date(parseInt(message.timestamp)) : new Date(),
           });
@@ -141,14 +140,11 @@ export class KafkaConnector extends BaseConnector {
       await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
           if (done) return;
-          const value = message.value ? JSON.parse(message.value.toString()) : undefined;
+          const value = message.value ? JSON.parse(message.value.toString()) : null;
           const key = message.key?.toString() || null;
-          events.push(createEvent({
-            op: 'I',
-            name: topic,
-            data: { key, value },
-            watermark: String(key || ''),
-          }));
+          events.push(createEvent('S', topic, {
+            key, value, partition, offset: message.offset,
+          }, null, message.offset, { source: 'kafka', partition }));
           if (events.length >= this.batchSize * 10) done = true;
         },
       });
@@ -167,7 +163,7 @@ export class KafkaConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.kafka) throw new Error('Not connected');
     const events: UnifiedChangeEvent[] = [];
     const groupId = `pulsyn-incr-${this.id}-${Date.now()}`;
@@ -195,13 +191,10 @@ export class KafkaConnector extends BaseConnector {
       await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
           if (done) return;
-          const value = message.value ? JSON.parse(message.value.toString()) : undefined;
-          events.push(createEvent({
-            op: 'I',
-            name: topic,
-            data: { key: message.key?.toString(), value },
-            watermark: message.key?.toString() || '',
-          }));
+          const value = message.value ? JSON.parse(message.value.toString()) : null;
+          events.push(createEvent('I', topic, {
+            key: message.key?.toString(), value, partition, offset: message.offset,
+          }, null, message.offset, { source: 'kafka', partition }));
           if (events.length >= this.batchSize) done = true;
         },
       });
@@ -215,9 +208,4 @@ export class KafkaConnector extends BaseConnector {
     return events;
   }
 }
-
-
-
-
-
 

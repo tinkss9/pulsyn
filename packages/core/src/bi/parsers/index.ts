@@ -22,4 +22,3 @@ export const PARSERS: Record<string, string> = {
   '.rdlc': 'SSRSParser',
 };
 
-

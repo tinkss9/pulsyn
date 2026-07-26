@@ -16,85 +16,85 @@ const TABLE_DEFINITIONS: Record<string, { pk: string; wmColumn: string; columns:
     pk: 'ACCT_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'ACCT_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'ACCT_NAME', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'CIS_DIVISION', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'ACCT_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'SETUP_DT', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'ACCT_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'ACCT_NAME', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'CIS_DIVISION', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'ACCT_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'SETUP_DT', type: 'date', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   CI_PREM: {
     pk: 'PREM_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'PREM_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'PREM_TYPE_CD', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'ADDRESS1', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'CITY', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'STATE', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'POSTAL', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'PREM_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'PREM_TYPE_CD', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'ADDRESS1', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'CITY', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'STATE', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'POSTAL', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   CI_MTR: {
     pk: 'MTR_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'MTR_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'MTR_TYPE_CD', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'MFG_SERIAL_NBR', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'MTR_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'INSTALL_DT', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'MTR_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'MTR_TYPE_CD', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'MFG_SERIAL_NBR', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'MTR_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'INSTALL_DT', type: 'date', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   CI_BSEG: {
     pk: 'BSEG_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'BSEG_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'SA_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'START_DT', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'END_DT', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'BILL_AMT', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'BSEG_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'SA_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'START_DT', type: 'date', nullable: true, defaultValue: null },
+      { name: 'END_DT', type: 'date', nullable: true, defaultValue: null },
+      { name: 'BILL_AMT', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   CI_FT: {
     pk: 'FT_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'FT_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'SA_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'FT_TYPE_FLG', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'CUR_AMT', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'FREEZE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'FT_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'SA_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'FT_TYPE_FLG', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'CUR_AMT', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'FREEZE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   CI_SA: {
     pk: 'SA_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'SA_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'ACCT_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'SA_TYPE_CD', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'SA_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'START_DT', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'SA_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'ACCT_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'SA_TYPE_CD', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'SA_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'START_DT', type: 'date', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   CI_SP: {
     pk: 'SP_ID',
     wmColumn: 'LAST_UPDATE_DTTM',
     columns: [
-      { name: 'SP_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'PREM_ID', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'SP_TYPE_CD', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'SP_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'INSTALL_DT', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'SP_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'PREM_ID', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'SP_TYPE_CD', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'SP_STATUS_FLG', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'INSTALL_DT', type: 'date', nullable: true, defaultValue: null },
+      { name: 'LAST_UPDATE_DTTM', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
 };
@@ -161,8 +161,8 @@ export class OracleUtilitiesConnector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     const def = TABLE_DEFINITIONS[table];
-    if (!def) return { table, columns: [], primaryKey: [] };
-    return { table, columns: def.columns, primaryKey: [def.pk] };
+    if (!def) return { table, columns: [], primaryKeys: [] };
+    return { table, columns: def.columns, primaryKeys: [def.pk] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -184,7 +184,7 @@ export class OracleUtilitiesConnector extends BaseConnector {
               { outFormat: 4002 } // OBJECT format
             );
             for (const row of result.rows || []) {
-              callback({ operation: 'UPDATE', table, before: undefined, after: row, ts: new Date() });
+              callback({ op: 'U', table, before: null, after: row, ts: new Date() });
             }
           } finally {
             await conn.close();
@@ -222,7 +222,7 @@ export class OracleUtilitiesConnector extends BaseConnector {
         if (rows.length === 0) break;
 
         for (const row of rows) {
-          events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[def.pk]?.toString() }));
+          events.push(createEvent('S', table, row, null, row[def.pk]?.toString(), { source: 'oracle-utilities' }));
         }
         lastKey = rows[rows.length - 1][def.pk]?.toString();
         if (rows.length < this.batchSize) break;
@@ -234,7 +234,7 @@ export class OracleUtilitiesConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const def = TABLE_DEFINITIONS[table];
     if (!def) throw new Error(`Unknown Oracle Utilities table: ${table}`);
     if (!this.oraPool) throw new Error('Not connected');
@@ -251,7 +251,7 @@ export class OracleUtilitiesConnector extends BaseConnector {
       );
       for (const row of (result.rows || [])) {
         const ts = row[def.wmColumn]?.toISOString() || new Date().toISOString();
-        events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: ts }));
+        events.push(createEvent('I', table, row, null, ts, { source: 'oracle-utilities' }));
       }
     } finally {
       await conn.close();
@@ -272,9 +272,4 @@ export class OracleUtilitiesConnector extends BaseConnector {
     return res.json();
   }
 }
-
-
-
-
-
 

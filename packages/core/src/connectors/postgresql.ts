@@ -90,7 +90,7 @@ export class PostgreSQLConnector extends BaseConnector {
           name: c.column_name, type: c.data_type,
           nullable: c.is_nullable === 'YES', defaultValue: c.column_default,
         })),
-        primaryKey: pks.rows.map((r) => r.attname),
+        primaryKeys: pks.rows.map((r) => r.attname),
       };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
@@ -131,8 +131,8 @@ export class PostgreSQLConnector extends BaseConnector {
             const op = c.kind === 'insert' ? 'I' : c.kind === 'update' ? 'U' : 'D';
             cb({
               op, table: `${c.schema}.${c.table}`,
-              before: c.oldkeys ? this.zip(c.oldkeys.keynames, c.oldkeys.keyvalues) : undefined,
-              after: c.columnvalues ? this.zip(c.columnnames, c.columnvalues) : undefined,
+              before: c.oldkeys ? this.zip(c.oldkeys.keynames, c.oldkeys.keyvalues) : null,
+              after: c.columnvalues ? this.zip(c.columnnames, c.columnvalues) : null,
               ts: new Date(),
             });
           }
@@ -161,7 +161,7 @@ export class PostgreSQLConnector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const schema = await this.getTableSchema(table);
-    const pk = schema.primaryKey[0] || 'id';
+    const pk = schema.primaryKeys[0] || 'id';
     const events: UnifiedChangeEvent[] = [];
     let lastKey: any = null;
     while (true) {
@@ -172,7 +172,7 @@ export class PostgreSQLConnector extends BaseConnector {
       const result = await this.pool.query(q, p);
       if (result.rows.length === 0) break;
       for (const row of result.rows) {
-        events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[pk]?.toString() || null }));
+        events.push(createEvent('S', table, row, null, row[pk]?.toString() || null, { source: 'postgresql' }));
       }
       lastKey = result.rows[result.rows.length - 1][pk];
       if (result.rows.length < this.batchSize) break;
@@ -180,7 +180,7 @@ export class PostgreSQLConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const wmCol = this.config.watermarkColumn || 'updated_at';
     const events: UnifiedChangeEvent[] = [];
@@ -190,14 +190,9 @@ export class PostgreSQLConnector extends BaseConnector {
     const p = watermark ? [watermark, this.batchSize] : [this.batchSize];
     const result = await this.pool.query(q, p);
     for (const row of result.rows) {
-      events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[wmCol]?.toString() || null }));
+      events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'postgresql' }));
     }
     return events;
   }
 }
-
-
-
-
-
 

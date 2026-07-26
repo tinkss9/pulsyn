@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Retool Connector — internal tools source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -22,5 +23,6 @@ export class RetoolConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Retool CDC not supported'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

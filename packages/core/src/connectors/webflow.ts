@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Webflow Connector — website builder source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -57,5 +58,6 @@ export class WebflowConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Webflow CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

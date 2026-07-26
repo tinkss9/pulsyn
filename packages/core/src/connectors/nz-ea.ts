@@ -17,66 +17,66 @@ const TABLE_ENDPOINTS: Record<string, { path: string; pk: string; columns: any[]
     path: '/prices/spot',
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'node', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'price', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'trading_period', type: 'integer', nullable: false, defaultValue: undefined },
-      { name: 'island', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'node', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'price', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'trading_period', type: 'integer', nullable: false, defaultValue: null },
+      { name: 'island', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   generation: {
     path: '/generation',
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'fuel_type', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'generation_mw', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'station', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'island', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'fuel_type', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'generation_mw', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'station', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'island', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   demand: {
     path: '/demand',
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'region', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'demand_mw', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'island', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'trading_period', type: 'integer', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'region', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'demand_mw', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'island', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'trading_period', type: 'integer', nullable: true, defaultValue: null },
     ],
   },
   reserves: {
     path: '/reserves',
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'island', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'reserve_type', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'price', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'quantity_mw', type: 'decimal', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'island', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'reserve_type', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'price', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'quantity_mw', type: 'decimal', nullable: true, defaultValue: null },
     ],
   },
   hvdc_flows: {
     path: '/hvdc',
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'direction', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'flow_mw', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'pole', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'trading_period', type: 'integer', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'direction', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'flow_mw', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'pole', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'trading_period', type: 'integer', nullable: true, defaultValue: null },
     ],
   },
   node_prices: {
     path: '/prices/nodes',
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'node', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'price', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'island', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'region', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'node', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'price', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'island', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'region', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
 };
@@ -129,8 +129,8 @@ export class NzEaConnector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     const def = TABLE_ENDPOINTS[table];
-    if (!def) return { table, columns: [], primaryKey: [] };
-    return { table, columns: def.columns, primaryKey: [def.pk] };
+    if (!def) return { table, columns: [], primaryKeys: [] };
+    return { table, columns: def.columns, primaryKeys: [def.pk] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -145,7 +145,7 @@ export class NzEaConnector extends BaseConnector {
           const since = this.lastWatermark[table] || new Date(Date.now() - pollMs).toISOString();
           const rows = await this.fetchData(table, since, new Date().toISOString());
           for (const row of rows) {
-            callback({ op: 'I', table, before: undefined, after: row, ts: new Date() });
+            callback({ op: 'I', table, before: null, after: row, ts: new Date() });
           }
           this.lastWatermark[table] = new Date().toISOString();
         }
@@ -174,7 +174,7 @@ export class NzEaConnector extends BaseConnector {
       const rows = await this.fetchData(table, chunkStart.toISOString(), chunkEnd.toISOString());
       for (const row of rows) {
         const pk = `${row.timestamp || ''}_${row.node || row.region || ''}`;
-        events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: pk }));
+        events.push(createEvent('S', table, row, null, pk, { source: 'nz-ea' }));
       }
       chunkStart = chunkEnd;
     }
@@ -182,7 +182,7 @@ export class NzEaConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const def = TABLE_ENDPOINTS[table];
     if (!def) throw new Error(`Unknown NZ EA table: ${table}`);
     const events: UnifiedChangeEvent[] = [];
@@ -193,7 +193,7 @@ export class NzEaConnector extends BaseConnector {
 
     for (const row of rows) {
       const ts = row.timestamp || new Date().toISOString();
-      events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: ts }));
+      events.push(createEvent('I', table, row, null, ts, { source: 'nz-ea' }));
     }
     this.lastWatermark[table] = until;
     return events;
@@ -206,7 +206,7 @@ export class NzEaConnector extends BaseConnector {
   }
 
   private async fetchData(
-    name: string,
+    table: string,
     from: string,
     to: string
   ): Promise<Record<string, any>[]> {
@@ -231,9 +231,4 @@ export class NzEaConnector extends BaseConnector {
     return [];
   }
 }
-
-
-
-
-
 

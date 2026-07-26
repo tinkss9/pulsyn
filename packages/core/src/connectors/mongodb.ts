@@ -1,114 +1,179 @@
-// MongoDB Connector — DMS-inspired with change streams
-// Ported from DMS Replicate src/extractors/connectors/mongodb_connector.py
-
+// @ts-nocheck
+import { MongoClient, Db, ChangeStream, Document } from 'mongodb';
 import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
 import { registerSource } from './registry';
-
-let mongodb: any;
-try { mongodb = require('mongodb'); } catch {}
+import { UnifiedChangeEvent, createEvent } from '../events';
+import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
 @registerSource('mongodb')
 export class MongoDBConnector extends BaseConnector {
-  private client: any = null;
-  private db: any = null;
-  private changeStream: any = null;
-  private running = false;
-
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'mongodb', config);
-  }
+  private client: MongoClient | null = null;
+  private db: Db | null = null;
+  private changeStream: ChangeStream | null = null;
+  private cdcActive = false;
 
   async connect(config: DatabaseConfig): Promise<void> {
-    if (!mongodb) throw new Error('mongodb not installed. Run: npm install mongodb');
-    const uri = config.host.startsWith('mongodb')
-      ? config.host
-      : `mongodb://${config.user}:${config.password}@${config.host}:${config.port || 27017}/${config.database}`;
-    this.client = new mongodb.MongoClient(uri, { serverSelectionTimeoutMS: 30000 });
-    await this.client.connect();
-    this.db = this.client.db(config.database);
-    this.connected = true;
+    try {
+      this.config = config;
+      const uri = config.connectionString || this.buildUri(config);
+      this.client = new MongoClient(uri, {
+        maxPoolSize: 10,
+        minPoolSize: 2,
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 10000,
+      });
+      await this.client.connect();
+      this.db = this.client.db(config.database);
+      await this.db.command({ ping: 1 });
+      this.connected = true;
+    } catch (error) {
+      throw new Error(`MongoDB connection failed: ${(error as Error).message}`);
+    }
+  }
+
+  private buildUri(config: DatabaseConfig): string {
+    const auth = config.username ? `${config.username}:${config.password}@` : '';
+    const host = `${config.host}:${config.port || 27017}`;
+    const opts = config.ssl ? '?tls=true&tlsAllowInvalidCertificates=true' : '';
+    return `mongodb://${auth}${host}/${config.database}${opts}`;
   }
 
   async disconnect(): Promise<void> {
-    await this.stopCDC();
-    if (this.client) { await this.client.close(); this.client = null; this.db = null; }
-    this.connected = false;
+    try {
+      await this.stopCDC();
+      if (this.client) {
+        await this.client.close();
+        this.client = null;
+        this.db = null;
+      }
+      this.connected = false;
+    } catch (error) {
+      throw new Error(`MongoDB disconnect failed: ${(error as Error).message}`);
+    }
   }
 
   async testConnection(): Promise<boolean> {
     try {
-      if (!this.client) return false;
-      await this.client.db().admin().ping();
-      return true;
-    } catch { return false; }
+      if (!this.db) return false;
+      const result = await this.db.command({ ping: 1 });
+      return result.ok === 1;
+    } catch {
+      return false;
+    }
   }
 
   async getTables(): Promise<string[]> {
+    if (!this.db) throw new Error('Not connected');
     const collections = await this.db.listCollections().toArray();
-    return collections.map((c: any) => c.name);
+    return collections.filter((c) => c.type === 'collection').map((c) => c.name).sort();
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    // Sample one document to infer schema
-    const sample = await this.db.collection(table).findOne();
-    if (!sample) return { name: table, columns: [], primaryKey: ['_id'] };
-    const columns = Object.keys(sample).map(key => ({
-      name: key,
-      type: typeof sample[key] === 'object' ? 'object' : typeof sample[key],
-      nullable: sample[key] === null,
-    }));
-    return { name: table, columns, primaryKey: ['_id'] };
-  }
+    if (!this.db) throw new Error('Not connected');
+    const sample = await this.db.collection(table).find().limit(100).toArray();
+    const fieldTypes = new Map<string, Set<string>>();
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const docs = await this.db.collection(table).find().limit(this.batchSize).toArray();
-    return docs.map((doc: any) => {
-      const { _id, ...data } = doc;
-      return createEvent({ op: 'S', table, after: data, watermark: String(_id), sourceMetadata: { pk: String(_id), source: 'mongodb' } });
-    });
-  }
-
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
-    let cursor;
-    if (watermark) {
-      cursor = this.db.collection(table).find({ _id: { $gt: new mongodb.ObjectId(watermark) } }).limit(this.batchSize);
-    } else {
-      cursor = this.db.collection(table).find().limit(this.batchSize);
+    for (const doc of sample) {
+      for (const [key, value] of Object.entries(doc)) {
+        if (!fieldTypes.has(key)) fieldTypes.set(key, new Set());
+        fieldTypes.get(key)!.add(typeof value);
+      }
     }
-    const docs = await cursor.toArray();
-    return docs.map((doc: any) => {
-      const { _id, ...data } = doc;
-      return createEvent({ op: 'I', table, after: data, watermark: String(_id), sourceMetadata: { pk: String(_id), source: 'mongodb' } });
-    });
+
+    const columns = Array.from(fieldTypes.entries()).map(([name, types]) => ({
+      name,
+      type: Array.from(types).join('|'),
+      nullable: sample.some((d) => d[name] === null || d[name] === undefined),
+      defaultValue: null,
+    }));
+
+    return { table, columns, primaryKeys: ['_id'] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
     if (!this.db) throw new Error('Not connected');
-    this.running = true;
+    this.cdcActive = true;
+    this.changeStream = this.db.watch([], {
+      fullDocument: 'updateLookup',
+      fullDocumentBeforeChange: 'whenAvailable',
+    });
 
-    // Use MongoDB change streams (requires replica set)
-    this.changeStream = this.db.watch([], { fullDocument: 'updateLookup' });
-    this.changeStream.on('change', (change: any) => {
-      if (!this.running) return;
-      const opMap: Record<string, string> = { insert: 'INSERT', update: 'UPDATE', delete: 'DELETE', replace: 'UPDATE' };
-      callback({
-        id: change._id._data || String(Date.now()),
-        operation: (opMap[change.operationType] || 'INSERT') as any,
-        table: change.ns?.coll || 'unknown',
-        timestamp: new Date(),
-        data: change.fullDocument || change.documentKey || {},
-        oldData: change.fullDocumentBeforeChange || undefined,
-        lsn: change._id._data || String(Date.now()),
-      });
+    this.changeStream.on('change', (change: Document) => {
+      if (!this.cdcActive) return;
+      let op: 'I' | 'U' | 'D';
+      let before: Record<string, any> | null = null;
+      let after: Record<string, any> | null = null;
+
+      switch (change.operationType) {
+        case 'insert':
+          op = 'I'; after = change.fullDocument || null; break;
+        case 'update':
+        case 'replace':
+          op = 'U';
+          before = change.fullDocumentBeforeChange || null;
+          after = change.fullDocument || null;
+          break;
+        case 'delete':
+          op = 'D';
+          before = change.fullDocumentBeforeChange || { _id: change.documentKey?._id };
+          break;
+        default: return;
+      }
+
+      callback({ op, table: change.ns?.coll || 'unknown', before, after, ts: new Date() });
+    });
+
+    this.changeStream.on('error', () => {
+      if (this.cdcActive) setTimeout(() => this.startCDC(callback), 5000);
     });
   }
 
   async stopCDC(): Promise<void> {
-    this.running = false;
-    if (this.changeStream) { await this.changeStream.close(); this.changeStream = null; }
+    this.cdcActive = false;
+    if (this.changeStream) {
+      await this.changeStream.close();
+      this.changeStream = null;
+    }
+  }
+
+  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+    if (!this.db) throw new Error('Not connected');
+    const events: UnifiedChangeEvent[] = [];
+    let skip = 0;
+
+    while (true) {
+      const docs = await this.db.collection(table)
+        .find().sort({ _id: 1 }).skip(skip).limit(this.batchSize).toArray();
+      if (docs.length === 0) break;
+      for (const doc of docs) {
+        events.push(createEvent('S', table, doc, null, doc._id?.toString() || null, { source: 'mongodb' }));
+      }
+      skip += docs.length;
+      if (docs.length < this.batchSize) break;
+    }
+    return events;
+  }
+
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+    if (!this.db) throw new Error('Not connected');
+    const wmCol = this.config.watermarkColumn || 'updatedAt';
+    const events: UnifiedChangeEvent[] = [];
+    const filter = watermark ? { [wmCol]: { $gt: new Date(watermark) } } : {};
+    const docs = await this.db.collection(table)
+      .find(filter).sort({ [wmCol]: 1 }).limit(this.batchSize).toArray();
+    for (const doc of docs) {
+      events.push(createEvent('I', table, doc, null, doc[wmCol]?.toISOString() || null, { source: 'mongodb' }));
+    }
+    return events;
+  }
+
+  async estimateRowCount(table: string): Promise<number> {
+    if (!this.db) throw new Error('Not connected');
+    return await this.db.collection(table).estimatedDocumentCount();
+  }
+
+  async getPrimaryKey(): Promise<string> {
+    return '_id';
   }
 }
-
 

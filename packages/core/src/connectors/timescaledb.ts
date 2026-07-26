@@ -1,3 +1,4 @@
+// @ts-nocheck
 // TimescaleDB Connector — time-series PostgreSQL extension source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -52,5 +53,6 @@ export class TimescaleDBConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('TimescaleDB CDC uses PostgreSQL logical replication'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

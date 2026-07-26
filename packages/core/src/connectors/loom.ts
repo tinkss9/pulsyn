@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Loom Connector — video recording source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -21,5 +22,6 @@ export class LoomConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Loom CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

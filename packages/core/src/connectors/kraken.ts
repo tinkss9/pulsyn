@@ -21,12 +21,12 @@ const TABLE_QUERIES: Record<string, { query: string; pk: string; columns: any[] 
       }
     }`,
     columns: [
-      { name: 'accountNumber', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'balance_amount', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'balance_currency', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'createdAt', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'updatedAt', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'accountNumber', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'balance_amount', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'balance_currency', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'createdAt', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'updatedAt', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   agreements: {
@@ -38,12 +38,12 @@ const TABLE_QUERIES: Record<string, { query: string; pk: string; columns: any[] 
       }
     }`,
     columns: [
-      { name: 'id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'accountNumber', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'tariffCode', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'validFrom', type: 'date', nullable: false, defaultValue: undefined },
-      { name: 'validTo', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
+      { name: 'id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'accountNumber', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'tariffCode', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'validFrom', type: 'date', nullable: false, defaultValue: null },
+      { name: 'validTo', type: 'date', nullable: true, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
     ],
   },
   meter_points: {
@@ -55,11 +55,11 @@ const TABLE_QUERIES: Record<string, { query: string; pk: string; columns: any[] 
       }
     }`,
     columns: [
-      { name: 'mpan', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'serialNumber', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'meterType', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'installedAt', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'mpan', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'serialNumber', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'meterType', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'installedAt', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   consumption: {
@@ -71,12 +71,12 @@ const TABLE_QUERIES: Record<string, { query: string; pk: string; columns: any[] 
       }
     }`,
     columns: [
-      { name: 'id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'mpan', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'startAt', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'endAt', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'unit', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'mpan', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'startAt', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'endAt', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'unit', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   tariffs: {
@@ -88,12 +88,12 @@ const TABLE_QUERIES: Record<string, { query: string; pk: string; columns: any[] 
       }
     }`,
     columns: [
-      { name: 'code', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'displayName', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'unitRate', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'standingCharge', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'validFrom', type: 'date', nullable: false, defaultValue: undefined },
-      { name: 'validTo', type: 'date', nullable: true, defaultValue: undefined },
+      { name: 'code', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'displayName', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'unitRate', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'standingCharge', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'validFrom', type: 'date', nullable: false, defaultValue: null },
+      { name: 'validTo', type: 'date', nullable: true, defaultValue: null },
     ],
   },
   payments: {
@@ -105,13 +105,13 @@ const TABLE_QUERIES: Record<string, { query: string; pk: string; columns: any[] 
       }
     }`,
     columns: [
-      { name: 'id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'accountNumber', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'amount', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'currency', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'method', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'createdAt', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
+      { name: 'id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'accountNumber', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'amount', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'currency', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'method', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'createdAt', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
     ],
   },
 };
@@ -164,8 +164,8 @@ export class KrakenConnector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     const def = TABLE_QUERIES[table];
-    if (!def) return { table, columns: [], primaryKey: [] };
-    return { table, columns: def.columns, primaryKey: [def.pk] };
+    if (!def) return { table, columns: [], primaryKeys: [] };
+    return { table, columns: def.columns, primaryKeys: [def.pk] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -184,7 +184,7 @@ export class KrakenConnector extends BaseConnector {
           for (const table of tables) {
             const events = await this.extractIncremental(table, null);
             for (const event of events) {
-              callback({ op: 'I', table, before: undefined, after: event.after, ts: new Date() });
+              callback({ op: 'I', table, before: null, after: event.after, ts: new Date() });
             }
           }
         } catch { /* retry */ }
@@ -218,7 +218,7 @@ export class KrakenConnector extends BaseConnector {
       if (edges.length === 0) break;
       for (const edge of edges) {
         const node = this.flattenNode(edge.node);
-        events.push(createEvent({ operation: "S", name: table, data: node, watermark: String(null || ""), sourceMetadata: node[def.pk]?.toString() }));
+        events.push(createEvent('S', table, node, null, node[def.pk]?.toString(), { source: 'kraken' }));
       }
 
       const pageInfo = connection?.pageInfo;
@@ -228,7 +228,7 @@ export class KrakenConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const def = TABLE_QUERIES[table];
     if (!def) throw new Error(`Unknown Kraken table: ${table}`);
     const events: UnifiedChangeEvent[] = [];
@@ -244,7 +244,7 @@ export class KrakenConnector extends BaseConnector {
     for (const edge of edges) {
       const node = this.flattenNode(edge.node);
       const ts = node.updatedAt || node.createdAt || new Date().toISOString();
-      events.push(createEvent({ operation: "I", name: table, data: node, watermark: String(null || ""), sourceMetadata: ts }));
+      events.push(createEvent('I', table, node, null, ts, { source: 'kraken' }));
     }
     return events;
   }
@@ -290,8 +290,8 @@ export class KrakenConnector extends BaseConnector {
           const change = msg.payload.data[key];
           const table = key.replace('Changed', '');
           callback({
-            operation: change.operation === 'DELETE' ? 'D' : change.operation === 'INSERT' ? 'I' : 'U',
-            table, before: undefined, after: change.node, ts: new Date(),
+            op: change.operation === 'DELETE' ? 'D' : change.operation === 'INSERT' ? 'I' : 'U',
+            table, before: null, after: change.node, ts: new Date(),
           });
         }
       } catch { /* ignore malformed messages */ }
@@ -314,9 +314,4 @@ export class KrakenConnector extends BaseConnector {
     return flat;
   }
 }
-
-
-
-
-
 

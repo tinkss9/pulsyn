@@ -79,15 +79,15 @@ export class RestApiConnector extends BaseConnector {
       const res = await fetch(`${url}?limit=1`, { headers: this.headers });
       const data = await res.json() as any;
       const sample = Array.isArray(data) ? data[0] : data.data?.[0] || data.results?.[0] || data;
-      if (!sample) return { table, columns: [], primaryKey: ['id'] };
+      if (!sample) return { table, columns: [], primaryKeys: ['id'] };
 
       const columns = Object.entries(sample).map(([name, value]) => ({
         name,
         type: typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string',
         nullable: value === null,
-        defaultValue: undefined,
+        defaultValue: null,
       }));
-      return { table, columns, primaryKey: ['id'] };
+      return { table, columns, primaryKeys: ['id'] };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
     }
@@ -116,7 +116,7 @@ export class RestApiConnector extends BaseConnector {
           const data = await res.json() as any;
           const items = Array.isArray(data) ? data : data.data || data.results || [];
           for (const item of items) {
-            callback({ operation: 'UPDATE', table, before: undefined, after: item, ts: new Date() });
+            callback({ op: 'U', table, before: null, after: item, ts: new Date() });
           }
         }
       } catch { /* polling error, retry */ }
@@ -149,7 +149,7 @@ export class RestApiConnector extends BaseConnector {
 
         if (items.length === 0) break;
         for (const item of items) {
-          events.push(createEvent({ operation: "S", name: table, data: item, watermark: String(null || ""), sourceMetadata: item.id?.toString() || offset.toString() }));
+          events.push(createEvent('S', table, item, null, item.id?.toString() || offset.toString(), { source: 'rest-api' }));
           offset++;
         }
 
@@ -157,7 +157,7 @@ export class RestApiConnector extends BaseConnector {
         if (paginationType === 'link') {
           const link = res.headers.get('Link');
           const next = link?.match(/<([^>]+)>;\s*rel="next"/);
-          url = next ? next[1] : undefined;
+          url = next ? next[1] : null;
         } else if (items.length < this.batchSize) {
           break;
         }
@@ -168,7 +168,7 @@ export class RestApiConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const events: UnifiedChangeEvent[] = [];
     const url = this.resolveUrl(table);
     const separator = url.includes('?') ? '&' : '?';
@@ -181,7 +181,7 @@ export class RestApiConnector extends BaseConnector {
       const items = Array.isArray(data) ? data : data.data || data.results || [];
       for (const item of items) {
         const ts = item.updated_at || item.modified_at || new Date().toISOString();
-        events.push(createEvent({ operation: "I", name: table, data: item, watermark: String(null || ""), sourceMetadata: ts }));
+        events.push(createEvent('I', table, item, null, ts, { source: 'rest-api' }));
       }
     } catch (error) {
       throw new Error(`Incremental extract failed: ${(error as Error).message}`);
@@ -195,9 +195,4 @@ export class RestApiConnector extends BaseConnector {
     return `${this.baseUrl}/${table}`;
   }
 }
-
-
-
-
-
 

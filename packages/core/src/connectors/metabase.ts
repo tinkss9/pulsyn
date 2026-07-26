@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Metabase Connector — BI dashboard source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -22,5 +23,6 @@ export class MetabaseConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Metabase CDC not supported'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

@@ -98,7 +98,7 @@ export class OracleConnector extends BaseConnector {
           name: c.COLUMN_NAME, type: c.DATA_TYPE,
           nullable: c.NULLABLE === 'Y', defaultValue: c.DATA_DEFAULT,
         })),
-        primaryKey: (pks.rows as any[]).map((r) => r.COLUMN_NAME),
+        primaryKeys: (pks.rows as any[]).map((r) => r.COLUMN_NAME),
       };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
@@ -129,7 +129,7 @@ export class OracleConnector extends BaseConnector {
           for (const row of (changes.rows as any[]) || []) {
             const op = row.OPERATION === 'INSERT' ? 'I'
               : row.OPERATION === 'UPDATE' ? 'U' : 'D';
-            callback({ op, table: `${row.SEG_OWNER}.${row.TABLE_NAME}`, before: undefined, after: undefined, ts: new Date() });
+            callback({ op, table: `${row.SEG_OWNER}.${row.TABLE_NAME}`, before: null, after: null, ts: new Date() });
             lastScn = row.SCN?.toString() || lastScn;
           }
           await c.execute('BEGIN DBMS_LOGMNR.END_LOGMNR; END;');
@@ -149,7 +149,7 @@ export class OracleConnector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const schema = await this.getTableSchema(table);
-    const pk = schema.primaryKey[0] || 'ROWID';
+    const pk = schema.primaryKeys[0] || 'ROWID';
     const events: UnifiedChangeEvent[] = [];
     let offset = 0;
 
@@ -167,7 +167,7 @@ export class OracleConnector extends BaseConnector {
       if (rows.length === 0) break;
       for (const row of rows) {
         const { RNUM, ...data } = row;
-        events.push(createEvent({ operation: "S", name: table, data: data, watermark: String(null || ""), sourceMetadata: data[pk]?.toString() || null }));
+        events.push(createEvent('S', table, data, null, data[pk]?.toString() || null, { source: 'oracle' }));
       }
       offset += this.batchSize;
       if (rows.length < this.batchSize) break;
@@ -175,7 +175,7 @@ export class OracleConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const wmCol = this.config.watermarkColumn || 'UPDATED_AT';
     const events: UnifiedChangeEvent[] = [];
@@ -187,14 +187,9 @@ export class OracleConnector extends BaseConnector {
     const result = await conn.execute(q, p);
     await conn.close();
     for (const row of (result.rows as any[]) || []) {
-      events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[wmCol]?.toString() || null }));
+      events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'oracle' }));
     }
     return events;
   }
 }
-
-
-
-
-
 

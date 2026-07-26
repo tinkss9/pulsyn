@@ -84,13 +84,13 @@ export class SAPConnector extends BaseConnector {
       });
       const data = (result.DATA as any[]) || [];
       const columns: TableSchema['columns'] = [];
-      const primaryKey: string[] = [];
+      const primaryKeys: string[] = [];
 
       for (const row of data) {
         const parts = (row.WA as string).split('|').map((s: string) => s.trim());
         const [name, type, keyFlag] = parts;
         if (!name || name.startsWith('.')) continue;
-        columns.push({ name, type, nullable: keyFlag !== 'X', defaultValue: undefined });
+        columns.push({ name, type, nullable: keyFlag !== 'X', defaultValue: null });
         if (keyFlag === 'X') primaryKeys.push(name);
       }
       return { table, columns, primaryKeys };
@@ -112,7 +112,7 @@ export class SAPConnector extends BaseConnector {
           const targetTables = tables.slice(0, 10); // monitor first 10
           for (const table of targetTables) {
             const result = await this.client!.call('RFC_READ_TABLE', {
-              QUERY_name: table,
+              QUERY_TABLE: table,
               DELIMITER: '|',
               OPTIONS: [{ TEXT: `CHANGED_AT > '${lastTimestamp}'` }],
               ROWCOUNT: this.batchSize,
@@ -120,8 +120,8 @@ export class SAPConnector extends BaseConnector {
             const data = (result.DATA as any[]) || [];
             for (const row of data) {
               callback({
-                operation: 'UPDATE', table,
-                before: undefined, after: { raw: row.WA },
+                op: 'U', table,
+                before: null, after: { raw: row.WA },
                 ts: new Date(),
               });
             }
@@ -147,7 +147,7 @@ export class SAPConnector extends BaseConnector {
     while (true) {
       try {
         const result = await this.client.call('RFC_READ_TABLE', {
-          QUERY_name: table,
+          QUERY_TABLE: table,
           DELIMITER: '|',
           ROWSKIPS: offset,
           ROWCOUNT: this.batchSize,
@@ -161,7 +161,7 @@ export class SAPConnector extends BaseConnector {
           const values = (row.WA as string).split('|').map((s: string) => s.trim());
           const record: Record<string, any> = {};
           fieldNames.forEach((name, i) => { record[name] = values[i] || null; });
-          events.push(createEvent({ operation: "S", name: table, data: record, watermark: String(null || ""), sourceMetadata: offset.toString() }));
+          events.push(createEvent('S', table, record, null, offset.toString(), { source: 'sap' }));
           offset++;
         }
         if (data.length < this.batchSize) break;
@@ -172,7 +172,7 @@ export class SAPConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.client) throw new Error('Not connected');
     const wmCol = this.config.watermarkColumn || 'CHANGED_AT';
     const events: UnifiedChangeEvent[] = [];
@@ -180,7 +180,7 @@ export class SAPConnector extends BaseConnector {
 
     try {
       const result = await this.client.call('RFC_READ_TABLE', {
-        QUERY_name: table,
+        QUERY_TABLE: table,
         DELIMITER: '|',
         OPTIONS: options,
         ROWCOUNT: this.batchSize,
@@ -193,7 +193,7 @@ export class SAPConnector extends BaseConnector {
         const values = (row.WA as string).split('|').map((s: string) => s.trim());
         const record: Record<string, any> = {};
         fieldNames.forEach((name, i) => { record[name] = values[i] || null; });
-        events.push(createEvent({ operation: "I", name: table, data: record, watermark: String(null || ""), sourceMetadata: record[wmCol] || null }));
+        events.push(createEvent('I', table, record, null, record[wmCol] || null, { source: 'sap' }));
       }
     } catch (error) {
       throw new Error(`Incremental extract failed: ${(error as Error).message}`);
@@ -201,9 +201,4 @@ export class SAPConnector extends BaseConnector {
     return events;
   }
 }
-
-
-
-
-
 

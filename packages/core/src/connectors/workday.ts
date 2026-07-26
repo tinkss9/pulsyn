@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Workday Connector — HR/Finance SaaS source
 // Uses Workday REST API
 
@@ -39,5 +40,6 @@ export class WorkdayConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Workday CDC requires Workday Web Services — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

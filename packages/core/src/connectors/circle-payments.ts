@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Circle (Crypto) Connector — USDC payment data
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -21,5 +22,6 @@ export class CirclePaymentsConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Circle CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

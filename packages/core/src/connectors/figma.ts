@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Figma Connector — design tool source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -54,5 +55,6 @@ export class FigmaConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Figma CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

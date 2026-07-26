@@ -24,40 +24,40 @@ const TABLE_SCHEMAS: Record<string, { columns: any[]; pk: string }> = {
   ActualTotalLoad: {
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'area', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'area', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   DayAheadPrices: {
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'area', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'price', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'currency', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'area', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'price', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'currency', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   ActualGeneration: {
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'area', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'production_type', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'area', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'production_type', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   CrossBorderFlows: {
     pk: 'timestamp',
     columns: [
-      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'in_area', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'out_area', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'timestamp', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'in_area', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'out_area', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'quantity', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'resolution', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
 };
@@ -120,8 +120,8 @@ export class EntsoeConnector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     const schema = TABLE_SCHEMAS[table];
-    if (!schema) return { table, columns: [], primaryKey: [] };
-    return { table, columns: schema.columns, primaryKey: [schema.pk] };
+    if (!schema) return { table, columns: [], primaryKeys: [] };
+    return { table, columns: schema.columns, primaryKeys: [schema.pk] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -139,7 +139,7 @@ export class EntsoeConnector extends BaseConnector {
             : new Date(now.getTime() - 3600000);
           const rows = await this.fetchTimeSeries(table, from, now);
           for (const row of rows) {
-            callback({ op: 'I', table, before: undefined, after: row, ts: new Date() });
+            callback({ op: 'I', table, before: null, after: row, ts: new Date() });
           }
           this.lastWatermark[table] = now.toISOString();
         }
@@ -160,26 +160,26 @@ export class EntsoeConnector extends BaseConnector {
     const from = new Date(now.getTime() - 86400000);
     const rows = await this.fetchTimeSeries(table, from, now);
     for (const row of rows) {
-      events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: row.timestamp }));
+      events.push(createEvent('S', table, row, null, row.timestamp, { source: 'entsoe' }));
     }
     this.lastWatermark[table] = now.toISOString();
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!DOCUMENT_TYPES[table]) throw new Error(`Unknown ENTSO-E table: ${table}`);
     const events: UnifiedChangeEvent[] = [];
     const now = new Date();
     const from = watermark ? new Date(watermark) : new Date(now.getTime() - 3600000);
     const rows = await this.fetchTimeSeries(table, from, now);
     for (const row of rows) {
-      events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: row.timestamp }));
+      events.push(createEvent('I', table, row, null, row.timestamp, { source: 'entsoe' }));
     }
     this.lastWatermark[table] = now.toISOString();
     return events;
   }
 
-  private buildUrl(name: string, from: Date, to: Date): string {
+  private buildUrl(table: string, from: Date, to: Date): string {
     const docType = DOCUMENT_TYPES[table];
     const periodStart = this.formatDate(from);
     const periodEnd = this.formatDate(to);
@@ -199,7 +199,7 @@ export class EntsoeConnector extends BaseConnector {
     return d.toISOString().replace(/[-:T]/g, '').slice(0, 12) + '00';
   }
 
-  private async fetchTimeSeries(name: string, from: Date, to: Date): Promise<Record<string, any>[]> {
+  private async fetchTimeSeries(table: string, from: Date, to: Date): Promise<Record<string, any>[]> {
     const url = this.buildUrl(table, from, to);
     const res = await fetch(url);
     if (!res.ok) throw new Error(`ENTSO-E API error: HTTP ${res.status}`);
@@ -260,12 +260,7 @@ export class EntsoeConnector extends BaseConnector {
     const simpleTag = tag.split('>').pop() || tag;
     const pattern = new RegExp(`<${simpleTag}[^>]*>([^<]+)</${simpleTag}>`, 'i');
     const match = pattern.exec(xml);
-    return match ? match[1].trim() : undefined;
+    return match ? match[1].trim() : null;
   }
 }
-
-
-
-
-
 

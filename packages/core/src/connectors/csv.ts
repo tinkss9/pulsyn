@@ -75,9 +75,9 @@ export class CsvConnector extends BaseConnector {
           name,
           type: 'string',
           nullable: true,
-          defaultValue: undefined,
+          defaultValue: null,
         })),
-        primaryKey: headers.length > 0 ? [headers[0]] : [],
+        primaryKeys: headers.length > 0 ? [headers[0]] : [],
       };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
@@ -89,7 +89,7 @@ export class CsvConnector extends BaseConnector {
   }
 
   async stopCDC(): Promise<void> {
-    // No-operation: CDC not supported
+    // No-op: CDC not supported
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
@@ -124,7 +124,7 @@ export class CsvConnector extends BaseConnector {
     });
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.connected) throw new Error('Not connected');
     const filePath = this.resolveFilePath(table);
     const startRow = watermark ? parseInt(watermark, 10) : 0;
@@ -191,9 +191,4 @@ export class CsvConnector extends BaseConnector {
     });
   }
 }
-
-
-
-
-
 

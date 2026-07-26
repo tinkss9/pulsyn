@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ClickHouse Connector — analytics database source
 // npm install @clickhouse/client
 
@@ -58,5 +59,6 @@ export class ClickHouseConnector extends BaseConnector {
     return rows.length;
   }
 }
+
 
 

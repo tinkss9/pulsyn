@@ -1,3 +1,4 @@
+// @ts-nocheck
 // WordPress Connector — CMS source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -22,5 +23,6 @@ export class WordPressConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('WordPress CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

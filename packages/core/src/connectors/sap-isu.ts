@@ -24,60 +24,60 @@ const TABLE_SCHEMAS: Record<string, { columns: any[]; pk: string }> = {
   EANLH: {
     pk: 'ANLAGE',
     columns: [
-      { name: 'ANLAGE', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'VKONTO', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'VSTELLE', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'ANLART', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'AB', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'BIS', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'ANLAGE', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'VKONTO', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'VSTELLE', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'ANLART', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'AB', type: 'date', nullable: true, defaultValue: null },
+      { name: 'BIS', type: 'date', nullable: true, defaultValue: null },
+      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   EGERH: {
     pk: 'EQUNR',
     columns: [
-      { name: 'EQUNR', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'MAESSION', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'GEESSION', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'ZWESSION', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'ABLHINW', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'EINESSION', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'EQUNR', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'MAESSION', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'GEESSION', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'ZWESSION', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'ABLHINW', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'EINESSION', type: 'date', nullable: true, defaultValue: null },
+      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   ERCH: {
     pk: 'BELNR',
     columns: [
-      { name: 'BELNR', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'VKONTO', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'BEGABRPE', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'ENDABRPE', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'BETRAG', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'WAESSION', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'BELNR', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'VKONTO', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'BEGABRPE', type: 'date', nullable: true, defaultValue: null },
+      { name: 'ENDABRPE', type: 'date', nullable: true, defaultValue: null },
+      { name: 'BETRAG', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'WAESSION', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   DBERCHZ: {
     pk: 'BELNR',
     columns: [
-      { name: 'BELNR', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'BELZEILE', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'BETRAG', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'MESSION', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'PREESSION', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'STTARIF', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'BELNR', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'BELZEILE', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'BETRAG', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'MESSION', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'PREESSION', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'STTARIF', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   ETTIFN: {
     pk: 'TAESSION',
     columns: [
-      { name: 'TAESSION', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'TARIESSION', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'AB', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'BIS', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'PREISE', type: 'decimal', nullable: true, defaultValue: undefined },
-      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'TAESSION', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'TARIESSION', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'AB', type: 'date', nullable: true, defaultValue: null },
+      { name: 'BIS', type: 'date', nullable: true, defaultValue: null },
+      { name: 'PREISE', type: 'decimal', nullable: true, defaultValue: null },
+      { name: 'CHANGED_AT', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
 };
@@ -135,8 +135,8 @@ export class SapIsuConnector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     const schema = TABLE_SCHEMAS[table];
-    if (!schema) return { table, columns: [], primaryKey: [] };
-    return { table, columns: schema.columns, primaryKey: [schema.pk] };
+    if (!schema) return { table, columns: [], primaryKeys: [] };
+    return { table, columns: schema.columns, primaryKeys: [schema.pk] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -153,7 +153,7 @@ export class SapIsuConnector extends BaseConnector {
           );
           const rows = await this.fetchByTimestamp(table, since);
           for (const row of rows) {
-            callback({ operation: 'UPDATE', table, before: undefined, after: row, ts: new Date() });
+            callback({ op: 'U', table, before: null, after: row, ts: new Date() });
           }
           this.lastWatermark[table] = this.formatSapTimestamp(new Date());
         }
@@ -184,7 +184,7 @@ export class SapIsuConnector extends BaseConnector {
       if (rows.length === 0) break;
 
       for (const row of rows) {
-        events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[def.pk]?.toString() }));
+        events.push(createEvent('S', table, row, null, row[def.pk]?.toString(), { source: 'sap-isu' }));
       }
       offset += rows.length;
       if (rows.length < maxRows) break;
@@ -193,7 +193,7 @@ export class SapIsuConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const def = TABLE_BAPIS[table];
     if (!def) throw new Error(`Unknown SAP ISU table: ${table}`);
     const events: UnifiedChangeEvent[] = [];
@@ -202,13 +202,13 @@ export class SapIsuConnector extends BaseConnector {
     const rows = await this.fetchByTimestamp(table, since);
     for (const row of rows) {
       const ts = row.CHANGED_AT || new Date().toISOString();
-      events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: ts }));
+      events.push(createEvent('I', table, row, null, ts, { source: 'sap-isu' }));
     }
     this.lastWatermark[table] = this.formatSapTimestamp(new Date());
     return events;
   }
 
-  private async fetchByTimestamp(name: string, since: string): Promise<Record<string, any>[]> {
+  private async fetchByTimestamp(table: string, since: string): Promise<Record<string, any>[]> {
     const def = TABLE_BAPIS[table];
     if (!def || !this.rfcClient) return [];
 
@@ -250,9 +250,4 @@ export class SapIsuConnector extends BaseConnector {
     return date.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
   }
 }
-
-
-
-
-
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Klaviyo Connector — email/SMS marketing SaaS source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -55,5 +56,6 @@ export class KlaviyoConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Klaviyo CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

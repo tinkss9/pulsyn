@@ -111,17 +111,17 @@ export class S3Connector extends BaseConnector {
     if (!this.client) throw new Error('Not connected');
     try {
       const key = await this.findFirstFile(table);
-      if (!key) return { table, columns: [], primaryKey: [] };
+      if (!key) return { table, columns: [], primaryKeys: [] };
 
       const content = await this.downloadFile(key);
       const sample = this.parseContent(content);
-      if (sample.length === 0) return { table, columns: [], primaryKey: [] };
+      if (sample.length === 0) return { table, columns: [], primaryKeys: [] };
 
       const columns = Object.entries(sample[0]).map(([name, value]) => ({
         name, type: typeof value === 'number' ? 'number' : 'string',
-        nullable: true, defaultValue: undefined,
+        nullable: true, defaultValue: null,
       }));
-      return { table, columns, primaryKey: columns.length > 0 ? [columns[0].name] : [] };
+      return { table, columns, primaryKeys: columns.length > 0 ? [columns[0].name] : [] };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
     }
@@ -146,7 +146,7 @@ export class S3Connector extends BaseConnector {
             const table = obj.Key.replace(this.prefix, '').split('/')[0];
             callback({
               op: 'I', table,
-              before: undefined, after: { key: obj.Key, size: obj.Size, lastModified: obj.LastModified },
+              before: null, after: { key: obj.Key, size: obj.Size, lastModified: obj.LastModified },
               ts: obj.LastModified || new Date(),
             });
           }
@@ -170,7 +170,7 @@ export class S3Connector extends BaseConnector {
         const content = await this.downloadFile(file);
         const records = this.parseContent(content);
         for (let i = 0; i < records.length; i++) {
-          events.push(createEvent({ operation: "S", name: table, data: records[i], watermark: String(null || ""), sourceMetadata: `${file}:${i}` }));
+          events.push(createEvent('S', table, records[i], null, `${file}:${i}`, { source: 's3', key: file }));
         }
       } catch (error) {
         throw new Error(`Failed to extract ${file}: ${(error as Error).message}`);
@@ -179,7 +179,7 @@ export class S3Connector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.client) throw new Error('Not connected');
     const events: UnifiedChangeEvent[] = [];
     const wmDate = watermark ? new Date(watermark) : new Date(0);
@@ -191,7 +191,7 @@ export class S3Connector extends BaseConnector {
         const content = await this.downloadFile(file);
         const records = this.parseContent(content);
         for (let i = 0; i < records.length; i++) {
-          events.push(createEvent({ operation: "I", name: table, data: records[i], watermark: String(null || ""), sourceMetadata: file }));
+          events.push(createEvent('I', table, records[i], null, file, { source: 's3', key: file }));
         }
       } catch { continue; }
     }
@@ -227,9 +227,4 @@ export class S3Connector extends BaseConnector {
     return res.Contents || [];
   }
 }
-
-
-
-
-
 

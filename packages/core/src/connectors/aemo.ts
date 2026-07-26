@@ -63,54 +63,54 @@ export class AemoConnector extends BaseConnector {
   async getTableSchema(table: string): Promise<TableSchema> {
     const schemas: Record<string, TableSchema> = {
       DISPATCHPRICE: {
-        table, primaryKey: ['SETTLEMENTDATE'],
+        table, primaryKeys: ['SETTLEMENTDATE'],
         columns: [
-          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: undefined },
-          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: undefined },
-          { name: 'RRP', type: 'decimal', nullable: false, defaultValue: undefined },
-          { name: 'INTERVENTION', type: 'integer', nullable: true, defaultValue: undefined },
-          { name: 'RAISE6SECRRP', type: 'decimal', nullable: true, defaultValue: undefined },
+          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: null },
+          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: null },
+          { name: 'RRP', type: 'decimal', nullable: false, defaultValue: null },
+          { name: 'INTERVENTION', type: 'integer', nullable: true, defaultValue: null },
+          { name: 'RAISE6SECRRP', type: 'decimal', nullable: true, defaultValue: null },
         ],
       },
       DISPATCHREGIONSUM: {
-        table, primaryKey: ['SETTLEMENTDATE'],
+        table, primaryKeys: ['SETTLEMENTDATE'],
         columns: [
-          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: undefined },
-          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: undefined },
-          { name: 'TOTALDEMAND', type: 'decimal', nullable: false, defaultValue: undefined },
-          { name: 'AVAILABLEGENERATION', type: 'decimal', nullable: true, defaultValue: undefined },
-          { name: 'CLEAREDSUPPLY', type: 'decimal', nullable: true, defaultValue: undefined },
+          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: null },
+          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: null },
+          { name: 'TOTALDEMAND', type: 'decimal', nullable: false, defaultValue: null },
+          { name: 'AVAILABLEGENERATION', type: 'decimal', nullable: true, defaultValue: null },
+          { name: 'CLEAREDSUPPLY', type: 'decimal', nullable: true, defaultValue: null },
         ],
       },
       DISPATCH_UNIT_SCADA: {
-        table, primaryKey: ['SETTLEMENTDATE'],
+        table, primaryKeys: ['SETTLEMENTDATE'],
         columns: [
-          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: undefined },
-          { name: 'DUID', type: 'varchar', nullable: false, defaultValue: undefined },
-          { name: 'SCADAVALUE', type: 'decimal', nullable: true, defaultValue: undefined },
+          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: null },
+          { name: 'DUID', type: 'varchar', nullable: false, defaultValue: null },
+          { name: 'SCADAVALUE', type: 'decimal', nullable: true, defaultValue: null },
         ],
       },
       TRADINGPRICE: {
-        table, primaryKey: ['SETTLEMENTDATE'],
+        table, primaryKeys: ['SETTLEMENTDATE'],
         columns: [
-          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: undefined },
-          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: undefined },
-          { name: 'RRP', type: 'decimal', nullable: false, defaultValue: undefined },
-          { name: 'PERIODID', type: 'integer', nullable: false, defaultValue: undefined },
+          { name: 'SETTLEMENTDATE', type: 'timestamp', nullable: false, defaultValue: null },
+          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: null },
+          { name: 'RRP', type: 'decimal', nullable: false, defaultValue: null },
+          { name: 'PERIODID', type: 'integer', nullable: false, defaultValue: null },
         ],
       },
       ROOFTOP_PV_ACTUAL: {
-        table, primaryKey: ['INTERVAL_DATETIME'],
+        table, primaryKeys: ['INTERVAL_DATETIME'],
         columns: [
-          { name: 'INTERVAL_DATETIME', type: 'timestamp', nullable: false, defaultValue: undefined },
-          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: undefined },
-          { name: 'POWER', type: 'decimal', nullable: false, defaultValue: undefined },
-          { name: 'QI', type: 'decimal', nullable: true, defaultValue: undefined },
-          { name: 'TYPE', type: 'varchar', nullable: true, defaultValue: undefined },
+          { name: 'INTERVAL_DATETIME', type: 'timestamp', nullable: false, defaultValue: null },
+          { name: 'REGIONID', type: 'varchar', nullable: false, defaultValue: null },
+          { name: 'POWER', type: 'decimal', nullable: false, defaultValue: null },
+          { name: 'QI', type: 'decimal', nullable: true, defaultValue: null },
+          { name: 'TYPE', type: 'varchar', nullable: true, defaultValue: null },
         ],
       },
     };
-    return schemas[table] || { table, columns: [], primaryKey: [] };
+    return schemas[table] || { table, columns: [], primaryKeys: [] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -127,7 +127,7 @@ export class AemoConnector extends BaseConnector {
           for (const file of newFiles) {
             const rows = await this.fetchAndParseCsv(`${this.baseUrl}${TABLE_PATHS[table]}${file}`);
             for (const row of rows) {
-              callback({ op: 'I', table, before: undefined, after: row, ts: new Date() });
+              callback({ op: 'I', table, before: null, after: row, ts: new Date() });
             }
             this.lastSeen[`${table}:${file}`] = new Date().toISOString();
           }
@@ -151,14 +151,14 @@ export class AemoConnector extends BaseConnector {
       const rows = await this.fetchAndParseCsv(`${this.baseUrl}${path}${file}`);
       for (const row of rows) {
         const pk = row.SETTLEMENTDATE || row.INTERVAL_DATETIME || null;
-        events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: pk }));
+        events.push(createEvent('S', table, row, null, pk, { source: 'aemo', file }));
       }
       this.lastSeen[`${table}:${file}`] = new Date().toISOString();
     }
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const events: UnifiedChangeEvent[] = [];
     const path = TABLE_PATHS[table];
     if (!path) throw new Error(`Unknown AEMO table: ${table}`);
@@ -172,7 +172,7 @@ export class AemoConnector extends BaseConnector {
       const rows = await this.fetchAndParseCsv(`${this.baseUrl}${path}${file}`);
       for (const row of rows) {
         const ts = row.SETTLEMENTDATE || row.INTERVAL_DATETIME || new Date().toISOString();
-        events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: ts }));
+        events.push(createEvent('I', table, row, null, ts, { source: 'aemo', file }));
       }
       this.lastSeen[`${table}:${file}`] = new Date().toISOString();
     }
@@ -237,9 +237,4 @@ export class AemoConnector extends BaseConnector {
     });
   }
 }
-
-
-
-
-
 

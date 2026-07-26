@@ -17,72 +17,72 @@ const TABLE_DEFINITIONS: Record<string, { endpoint: string; pk: string; columns:
     endpoint: '/api/v2/accounts',
     pk: 'account_id',
     columns: [
-      { name: 'account_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'account_name', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'account_type', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'created_at', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'updated_at', type: 'timestamp', nullable: true, defaultValue: undefined },
+      { name: 'account_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'account_name', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'account_type', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'created_at', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'updated_at', type: 'timestamp', nullable: true, defaultValue: null },
     ],
   },
   meters: {
     endpoint: '/api/v2/meters',
     pk: 'meter_id',
     columns: [
-      { name: 'meter_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'serial_number', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'meter_type', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'icp', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'installed_date', type: 'date', nullable: true, defaultValue: undefined },
+      { name: 'meter_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'serial_number', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'meter_type', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'icp', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'installed_date', type: 'date', nullable: true, defaultValue: null },
     ],
   },
   meter_readings: {
     endpoint: '/api/v2/meter-readings',
     pk: 'reading_id',
     columns: [
-      { name: 'reading_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'meter_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'reading_date', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'value', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'unit', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'reading_type', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'reading_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'meter_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'reading_date', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'value', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'unit', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'reading_type', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   invoices: {
     endpoint: '/api/v2/invoices',
     pk: 'invoice_id',
     columns: [
-      { name: 'invoice_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'account_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'invoice_date', type: 'date', nullable: false, defaultValue: undefined },
-      { name: 'due_date', type: 'date', nullable: true, defaultValue: undefined },
-      { name: 'total_amount', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'status', type: 'varchar', nullable: false, defaultValue: undefined },
+      { name: 'invoice_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'account_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'invoice_date', type: 'date', nullable: false, defaultValue: null },
+      { name: 'due_date', type: 'date', nullable: true, defaultValue: null },
+      { name: 'total_amount', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'status', type: 'varchar', nullable: false, defaultValue: null },
     ],
   },
   payments: {
     endpoint: '/api/v2/payments',
     pk: 'payment_id',
     columns: [
-      { name: 'payment_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'account_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'payment_date', type: 'timestamp', nullable: false, defaultValue: undefined },
-      { name: 'amount', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'method', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'reference', type: 'varchar', nullable: true, defaultValue: undefined },
+      { name: 'payment_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'account_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'payment_date', type: 'timestamp', nullable: false, defaultValue: null },
+      { name: 'amount', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'method', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'reference', type: 'varchar', nullable: true, defaultValue: null },
     ],
   },
   tariffs: {
     endpoint: '/api/v2/tariffs',
     pk: 'tariff_id',
     columns: [
-      { name: 'tariff_id', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'tariff_code', type: 'varchar', nullable: false, defaultValue: undefined },
-      { name: 'description', type: 'varchar', nullable: true, defaultValue: undefined },
-      { name: 'rate', type: 'decimal', nullable: false, defaultValue: undefined },
-      { name: 'effective_from', type: 'date', nullable: false, defaultValue: undefined },
-      { name: 'effective_to', type: 'date', nullable: true, defaultValue: undefined },
+      { name: 'tariff_id', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'tariff_code', type: 'varchar', nullable: false, defaultValue: null },
+      { name: 'description', type: 'varchar', nullable: true, defaultValue: null },
+      { name: 'rate', type: 'decimal', nullable: false, defaultValue: null },
+      { name: 'effective_from', type: 'date', nullable: false, defaultValue: null },
+      { name: 'effective_to', type: 'date', nullable: true, defaultValue: null },
     ],
   },
 };
@@ -156,8 +156,8 @@ export class GentrackG2Connector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     const def = TABLE_DEFINITIONS[table];
-    if (!def) return { table, columns: [], primaryKey: [] };
-    return { table, columns: def.columns, primaryKey: [def.pk] };
+    if (!def) return { table, columns: [], primaryKeys: [] };
+    return { table, columns: def.columns, primaryKeys: [def.pk] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -179,7 +179,7 @@ export class GentrackG2Connector extends BaseConnector {
           const items = data.data || data.results || data;
           if (Array.isArray(items)) {
             for (const item of items) {
-              callback({ operation: 'UPDATE', table, before: undefined, after: item, ts: new Date() });
+              callback({ op: 'U', table, before: null, after: item, ts: new Date() });
             }
           }
           this.lastWatermark[table] = new Date().toISOString();
@@ -211,7 +211,7 @@ export class GentrackG2Connector extends BaseConnector {
       if (result.rows.length === 0) break;
 
       for (const row of result.rows) {
-        events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[def.pk]?.toString() }));
+        events.push(createEvent('S', table, row, null, row[def.pk]?.toString(), { source: 'gentrack-g2' }));
       }
       lastKey = result.rows[result.rows.length - 1][def.pk];
       if (result.rows.length < this.batchSize) break;
@@ -219,7 +219,7 @@ export class GentrackG2Connector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     const def = TABLE_DEFINITIONS[table];
     if (!def) throw new Error(`Unknown Gentrack G2 table: ${table}`);
     const events: UnifiedChangeEvent[] = [];
@@ -236,7 +236,7 @@ export class GentrackG2Connector extends BaseConnector {
       const items = data.data || data.results || [];
       for (const item of items) {
         const ts = item.updated_at || item.created_at || new Date().toISOString();
-        events.push(createEvent({ operation: "I", name: table, data: item, watermark: String(null || ""), sourceMetadata: ts }));
+        events.push(createEvent('I', table, item, null, ts, { source: 'gentrack-g2' }));
       }
       url = data.next || data.links?.next || null;
     }
@@ -272,9 +272,4 @@ export class GentrackG2Connector extends BaseConnector {
     };
   }
 }
-
-
-
-
-
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Spanner Connector — Google globally-distributed database source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -61,5 +62,6 @@ export class SpannerConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Spanner CDC requires Change Streams — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

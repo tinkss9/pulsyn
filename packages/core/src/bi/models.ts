@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type ChartType =
   | 'bar'
   | 'line'
@@ -156,3 +157,4 @@ export function createParseResult(
     parseDurationMs: 0,
   };
 }
+

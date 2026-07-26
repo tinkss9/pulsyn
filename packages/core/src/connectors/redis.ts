@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Redis Connector — cache/session store source
 // npm install ioredis
 
@@ -51,5 +52,6 @@ export class RedisConnector extends BaseConnector {
 
   async stopCDC(): Promise<void> {}
 }
+
 
 

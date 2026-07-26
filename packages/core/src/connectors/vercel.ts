@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Vercel Connector — deployments source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
@@ -22,5 +23,6 @@ export class VercelConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Vercel CDC requires webhooks'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

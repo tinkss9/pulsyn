@@ -84,10 +84,10 @@ export class MySQLConnector extends BaseConnector {
         nullable: (c.is_nullable || c.IS_NULLABLE) === 'YES',
         defaultValue: c.column_default || c.COLUMN_DEFAULT,
       }));
-      const primaryKey = (cols as any[])
+      const primaryKeys = (cols as any[])
         .filter((c) => (c.column_key || c.COLUMN_KEY) === 'PRI')
         .map((c) => c.column_name || c.COLUMN_NAME);
-      return { table, columns, primaryKey };
+      return { table, columns, primaryKeys };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
     }
@@ -118,8 +118,8 @@ export class MySQLConnector extends BaseConnector {
               : evt.Event_type === 'Update_rows' ? 'U' : 'D';
             cb({
               op, table: evt.Info?.split(' ')[0] || 'unknown',
-              before: op !== 'I' ? {} : undefined,
-              after: op !== 'D' ? {} : undefined,
+              before: op !== 'I' ? {} : null,
+              after: op !== 'D' ? {} : null,
               ts: new Date(),
             });
           }
@@ -139,7 +139,7 @@ export class MySQLConnector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const schema = await this.getTableSchema(table);
-    const pk = schema.primaryKey[0] || 'id';
+    const pk = schema.primaryKeys[0] || 'id';
     const events: UnifiedChangeEvent[] = [];
     let lastKey: any = null;
 
@@ -152,7 +152,7 @@ export class MySQLConnector extends BaseConnector {
       const data = rows as any[];
       if (data.length === 0) break;
       for (const row of data) {
-        events.push(createEvent({ operation: "S", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[pk]?.toString() || null }));
+        events.push(createEvent('S', table, row, null, row[pk]?.toString() || null, { source: 'mysql' }));
       }
       lastKey = data[data.length - 1][pk];
       if (data.length < this.batchSize) break;
@@ -160,7 +160,7 @@ export class MySQLConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(name: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const wmCol = this.config.watermarkColumn || 'updated_at';
     const events: UnifiedChangeEvent[] = [];
@@ -170,14 +170,9 @@ export class MySQLConnector extends BaseConnector {
     const p = watermark ? [watermark, this.batchSize] : [this.batchSize];
     const [rows] = await this.pool.query(q, p);
     for (const row of rows as any[]) {
-      events.push(createEvent({ operation: "I", name: table, data: row, watermark: String(null || ""), sourceMetadata: row[wmCol]?.toString() || null }));
+      events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'mysql' }));
     }
     return events;
   }
 }
-
-
-
-
-
 

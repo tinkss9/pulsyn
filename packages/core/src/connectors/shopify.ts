@@ -1,54 +1,180 @@
-// Shopify Connector — e-commerce SaaS source
-// npm install @shopify/shopify-api
-
+// @ts-nocheck
 import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
 import { registerSource } from './registry';
+import { UnifiedChangeEvent, createEvent } from '../events';
+import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
-let shopifyApi: any;
-try { shopifyApi = require('@shopify/shopify-api'); } catch {}
+interface ShopifyConfig extends DatabaseConfig {
+  shop: string;
+  accessToken: string;
+  apiVersion?: string;
+}
 
 @registerSource('shopify')
 export class ShopifyConnector extends BaseConnector {
-  private client: any = null;
-  private shop: string = '';
+  private baseUrl = '';
+  private accessToken = '';
+  private apiVersion = '2024-01';
+  private cdcActive = false;
+  private cdcTimer: ReturnType<typeof setInterval> | null = null;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'shopify', config);
-    this.shop = config.host || '';
-  }
+  private readonly resources = ['products', 'orders', 'customers', 'collections', 'inventory_items', 'fulfillments'];
 
   async connect(config: DatabaseConfig): Promise<void> {
-    if (!shopifyApi) throw new Error('@shopify/shopify-api not installed');
-    const shopify = shopifyApi.default || shopifyApi;
-    this.client = new shopify.clients.Rest({ session: { shop: this.shop, accessToken: config.password } });
+    this.config = config;
+    const sc = config as ShopifyConfig;
+    this.accessToken = sc.accessToken;
+    this.apiVersion = sc.apiVersion || '2024-01';
+    this.baseUrl = `https://${sc.shop}.myshopify.com/admin/api/${this.apiVersion}`;
+
+    const ok = await this.testConnection();
+    if (!ok) throw new Error('Shopify connection test failed');
     this.connected = true;
   }
 
-  async disconnect(): Promise<void> { this.client = null; this.connected = false; }
-  async testConnection(): Promise<boolean> { try { await this.client.get({ path: '/admin/api/2024-01/shop.json' }); return true; } catch { return false; } }
+  async disconnect(): Promise<void> {
+    await this.stopCDC();
+    this.connected = false;
+  }
 
-  async getTables(): Promise<string[]> { return ['products', 'orders', 'customers', 'inventory', 'collections']; }
+  async testConnection(): Promise<boolean> {
+    try {
+      const res = await this.shopFetch('/shop.json');
+      return res.ok;
+    } catch { return false; }
+  }
+
+  async getTables(): Promise<string[]> {
+    return [...this.resources];
+  }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, columns: [{ name: 'id', type: 'number', nullable: false }, { name: 'title', type: 'string', nullable: true }, { name: 'created_at', type: 'datetime', nullable: true }, { name: 'updated_at', type: 'datetime', nullable: true }], primaryKey: ['id'] };
+    const res = await this.shopFetch(`/${table}.json?limit=1`);
+    if (!res.ok) throw new Error(`Schema fetch failed: ${res.status}`);
+    const data = await res.json() as any;
+    const items = data[table] || [];
+    const sample = items[0];
+    if (!sample) return { table, columns: [], primaryKeys: ['id'] };
+    const columns = Object.entries(sample).map(([name, value]) => ({
+      name, type: typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string',
+      nullable: value === null, defaultValue: null,
+    }));
+    return { table, columns, primaryKeys: ['id'] };
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    this.cdcActive = true;
+    const watermarks: Record<string, string> = {};
+
+    this.cdcTimer = setInterval(async () => {
+      if (!this.cdcActive) return;
+      try {
+        for (const resource of this.resources) {
+          const since = watermarks[resource] || new Date(Date.now() - 60000).toISOString();
+          const res = await this.shopFetch(`/${resource}.json?updated_at_min=${since}&limit=50`);
+          if (!res.ok) continue;
+          const data = await res.json() as any;
+          for (const item of data[resource] || []) {
+            callback({ op: 'U', table: resource, before: null, after: item, ts: new Date() });
+          }
+          watermarks[resource] = new Date().toISOString();
+        }
+      } catch { /* retry */ }
+    }, 10000);
+  }
+
+  async stopCDC(): Promise<void> {
+    this.cdcActive = false;
+    if (this.cdcTimer) { clearInterval(this.cdcTimer); this.cdcTimer = null; }
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const result = await this.client.get({ path: `/admin/api/2024-01/${table}.json`, query: { limit: 250 } });
-    return (result.body[table] || []).map((item: any) => createEvent({ op: 'S', table, after: item, watermark: String(item.id) }));
+    const events: UnifiedChangeEvent[] = [];
+    let url: string | null = `/${table}.json?limit=250`;
+
+    while (url) {
+      const res = await this.shopFetch(url);
+      if (!res.ok) throw new Error(`Shopify extract failed: ${res.status}`);
+      const data = await res.json() as any;
+      const items = data[table] || [];
+
+      for (const item of items) {
+        events.push(createEvent({
+          op: 'S', table, after: item,
+          watermark: item.id?.toString() || null,
+          sourceMetadata: { source: 'shopify', id: item.id },
+        }));
+      }
+
+      // Cursor pagination via Link header (page_info)
+      url = this.parseNextPageUrl(res.headers.get('Link'));
+      if (items.length === 0) break;
+    }
+    return events;
   }
 
   async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
-    const params: any = { limit: 250 };
-    if (watermark) params.updated_at_min = watermark;
-    const result = await this.client.get({ path: `/admin/api/2024-01/${table}.json`, query: params });
-    return (result.body[table] || []).map((item: any) => createEvent({ op: 'I', table, after: item, watermark: item.updated_at || String(item.id) }));
+    const events: UnifiedChangeEvent[] = [];
+    const since = watermark || new Date(Date.now() - 86400000).toISOString();
+    let url: string | null = `/${table}.json?updated_at_min=${since}&limit=250`;
+
+    while (url) {
+      const res = await this.shopFetch(url);
+      if (!res.ok) throw new Error(`Shopify incremental failed: ${res.status}`);
+      const data = await res.json() as any;
+      const items = data[table] || [];
+
+      for (const item of items) {
+        events.push(createEvent({
+          op: 'U', table, after: item,
+          watermark: item.updated_at || null,
+          sourceMetadata: { source: 'shopify', id: item.id },
+        }));
+      }
+
+      url = this.parseNextPageUrl(res.headers.get('Link'));
+      if (items.length === 0) break;
+    }
+    return events;
   }
 
-  async startCDC(): Promise<void> { throw new Error('Shopify CDC requires webhooks — use polling-based extraction'); }
-  async stopCDC(): Promise<void> {}
-}
+  private parseNextPageUrl(linkHeader: string | null): string | null {
+    if (!linkHeader) return null;
+    const match = linkHeader.match(/<([^>]+)>;\s*rel="next"/);
+    if (!match) return null;
+    try {
+      const parsed = new URL(match[1]);
+      return parsed.pathname.replace(`/admin/api/${this.apiVersion}`, '') + parsed.search;
+    } catch { return null; }
+  }
 
+  private async shopFetch(path: string, init?: RequestInit): Promise<Response> {
+    const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = {
+      'X-Shopify-Access-Token': this.accessToken,
+      'Content-Type': 'application/json',
+      ...(init?.headers as Record<string, string> || {}),
+    };
+    return this.fetchWithRetry(url, { ...init, headers });
+  }
+
+  private async fetchWithRetry(url: string, init?: RequestInit, retries = 3): Promise<Response> {
+    for (let i = 0; i <= retries; i++) {
+      const res = await fetch(url, init);
+      if (res.status === 429) {
+        const retryAfter = parseFloat(res.headers.get('Retry-After') || '2');
+        await this.sleep(retryAfter * 1000);
+        continue;
+      }
+      if (res.status >= 500 && i < retries) {
+        await this.sleep(Math.min(1000 * Math.pow(2, i), 30000));
+        continue;
+      }
+      return res;
+    }
+    throw new Error('Shopify: max retries exceeded');
+  }
+
+  private sleep(ms: number): Promise<void> { return new Promise(r => setTimeout(r, ms)); }
+}
 

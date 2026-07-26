@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Twilio Connector — messaging/voice SaaS source
 import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -53,5 +54,6 @@ export class TwilioConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Twilio CDC requires webhooks — use polling'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

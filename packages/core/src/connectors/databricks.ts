@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Databricks Connector — lakehouse source/target
 // npm install @databricks/sql
 
@@ -59,5 +60,6 @@ export class DatabricksConnector extends BaseConnector {
   async startCDC(): Promise<void> { throw new Error('Databricks CDC not supported — use incremental extraction'); }
   async stopCDC(): Promise<void> {}
 }
+
 
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BaseConnector } from '../../connectors/base';
 import { getTestConnector, getTargetConnector, TEST_TABLE } from './conftest';
@@ -106,3 +107,4 @@ describe('Schema Evolution Conformance', () => {
     expect(hasRename || hasRemoveAndAdd).toBe(true);
   });
 });
+

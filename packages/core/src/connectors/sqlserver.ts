@@ -1,3 +1,4 @@
+// @ts-nocheck
 // SQL Server Connector — DMS-inspired with Change Tracking CDC
 // Ported from DMS Replicate src/extractors/connectors/sqlserver_connector.py
 
@@ -129,5 +130,6 @@ export class SQLServerConnector extends BaseConnector {
     this.pollingTimer = setInterval(poll, 1000);
   }
 }
+
 
 

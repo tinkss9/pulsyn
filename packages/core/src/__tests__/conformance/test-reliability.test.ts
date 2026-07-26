@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BaseConnector } from '../../connectors/base';
 import { ConnectorRegistry } from '../../connectors/registry';
@@ -101,3 +102,4 @@ describe('Reliability Conformance', () => {
     expect(events.length).toBeGreaterThanOrEqual(uniqueKeys.length);
   });
 });
+

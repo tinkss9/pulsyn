@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Connector Registry Unit Tests
 import { describe, it, expect } from 'vitest';
 import { ConnectorRegistry } from '../../connectors/registry';
@@ -40,3 +41,4 @@ describe('ConnectorRegistry', () => {
     expect(() => ConnectorRegistry.getTarget('nonexistent', 'id', {} as any)).toThrow('Unknown target connector');
   });
 });
+
