@@ -75,6 +75,10 @@ export { BigQueryTargetConnector } from './targets/bigquery';
 // Engine
 export { CDCEngine } from './engine/cdc-engine';
 
+// Certification
+export { CertificationEngine } from './certification/engine';
+export type { CertificationLevel as ConnectorCertLevel, TestResult as ConnectorTestResult, CertificationReport as ConnectorCertReport } from './certification/engine';
+
 // Checkpoint
 export { CheckpointManager } from './checkpoint/checkpoint-manager';
 export { WatermarkTracker } from './checkpoint/watermark';
