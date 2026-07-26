@@ -276,21 +276,36 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { icon: '⚡', title: 'Real-time CDC', desc: 'Log-based capture with sub-second latency. No polling, no batch jobs.' },
-              { icon: '🔄', title: 'Checkpoint Recovery', desc: 'Exactly-once semantics. Resume from any point after failure.' },
-              { icon: '🤖', title: 'AI Agent Integration', desc: '26 MCP tools. Control pipelines from Claude, Cursor, or any agent.' },
-              { icon: '🧠', title: 'AI Schema Mapping', desc: 'Auto-map fields across 763 connectors. Type inference. Conflict resolution.' },
-              { icon: '🔒', title: 'In-flight Masking', desc: 'Hash, redact, or format-preserving encryption during replication.' },
-              { icon: '📊', title: 'Connector Certification', desc: 'Measured throughput and correctness benchmarks per pair.' },
-              { icon: '🛡️', title: 'Enterprise Security', desc: 'API keys, rate limiting, IP blocking, brute-force protection.' },
-              { icon: '📡', title: '763 Connectors', desc: 'Databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, and more.' },
-              { icon: '☁️', title: 'Deploy Anywhere', desc: 'Self-hosted, managed cloud, or hybrid. Docker or Vercel.' },
-              { icon: '📈', title: 'Real-time Monitoring', desc: 'Pipeline health, latency, throughput, errors. Grafana integration.' },
-              { icon: '🔄', title: 'Data Mesh', desc: 'Multi-tenant, governance, compliance. Enterprise-grade data mesh.' },
-              { icon: '💰', title: 'Affordable', desc: 'Starting free. Pro at $499/mo. Enterprise-grade features at startup prices.' },
+              { icon: 'bolt', title: 'Real-time CDC', desc: 'Log-based capture with sub-second latency. No polling, no batch jobs.' },
+              { icon: 'refresh', title: 'Checkpoint Recovery', desc: 'Exactly-once semantics. Resume from any point after failure.' },
+              { icon: 'cpu', title: 'AI Agent Integration', desc: '26 MCP tools. Control pipelines from Claude, Cursor, or any agent.' },
+              { icon: 'layers', title: 'AI Schema Mapping', desc: 'Auto-map fields across 763 connectors. Type inference. Conflict resolution.' },
+              { icon: 'shield', title: 'In-flight Masking', desc: 'Hash, redact, or format-preserving encryption during replication.' },
+              { icon: 'chart', title: 'Connector Certification', desc: 'Measured throughput and correctness benchmarks per pair.' },
+              { icon: 'lock', title: 'Enterprise Security', desc: 'API keys, rate limiting, IP blocking, brute-force protection.' },
+              { icon: 'db', title: '763 Connectors', desc: 'Databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, and more.' },
+              { icon: 'cloud', title: 'Deploy Anywhere', desc: 'Self-hosted, managed cloud, or hybrid. Docker or Vercel.' },
+              { icon: 'eye', title: 'Real-time Monitoring', desc: 'Pipeline health, latency, throughput, errors. Grafana integration.' },
+              { icon: 'grid', title: 'Data Mesh', desc: 'Multi-tenant, governance, compliance. Enterprise-grade data mesh.' },
+              { icon: 'tag', title: 'Affordable', desc: 'Starting free. Pro at $499/mo. Enterprise-grade features at startup prices.' },
             ].map((f) => (
               <div key={f.title} className="group bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 hover:bg-white/[0.06] hover:border-cyan-500/30 transition-all">
-                <div className="text-2xl mb-3">{f.icon}</div>
+                <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-3">
+                  <span className="text-cyan-400 text-lg">
+                    {f.icon === 'bolt' && '⚡'}
+                    {f.icon === 'refresh' && '↻'}
+                    {f.icon === 'cpu' && '⚙'}
+                    {f.icon === 'layers' && '⧉'}
+                    {f.icon === 'shield' && '⛨'}
+                    {f.icon === 'chart' && '📊'}
+                    {f.icon === 'lock' && '🔒'}
+                    {f.icon === 'db' && '🗄'}
+                    {f.icon === 'cloud' && '☁'}
+                    {f.icon === 'eye' && '👁'}
+                    {f.icon === 'grid' && '⊞'}
+                    {f.icon === 'tag' && '🏷'}
+                  </span>
+                </div>
                 <h3 className="text-base font-semibold mb-2 text-white">{f.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
               </div>
