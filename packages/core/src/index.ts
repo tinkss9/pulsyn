@@ -66,6 +66,16 @@ export { NetSuiteConnector } from './connectors/netsuite';
 export { WorkdayConnector } from './connectors/workday';
 export { NotionConnector } from './connectors/notion';
 export { AirtableConnector } from './connectors/airtable';
+export { GitHubConnector } from './connectors/github';
+export { GitLabConnector } from './connectors/gitlab';
+export { TwilioConnector } from './connectors/twilio';
+export { SendGridConnector } from './connectors/sendgrid';
+export { SegmentConnector } from './connectors/segment';
+export { IntercomConnector } from './connectors/intercom';
+export { LinearConnector } from './connectors/linear';
+export { Neo4jConnector } from './connectors/neo4j';
+export { InfluxDBConnector } from './connectors/influxdb';
+export { DuckDBConnector } from './connectors/duckdb';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Connectors — Target
