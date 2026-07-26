@@ -1,4 +1,4 @@
-// Vercel serverless helper — PostgreSQL connection + authentication + rate limiting + security logging
+// Vercel serverless helper — PostgreSQL connection + authentication + rate limiting + security logging + IP blocking
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Pool } from 'pg';
 import crypto from 'crypto';
@@ -48,14 +48,60 @@ async function logSecurityEvent(
       ]
     );
   } catch (err) {
-    // Don't fail the request if logging fails
     console.error('Failed to log security event:', err);
   }
 }
 
-// API Key authentication with rate limiting and security logging
+// Check if IP is blocked
+async function isIpBlocked(ip: string): Promise<{ blocked: boolean; reason?: string; expiresAt?: string }> {
+  try {
+    const result = await query('SELECT * FROM is_ip_blocked($1)', [ip]);
+    const row = result.rows[0];
+    return {
+      blocked: row.blocked,
+      reason: row.reason,
+      expiresAt: row.expires_at,
+    };
+  } catch {
+    return { blocked: false };
+  }
+}
+
+// Check and auto-block IP if threshold exceeded
+async function checkAndAutoBlock(ip: string, req: VercelRequest): Promise<void> {
+  try {
+    const result = await query('SELECT * FROM check_and_auto_block($1)', [ip]);
+    const row = result.rows[0];
+
+    if (row.was_blocked) {
+      await logSecurityEvent('suspicious_activity', null, req, {
+        action: 'auto_blocked',
+        reason: row.block_reason,
+        ip,
+      });
+    }
+  } catch (err) {
+    console.error('Failed to check auto-block:', err);
+  }
+}
+
+// API Key authentication with rate limiting, security logging, and IP blocking
 export async function authenticate(req: VercelRequest, res: VercelResponse): Promise<boolean> {
   const startTime = Date.now();
+  const clientIp = getClientIp(req);
+
+  // Check if IP is blocked FIRST (before any processing)
+  const blockStatus = await isIpBlocked(clientIp);
+  if (blockStatus.blocked) {
+    res.status(403).json({
+      error: 'IP blocked',
+      message: 'Your IP has been blocked due to suspicious activity.',
+      reason: blockStatus.reason,
+      expiresAt: blockStatus.expiresAt,
+      contact: 'support@pulsyn.io to request unblocking',
+    });
+    return false;
+  }
 
   // Check for API key in header
   const authHeader = req.headers.authorization;
@@ -75,16 +121,17 @@ export async function authenticate(req: VercelRequest, res: VercelResponse): Pro
     if (cronSecret) {
       const cronAuth = req.headers.authorization;
       if (cronAuth === `Bearer ${cronSecret}` || req.headers['x-vercel-cron']) {
-        return true; // Valid cron request
+        return true;
       }
     }
 
-    // Log auth failure
+    // Log auth failure and check for auto-block
     await logSecurityEvent('auth_failure', null, req, {
       reason: 'no_api_key',
       hasAuthHeader: !!authHeader,
       hasApiKeyHeader: !!apiKeyHeader,
     });
+    await checkAndAutoBlock(clientIp, req);
 
     res.status(401).json({
       error: 'Authentication required',
@@ -101,11 +148,12 @@ export async function authenticate(req: VercelRequest, res: VercelResponse): Pro
     );
 
     if (result.rowCount === 0) {
-      // Log invalid key attempt
+      // Log invalid key attempt and check for auto-block
       await logSecurityEvent('invalid_key', null, req, {
         reason: 'key_not_found',
         keyPrefix: apiKey.substring(0, 12) + '...',
       });
+      await checkAndAutoBlock(clientIp, req);
 
       res.status(401).json({ error: 'Invalid API key' });
       return false;

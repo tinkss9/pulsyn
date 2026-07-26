@@ -68,11 +68,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           GROUP BY event_type
           ORDER BY count DESC
         `);
+
+        // Get blocked IPs count
+        const blockedResult = await query(
+          `SELECT COUNT(*) as count FROM _pulsyn_blocked_ips WHERE status = 'active'`
+        );
+
         return res.json({
           data: {
             type: 'summary',
             period: '24 hours',
             events: result.rows,
+            blockedIps: parseInt(blockedResult.rows[0].count),
+          },
+        });
+
+      case 'blocked':
+        // Blocked IPs
+        result = await query('SELECT * FROM v_pulsyn_blocked_ips WHERE status = $1', [req.query.blockStatus || 'active']);
+        return res.json({
+          data: {
+            type: 'blocked_ips',
+            items: result.rows,
+            total: result.rowCount,
           },
         });
 
