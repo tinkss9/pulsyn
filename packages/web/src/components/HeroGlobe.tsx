@@ -25,9 +25,9 @@ export default function HeroGlobe() {
 
     const W = () => window.innerWidth;
     const H = () => window.innerHeight;
-    const cx = () => W() * 0.55; // Slightly right of center for asymmetric feel
-    const cy = () => H() * 0.45; // Slightly above center
-    const R = () => Math.min(W(), H()) * 0.38; // 35% bigger
+    const cx = () => W() / 2; // Centered
+    const cy = () => H() / 2; // Centered
+    const R = () => Math.min(W(), H()) * 0.40; // Big and prominent
 
     // === PARTICLES (subtle, calm) ===
     interface Particle {
@@ -48,11 +48,11 @@ export default function HeroGlobe() {
     }
 
     const particles: Particle[] = [];
-    for (let i = 0; i < 2500; i++) {
-      const phi = Math.acos(1 - 2 * (i + 0.5) / 2500);
+    for (let i = 0; i < 2000; i++) {
+      const phi = Math.acos(1 - 2 * (i + 0.5) / 2000);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-      const baseSize = 0.3 + Math.random() * 0.8;
-      const baseBrightness = 0.15 + Math.random() * 0.5;
+      const baseSize = 0.5 + Math.random() * 1.2;
+      const baseBrightness = 0.3 + Math.random() * 0.7;
       particles.push({
         theta,
         phi,
@@ -61,7 +61,7 @@ export default function HeroGlobe() {
         baseBrightness,
         brightness: baseBrightness,
         pulsePhase: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.2 + Math.random() * 0.8,
+        pulseSpeed: 0.3 + Math.random() * 1.0,
         energy: 0,
         energyDecay: 0.97,
         vx: 0,
@@ -121,16 +121,16 @@ export default function HeroGlobe() {
     };
 
     const draw = () => {
-      time += 0.004; // Even slower — more hypnotic
+      time += 0.008; // Moderate pace — visible movement
       const w = W();
       const h = H();
 
-      // Very slow fade
-      ctx.fillStyle = 'rgba(8, 8, 12, 0.04)';
+      // Fade
+      ctx.fillStyle = 'rgba(8, 8, 12, 0.08)';
       ctx.fillRect(0, 0, w, h);
 
-      const rotY = time * 0.15;
-      const rotX = Math.sin(time * 0.06) * 0.1;
+      const rotY = time * 0.25;
+      const rotX = Math.sin(time * 0.1) * 0.12;
 
       // === UPDATE CATALYST ===
       catalyst.bouncePhase += 0.02;
@@ -185,13 +185,23 @@ export default function HeroGlobe() {
         p.phi += p.vy;
       }
 
-      // === OUTER GLOW (very subtle) ===
-      const glow = ctx.createRadialGradient(cx(), cy(), R() * 0.5, cx(), cy(), R() * 1.2);
-      glow.addColorStop(0, 'rgba(6, 182, 212, 0.03)');
+      // === OUTER GLOW — makes globe stand out from background ===
+      const glow = ctx.createRadialGradient(cx(), cy(), R() * 0.3, cx(), cy(), R() * 1.3);
+      glow.addColorStop(0, 'rgba(6, 182, 212, 0.08)');
+      glow.addColorStop(0.5, 'rgba(6, 182, 212, 0.04)');
       glow.addColorStop(1, 'rgba(6, 182, 212, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(cx(), cy(), R() * 1.2, 0, Math.PI * 2);
+      ctx.arc(cx(), cy(), R() * 1.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Inner glow — brighter core
+      const innerGlow = ctx.createRadialGradient(cx(), cy(), 0, cx(), cy(), R() * 0.8);
+      innerGlow.addColorStop(0, 'rgba(6, 182, 212, 0.06)');
+      innerGlow.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      ctx.fillStyle = innerGlow;
+      ctx.beginPath();
+      ctx.arc(cx(), cy(), R() * 0.8, 0, Math.PI * 2);
       ctx.fill();
 
       // === DRAW PARTICLES ===
@@ -215,17 +225,23 @@ export default function HeroGlobe() {
 
       for (const p of projected) {
         if (p.z > -R() * 0.3) {
-          // Base particle
-          ctx.fillStyle = `rgba(6, 182, 212, ${p.alpha})`;
+          // Bright particle core
+          ctx.fillStyle = `rgba(34, 211, 238, ${Math.min(1, p.alpha * 1.5)})`;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fill();
 
-          // Energy glow (only when energized)
+          // Glow around every particle
+          ctx.fillStyle = `rgba(6, 182, 212, ${p.alpha * 0.2})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Extra glow when energized
           if (p.energy > 0.1) {
-            ctx.fillStyle = `rgba(34, 211, 238, ${p.energy * 0.3})`;
+            ctx.fillStyle = `rgba(34, 211, 238, ${p.energy * 0.4})`;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, p.size * 5, 0, Math.PI * 2);
             ctx.fill();
           }
         }

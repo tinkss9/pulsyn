@@ -151,9 +151,9 @@ export default function LandingPage() {
 
       {/* Hero — Globe is fixed background, text floats on top */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_50%)]" />
-        {/* Dark gradient overlay for text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/80 via-[#0a0a0f]/40 to-[#0a0a0f]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.12),transparent_60%)]" />
+        {/* Subtle overlay for text readability — not too dark */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/60 via-transparent to-[#0a0a0f]/60 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 mb-8">
