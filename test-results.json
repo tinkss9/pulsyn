@@ -1,0 +1,165 @@
+{
+  "timestamp": "2026-07-26T13:40:59.900Z",
+  "summary": {
+    "passed": 37,
+    "failed": 0,
+    "warnings": 0,
+    "total": 37
+  },
+  "results": [
+    {
+      "test": "Homepage — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "Pricing — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "Demo Lab — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "Login — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "Signup — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "vs Fivetran — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "vs Airbyte — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "vs Confluent — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "vs Debezium — Load",
+      "status": "PASS"
+    },
+    {
+      "test": "Video — Element",
+      "status": "PASS"
+    },
+    {
+      "test": "Video — Source",
+      "status": "PASS",
+      "error": "https://pulsynai.com/hero-video.mp4"
+    },
+    {
+      "test": "Video — Duration",
+      "status": "PASS",
+      "error": "79s"
+    },
+    {
+      "test": "Video — Autoplay",
+      "status": "PASS"
+    },
+    {
+      "test": "Video — Muted",
+      "status": "PASS"
+    },
+    {
+      "test": "Video — Loop",
+      "status": "PASS"
+    },
+    {
+      "test": "Demo — Connectors",
+      "status": "PASS",
+      "error": "PG:true MY:true ST:true"
+    },
+    {
+      "test": "Demo — Live Metrics",
+      "status": "PASS"
+    },
+    {
+      "test": "Demo — Tables",
+      "status": "PASS"
+    },
+    {
+      "test": "Demo — Click Connector",
+      "status": "PASS"
+    },
+    {
+      "test": "Demo — Data Loads",
+      "status": "PASS",
+      "error": "21 rows"
+    },
+    {
+      "test": "AI Chat — Input Found",
+      "status": "PASS"
+    },
+    {
+      "test": "AI Chat — Connector Response",
+      "status": "PASS"
+    },
+    {
+      "test": "AI Chat — Pricing Response",
+      "status": "PASS"
+    },
+    {
+      "test": "AI Chat — Latency Response",
+      "status": "PASS"
+    },
+    {
+      "test": "Navigation — Nav Links",
+      "status": "PASS",
+      "error": "Features, Connectors, AI, Pricing, Demo"
+    },
+    {
+      "test": "Navigation — Start Free",
+      "status": "PASS"
+    },
+    {
+      "test": "Navigation — Sign In",
+      "status": "PASS"
+    },
+    {
+      "test": "Navigation — Logo",
+      "status": "PASS"
+    },
+    {
+      "test": "Responsive — Mobile",
+      "status": "PASS"
+    },
+    {
+      "test": "Responsive — Tablet",
+      "status": "PASS"
+    },
+    {
+      "test": "Responsive — Desktop",
+      "status": "PASS"
+    },
+    {
+      "test": "Globe — Canvas Element",
+      "status": "PASS"
+    },
+    {
+      "test": "Globe — Canvas Size",
+      "status": "PASS",
+      "error": "1440x900"
+    },
+    {
+      "test": "Pricing — Free Tier",
+      "status": "PASS"
+    },
+    {
+      "test": "Pricing — Pro Tier",
+      "status": "PASS"
+    },
+    {
+      "test": "Pricing — Enterprise",
+      "status": "PASS"
+    },
+    {
+      "test": "Pricing — Start Free CTA",
+      "status": "PASS"
+    }
+  ]
+}

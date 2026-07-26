@@ -53,6 +53,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@playwright/test": "^1.62.0",
     "mongodb": "^7.5.0",
     "mssql": "^12.7.0",
     "mysql2": "^3.23.1",
