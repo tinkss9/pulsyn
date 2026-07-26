@@ -1,7 +1,7 @@
 // Snowflake Target Connector — write-only for data warehouse loading
 // npm install snowflake-sdk
 
-import { BaseConnector } from '../connectors/base';
+import { BaseConnector, WriteBatchResult } from '../connectors/base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 import { UnifiedChangeEvent } from '../events';
 import { registerTarget } from '../connectors/registry';
@@ -60,30 +60,32 @@ export class SnowflakeTargetConnector extends BaseConnector {
     };
   }
 
-  async writeBatch(table: string, events: UnifiedChangeEvent[]): Promise<number> {
-    let written = 0;
+  async writeBatch(table: string, events: UnifiedChangeEvent[]): Promise<WriteBatchResult> {
+    let inserted = 0;
+    let deleted = 0;
     for (const event of events) {
       if (event.op === 'I' || event.op === 'S') {
         const cols = Object.keys(event.after || {});
         const vals = cols.map(c => `'${String((event.after || {})[c]).replace(/'/g, "''")}'`);
         await this.execute(`INSERT INTO ${table} (${cols.join(',')}) VALUES (${vals.join(',')})`);
-        written++;
+        inserted++;
       } else if (event.op === 'U' && event.before) {
         const sets = Object.entries(event.after || {}).map(([k, v]) => `${k}='${String(v).replace(/'/g, "''")}'`);
         const wheres = Object.entries(event.before).map(([k, v]) => `${k}='${String(v).replace(/'/g, "''")}'`);
         await this.execute(`UPDATE ${table} SET ${sets.join(',')} WHERE ${wheres.join(' AND ')}`);
-        written++;
+        inserted++;
       } else if (event.op === 'D' && event.before) {
         const wheres = Object.entries(event.before).map(([k, v]) => `${k}='${String(v).replace(/'/g, "''")}'`);
         await this.execute(`DELETE FROM ${table} WHERE ${wheres.join(' AND ')}`);
-        written++;
+        deleted++;
       }
     }
-    return written;
+    return { inserted, errors: 0, deleted, merged: 0, failedRecords: [] };
   }
 
   async merge(table: string, events: UnifiedChangeEvent[], keyColumns: string[]): Promise<number> {
-    return this.writeBatch(table, events); // Simplified — real MERGE needs Snowflake SQL
+    const result = await this.writeBatch(table, events);
+    return result.inserted + result.merged;
   }
 
   async startCDC(): Promise<void> { throw new Error('Snowflake is a target-only connector'); }

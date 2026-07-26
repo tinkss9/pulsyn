@@ -7,10 +7,10 @@ describe('CDCEngine', () => {
   beforeEach(() => {
     engine = new CDCEngine({
       batchSize: 100,
-      flushInterval: 500,
+      flushIntervalMs: 500,
       maxRetries: 2,
-      checkpointInterval: 1000,
-      exactlyOnce: true,
+      checkpointIntervalMs: 1000,
+      enableExactlyOnce: true,
     });
   });
 
@@ -24,9 +24,9 @@ describe('CDCEngine', () => {
   it('should create engine with custom config', () => {
     const stats = engine.getStats();
     expect(stats.config.batchSize).toBe(100);
-    expect(stats.config.flushInterval).toBe(500);
+    expect(stats.config.flushIntervalMs).toBe(500);
     expect(stats.config.maxRetries).toBe(2);
-    expect(stats.config.exactlyOnce).toBe(true);
+    expect(stats.config.enableExactlyOnce).toBe(true);
   });
 
   it('should emit started event', async () => {
@@ -66,7 +66,7 @@ describe('CDCEngine', () => {
   });
 
   it('should throw error if source not set', async () => {
-    await expect(engine.start()).rejects.toError('Source and target connectors must be set');
+    await expect(engine.start()).rejects.toThrow('Source and target connectors must be set');
   });
 
   it('should throw error if target not set', async () => {
@@ -76,6 +76,6 @@ describe('CDCEngine', () => {
     };
     engine.setSource(mockSource as any);
 
-    await expect(engine.start()).rejects.toError('Source and target connectors must be set');
+    await expect(engine.start()).rejects.toThrow('Source and target connectors must be set');
   });
 });

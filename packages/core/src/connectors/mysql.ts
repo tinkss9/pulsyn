@@ -10,16 +10,17 @@ export class MySQLConnector extends BaseConnector {
   private pool: Pool | null = null;
   private cdcActive = false;
 
-  async connect(config: DatabaseConfig): Promise<void> {
+  async connect(config?: DatabaseConfig): Promise<void> {
     try {
-      this.config = config;
+      if (config) this.config = config;
+      const cfg = this.config;
       this.pool = mysql.createPool({
-        host: config.host,
-        port: config.port || 3306,
-        database: config.database,
-        user: config.username,
-        password: config.password,
-        ssl: config.ssl ? { rejectUnauthorized: false } : undefined,
+        host: cfg.host,
+        port: cfg.port || 3306,
+        database: cfg.database,
+        user: cfg.username,
+        password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined,
         connectionLimit: 10,
         waitForConnections: true,
       });

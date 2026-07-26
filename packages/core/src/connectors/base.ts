@@ -9,6 +9,21 @@ import {
 } from '../types';
 import { UnifiedChangeEvent } from '../events';
 
+export interface WriteBatchResult {
+  inserted: number;
+  errors: number;
+  deleted: number;
+  merged: number;
+  failedRecords: any[];
+}
+
+export interface SchemaDiff {
+  added: { name: string; type: string }[];
+  modified: { name: string; oldType: string; newType: string }[];
+  removed: { name: string; type: string }[];
+  renamed?: { from: string; to: string }[];
+}
+
 export abstract class BaseConnector implements Connector {
   id: string;
   name: string;
@@ -26,7 +41,7 @@ export abstract class BaseConnector implements Connector {
   }
 
   // Core connection methods
-  abstract connect(config: DatabaseConfig): Promise<void>;
+  abstract connect(config?: DatabaseConfig): Promise<void>;
   abstract disconnect(): Promise<void>;
   abstract testConnection(): Promise<boolean>;
 
@@ -38,12 +53,18 @@ export abstract class BaseConnector implements Connector {
   abstract startCDC(callback: (event: CDCEvent) => void): Promise<void>;
   abstract stopCDC(): Promise<void>;
 
+  // Config (masks sensitive fields)
+  getConfig(): Record<string, any> {
+    const { password, ...rest } = this.config;
+    return { ...rest, password: password ? '***' : undefined };
+  }
+
   // Extended methods (from DMS Extractor pattern)
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
     throw new Error(`extractFull not implemented for ${this.engine}`);
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     throw new Error(`extractIncremental not implemented for ${this.engine}`);
   }
 
@@ -56,7 +77,7 @@ export abstract class BaseConnector implements Connector {
   }
 
   // Extended methods (from DMS Writer pattern)
-  async writeBatch(table: string, events: UnifiedChangeEvent[]): Promise<number> {
+  async writeBatch(table: string, events: UnifiedChangeEvent[], opts?: { mode?: string }): Promise<WriteBatchResult> {
     throw new Error(`writeBatch not implemented for ${this.engine}`);
   }
 
@@ -64,8 +85,34 @@ export abstract class BaseConnector implements Connector {
     throw new Error(`merge not implemented for ${this.engine}`);
   }
 
-  async createTableIfNeeded(table: string, schema: Record<string, any>): Promise<void> {
+  async createTableIfNeeded(table: string, schema: Record<string, any>): Promise<{ created: boolean }> {
     throw new Error(`createTableIfNeeded not implemented for ${this.engine}`);
+  }
+
+  // Schema diff
+  async detectSchemaChanges(oldSchema: TableSchema, newSchema: TableSchema): Promise<SchemaDiff> {
+    const added: { name: string; type: string }[] = [];
+    const modified: { name: string; oldType: string; newType: string }[] = [];
+    const removed: { name: string; type: string }[] = [];
+
+    const oldCols = new Map(oldSchema.columns.map(c => [c.name, c]));
+    const newCols = new Map(newSchema.columns.map(c => [c.name, c]));
+
+    for (const [name, col] of newCols) {
+      if (!oldCols.has(name)) {
+        added.push({ name, type: col.type });
+      } else if (oldCols.get(name)!.type !== col.type) {
+        modified.push({ name, oldType: oldCols.get(name)!.type, newType: col.type });
+      }
+    }
+
+    for (const [name, col] of oldCols) {
+      if (!newCols.has(name)) {
+        removed.push({ name, type: col.type });
+      }
+    }
+
+    return { added, modified, removed };
   }
 
   // Utility
@@ -73,5 +120,3 @@ export abstract class BaseConnector implements Connector {
     return this.connected;
   }
 }
-
-

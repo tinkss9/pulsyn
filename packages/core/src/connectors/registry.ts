@@ -5,7 +5,7 @@ import { BaseConnector } from './base';
 import { DatabaseConfig, TableSchema } from '../types';
 import { UnifiedChangeEvent } from '../events';
 
-type ConnectorConstructor = new (id: string, name: string, config: DatabaseConfig, options?: any) => BaseConnector;
+type ConnectorConstructor = new (id: string, name: string, engine: string, config: DatabaseConfig, batchSize?: number) => BaseConnector;
 
 const sources: Map<string, ConnectorConstructor> = new Map();
 const targets: Map<string, ConnectorConstructor> = new Map();
@@ -30,7 +30,7 @@ export class ConnectorRegistry {
     if (!cls) {
       throw new Error(`Unknown source connector: ${name}. Available: ${sources.keys()}`);
     }
-    return new cls(id, name, config, options);
+    return new cls(id, name, name, config);
   }
 
   static getTarget(name: string, id: string, config: DatabaseConfig, options?: any): BaseConnector {
@@ -38,7 +38,7 @@ export class ConnectorRegistry {
     if (!cls) {
       throw new Error(`Unknown target connector: ${name}. Available: ${targets.keys()}`);
     }
-    return new cls(id, name, config, options);
+    return new cls(id, name, name, config);
   }
 
   static listSources(): string[] {
@@ -60,5 +60,3 @@ export class ConnectorRegistry {
     return sources.has(name) || targets.has(name);
   }
 }
-
-

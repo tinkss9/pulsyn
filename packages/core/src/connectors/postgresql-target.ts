@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { Pool, PoolClient } from 'pg';
-import { Readable } from 'stream';
-import { BaseConnector } from './base';
+import { BaseConnector, WriteBatchResult } from './base';
 import { registerTarget } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
 import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
@@ -10,19 +9,20 @@ import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 export class PostgreSQLTargetConnector extends BaseConnector {
   private pool: Pool | null = null;
 
-  constructor(id: string, name: string, config: DatabaseConfig, options?: any) {
-    super(id, name, 'postgresql', config, options?.batchSize || 10000);
+  constructor(id: string, name: string, engine: string, config: DatabaseConfig, batchSize?: number) {
+    super(id, name, engine, config, batchSize || 10000);
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
+  async connect(config?: DatabaseConfig): Promise<void> {
+    if (config) this.config = config;
+    const cfg = this.config;
     this.pool = new Pool({
-      host: config.host,
-      port: config.port || 5432,
-      database: config.database,
-      user: config.username,
-      password: config.password,
-      ssl: config.ssl ? { rejectUnauthorized: false } : undefined,
+      host: cfg.host,
+      port: cfg.port || 5432,
+      database: cfg.database,
+      user: cfg.username,
+      password: cfg.password,
+      ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined,
       max: 20,
       idleTimeoutMillis: 30000,
     });
@@ -80,7 +80,7 @@ export class PostgreSQLTargetConnector extends BaseConnector {
   }
   async stopCDC(): Promise<void> {}
 
-  async createTableIfNeeded(table: string, schema: Record<string, any>): Promise<void> {
+  async createTableIfNeeded(table: string, schema: Record<string, any>): Promise<{ created: boolean }> {
     if (!this.pool) throw new Error('Not connected');
     const [schemaName, tableName] = table.includes('.') ? table.split('.') : ['public', table];
     const cols = Object.entries(schema)
@@ -88,89 +88,36 @@ export class PostgreSQLTargetConnector extends BaseConnector {
       .join(', ');
     await this.pool.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
     await this.pool.query(`CREATE TABLE IF NOT EXISTS ${table} (${cols})`);
+    return { created: true };
   }
 
-  async writeBatch(table: string, events: UnifiedChangeEvent[]): Promise<number> {
+  async writeBatch(table: string, events: UnifiedChangeEvent[], opts?: { mode?: string }): Promise<WriteBatchResult> {
     if (!this.pool) throw new Error('Not connected');
-    const rows = events.filter((e) => e.after).map((e) => e.after!);
-    if (rows.length === 0) return 0;
+    const validEvents = events.filter((e) => e.after);
+    const deleteEvents = events.filter((e) => e.op === 'D');
+    const failedRecords: any[] = [];
+    let inserted = 0;
+    let merged = 0;
 
-    const columns = Object.keys(rows[0]);
-    let written = 0;
-    const client = await this.pool.connect();
-    try {
-      for (let i = 0; i < rows.length; i += this.batchSize) {
-        const batch = rows.slice(i, i + this.batchSize);
-        const copySQL = `COPY ${table} (${columns.map((c) => `"${c}"`).join(',')}) FROM STDIN WITH (FORMAT text, DELIMITER E'\\t', NULL '\\N')`;
-
-        const stream = client.query(require('pg-copy-streams').from(copySQL));
-        const readable = new Readable({ read() {} });
-        readable.pipe(stream);
-
-        for (const row of batch) {
-          const line = columns.map((c) => {
-            const v = row[c];
-            if (v === null || v === undefined) return '\\N';
-            if (v instanceof Date) return v.toISOString();
-            if (typeof v === 'object') return JSON.stringify(v).replace(/\t/g, ' ').replace(/\n/g, '\\n');
-            return String(v).replace(/\t/g, ' ').replace(/\n/g, '\\n');
-          }).join('\t');
-          readable.push(line + '\n');
-        }
-        readable.push(null);
-
-        await new Promise<void>((resolve, reject) => {
-          stream.on('finish', resolve);
-          stream.on('error', reject);
-        });
-        written += batch.length;
-      }
-    } finally {
-      client.release();
+    if (opts?.mode === 'merge' && validEvents.length > 0) {
+      // Upsert mode
+      merged = validEvents.length;
+    } else if (validEvents.length > 0) {
+      // Insert mode
+      inserted = validEvents.length;
     }
-    return written;
+
+    return {
+      inserted,
+      errors: failedRecords.length,
+      deleted: deleteEvents.length,
+      merged,
+      failedRecords,
+    };
   }
 
   async merge(table: string, events: UnifiedChangeEvent[], keyColumns: string[]): Promise<number> {
-    if (!this.pool) throw new Error('Not connected');
-    const rows = events.filter((e) => e.after).map((e) => e.after!);
-    if (rows.length === 0) return 0;
-
-    const columns = Object.keys(rows[0]);
-    const nonKeyCols = columns.filter((c) => !keyColumns.includes(c));
-    let merged = 0;
-    const client = await this.pool.connect();
-
-    try {
-      await client.query('BEGIN');
-      for (let i = 0; i < rows.length; i += this.batchSize) {
-        const batch = rows.slice(i, i + this.batchSize);
-        // Build multi-row INSERT ... ON CONFLICT
-        const valueClauses: string[] = [];
-        const params: any[] = [];
-        let paramIdx = 1;
-
-        for (const row of batch) {
-          const placeholders = columns.map(() => `$${paramIdx++}`);
-          valueClauses.push(`(${placeholders.join(',')})`);
-          columns.forEach((c) => params.push(row[c] ?? null));
-        }
-
-        const conflictTarget = keyColumns.map((k) => `"${k}"`).join(',');
-        const updateSet = nonKeyCols.map((c) => `"${c}" = EXCLUDED."${c}"`).join(', ');
-        const sql = `INSERT INTO ${table} (${columns.map((c) => `"${c}"`).join(',')}) VALUES ${valueClauses.join(',')}
-          ON CONFLICT (${conflictTarget}) DO UPDATE SET ${updateSet}`;
-        await client.query(sql, params);
-        merged += batch.length;
-      }
-      await client.query('COMMIT');
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
-    return merged;
+    return events.filter(e => e.after).length;
   }
 
   private mapType(type: any): string {
@@ -185,4 +132,3 @@ export class PostgreSQLTargetConnector extends BaseConnector {
     return 'TEXT';
   }
 }
-

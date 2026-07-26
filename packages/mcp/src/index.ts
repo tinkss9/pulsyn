@@ -7,7 +7,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 // Import Pulsyn core
-import { ConnectorRegistry } from '../core/src/connectors/registry';
+import { ConnectorRegistry } from '@pulsyn/core';
 
 const server = new Server(
   { name: 'pulsyn-mcp', version: '1.0.0' },

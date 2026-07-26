@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import { WatermarkTracker } from '../../checkpoint/watermark';
+import { WatermarkTracker } from '../checkpoint/watermark';
 
 describe('WatermarkTracker', () => {
   const testFile = path.join(__dirname, '.test-watermarks.json');

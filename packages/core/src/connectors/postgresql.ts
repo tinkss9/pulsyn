@@ -11,16 +11,17 @@ export class PostgreSQLConnector extends BaseConnector {
   private replicationClient: Client | null = null;
   private cdcActive = false;
 
-  async connect(config: DatabaseConfig): Promise<void> {
+  async connect(config?: DatabaseConfig): Promise<void> {
     try {
-      this.config = config;
+      if (config) this.config = config;
+      const cfg = this.config;
       this.pool = new Pool({
-        host: config.host,
-        port: config.port || 5432,
-        database: config.database,
-        user: config.username,
-        password: config.password,
-        ssl: config.ssl ? { rejectUnauthorized: false } : undefined,
+        host: cfg.host,
+        port: cfg.port || 5432,
+        database: cfg.database,
+        user: cfg.username,
+        password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined,
         max: 10,
       });
       await this.pool.query('SELECT 1');
@@ -84,12 +85,16 @@ export class PostgreSQLConnector extends BaseConnector {
          WHERE i.indrelid = $1::regclass AND i.indisprimary`,
         [`${schema}.${tableName}`]
       );
+      const pkSet = new Set(pks.rows.map((r) => r.attname));
       return {
+        name: table,
         table,
         columns: cols.rows.map((c) => ({
           name: c.column_name, type: c.data_type,
           nullable: c.is_nullable === 'YES', defaultValue: c.column_default,
+          primaryKey: pkSet.has(c.column_name),
         })),
+        primaryKey: pks.rows.map((r) => r.attname),
         primaryKeys: pks.rows.map((r) => r.attname),
       };
     } catch (error) {
@@ -158,31 +163,40 @@ export class PostgreSQLConnector extends BaseConnector {
     }
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
     const schema = await this.getTableSchema(table);
     const pk = schema.primaryKeys[0] || 'id';
     const events: UnifiedChangeEvent[] = [];
+    const limit = opts?.limit || this.batchSize;
     let lastKey: any = null;
+    let offset = opts?.offset || 0;
+
     while (true) {
       const q = lastKey
         ? `SELECT * FROM ${table} WHERE ${pk} > $1 ORDER BY ${pk} LIMIT $2`
-        : `SELECT * FROM ${table} ORDER BY ${pk} LIMIT $1`;
-      const p = lastKey ? [lastKey, this.batchSize] : [this.batchSize];
+        : `SELECT * FROM ${table} ORDER BY ${pk} LIMIT $1 OFFSET $2`;
+      const p = lastKey ? [lastKey, limit] : [limit, offset];
       const result = await this.pool.query(q, p);
       if (result.rows.length === 0) break;
       for (const row of result.rows) {
-        events.push(createEvent('S', table, row, null, row[pk]?.toString() || null, { source: 'postgresql' }));
+        events.push(createEvent({
+          op: 'S', table,
+          after: row,
+          before: null,
+          sourceMetadata: { source: 'postgresql', pk: row[pk]?.toString() || null },
+        }));
       }
       lastKey = result.rows[result.rows.length - 1][pk];
-      if (result.rows.length < this.batchSize) break;
+      if (result.rows.length < limit) break;
     }
     return events;
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
-    const wmCol = this.config.watermarkColumn || 'updated_at';
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || 'updated_at';
+    const watermark = opts?.watermarkValue || null;
     const events: UnifiedChangeEvent[] = [];
     const q = watermark
       ? `SELECT * FROM ${table} WHERE ${wmCol} > $1 ORDER BY ${wmCol} LIMIT $2`
@@ -190,9 +204,13 @@ export class PostgreSQLConnector extends BaseConnector {
     const p = watermark ? [watermark, this.batchSize] : [this.batchSize];
     const result = await this.pool.query(q, p);
     for (const row of result.rows) {
-      events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'postgresql' }));
+      events.push(createEvent({
+        op: 'I', table,
+        after: row,
+        before: null,
+        sourceMetadata: { source: 'postgresql', pk: row[wmCol]?.toString() || null },
+      }));
     }
     return events;
   }
 }
-

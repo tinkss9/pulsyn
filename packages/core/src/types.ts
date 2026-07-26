@@ -139,6 +139,7 @@ export interface ColumnSchema {
   name: string;
   type: string;
   nullable: boolean;
+  primaryKey?: boolean;
   defaultValue?: string;
 }
 

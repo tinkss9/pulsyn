@@ -1,6 +1,6 @@
 // Events Module Unit Tests
 import { describe, it, expect } from 'vitest';
-import { createEvent, eventKey, eventToDict, dictToEvent } from '../../events';
+import { createEvent, eventKey, eventToDict, dictToEvent } from '../events';
 
 describe('UnifiedChangeEvent', () => {
   describe('createEvent', () => {

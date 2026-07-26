@@ -24,8 +24,8 @@ describe('Discovery Conformance', () => {
   it('should return table names as strings', async () => {
     const tables = await connector.getTables();
     for (const table of tables) {
-      expect(typeof table.name).toBe('string');
-      expect(table.name.length).toBeGreaterThan(0);
+      expect(typeof table).toBe('string');
+      expect((table as string).length).toBeGreaterThan(0);
     }
   });
 
@@ -61,4 +61,3 @@ describe('Discovery Conformance', () => {
     }
   });
 });
-

@@ -1,7 +1,7 @@
 // BigQuery Target Connector — write-only for data warehouse loading
 // npm install @google-cloud/bigquery
 
-import { BaseConnector } from '../connectors/base';
+import { BaseConnector, WriteBatchResult } from '../connectors/base';
 import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 import { UnifiedChangeEvent } from '../events';
 import { registerTarget } from '../connectors/registry';
@@ -62,16 +62,16 @@ export class BigQueryTargetConnector extends BaseConnector {
     };
   }
 
-  async writeBatch(table: string, events: UnifiedChangeEvent[]): Promise<number> {
+  async writeBatch(table: string, events: UnifiedChangeEvent[]): Promise<WriteBatchResult> {
     const rows = events
       .filter(e => e.op === 'I' || e.op === 'S')
       .map(e => ({ json: e.after }));
 
-    if (rows.length === 0) return 0;
+    if (rows.length === 0) return { inserted: 0, errors: 0, deleted: 0, merged: 0, failedRecords: [] };
 
     const dataset = this.bq.dataset(this.dataset);
     await dataset.table(table).insert(rows);
-    return rows.length;
+    return { inserted: rows.length, errors: 0, deleted: 0, merged: 0, failedRecords: [] };
   }
 
   async startCDC(): Promise<void> { throw new Error('BigQuery is a target-only connector'); }

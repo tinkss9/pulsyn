@@ -173,8 +173,8 @@ pipelineCmd
       header(`Pipeline: ${p.config?.name || p.id}`);
       keyValue('ID', p.id);
       keyValue('Status', statusBadge(p.status));
-      keyValue('Source', `${p.config?.source?.engine}://${p.config?.source?.host}:${p.config?.source?.port}/${p.config?.source?.database}`);
-      keyValue('Target', `${p.config?.target?.engine}://${p.config?.target?.host}:${p.config?.target?.port}/${p.config?.target?.database}`);
+      keyValue('Source', `${p.config?.source?.engine}://${p.config?.source?.config?.host}:${p.config?.source?.config?.port}/${p.config?.source?.config?.database}`);
+      keyValue('Target', `${p.config?.target?.engine}://${p.config?.target?.config?.host}:${p.config?.target?.config?.port}/${p.config?.target?.config?.database}`);
       keyValue('Tables', p.config?.tables?.length || 0);
       keyValue('Rows Read', p.stats?.rowsRead || 0);
       keyValue('Rows Written', p.stats?.rowsWritten || 0);

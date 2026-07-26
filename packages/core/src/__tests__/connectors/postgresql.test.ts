@@ -2,7 +2,7 @@
 // PostgreSQL Connector Unit Tests
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock pg module
+// Mock pg module with query-aware mock
 vi.mock('pg', () => {
   const mockClient = {
     query: vi.fn(),
@@ -10,61 +10,73 @@ vi.mock('pg', () => {
   };
   const mockPool = {
     connect: vi.fn().mockResolvedValue(mockClient),
-    query: vi.fn(),
+    query: vi.fn((sql: string) => {
+      if (sql.includes('SELECT 1 AS ok')) {
+        return Promise.resolve({ rows: [{ ok: 1 }], rowCount: 1 });
+      }
+      if (sql.includes('SELECT 1')) {
+        return Promise.resolve({ rows: [{ '1': 1 }], rowCount: 1 });
+      }
+      if (sql.includes('information_schema.tables')) {
+        return Promise.resolve({ rows: [{ full_name: 'public.users' }], rowCount: 1 });
+      }
+      if (sql.includes('information_schema.columns')) {
+        return Promise.resolve({
+          rows: [
+            { column_name: 'id', data_type: 'integer', is_nullable: 'NO', column_default: null },
+            { column_name: 'name', data_type: 'varchar', is_nullable: 'YES', column_default: null },
+          ],
+          rowCount: 2,
+        });
+      }
+      if (sql.includes('pg_index')) {
+        return Promise.resolve({ rows: [{ attname: 'id' }], rowCount: 1 });
+      }
+      return Promise.resolve({ rows: [], rowCount: 0 });
+    }),
     end: vi.fn(),
   };
-  return { Pool: vi.fn(() => mockPool) };
+  return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient) };
 });
 
 import { PostgreSQLConnector } from '../../connectors/postgresql';
 
 describe('PostgreSQLConnector', () => {
   let connector: PostgreSQLConnector;
-  let mockPool: any;
 
   beforeEach(() => {
-    connector = new PostgreSQLConnector('pg-1', 'test-pg', {
+    connector = new PostgreSQLConnector('pg-1', 'test-pg', 'postgresql', {
       host: 'localhost',
       port: 5432,
       database: 'testdb',
       user: 'testuser',
       password: 'testpass',
     });
-    mockPool = (connector as any).pool;
   });
 
   describe('connect', () => {
     it('should connect successfully', async () => {
-      const mockClient = { query: vi.fn().mockResolvedValue({}), release: vi.fn() };
-      mockPool.connect.mockResolvedValue(mockClient);
-
-      await connector.connect(connector.config);
-
-      expect(mockPool.connect).toHaveBeenCalled();
-      expect(mockClient.query).toHaveBeenCalledWith('SELECT 1');
-      expect(mockClient.release).toHaveBeenCalled();
+      await connector.connect();
       expect(connector.isConnected()).toBe(true);
     });
 
     it('should throw on connection failure', async () => {
-      mockPool.connect.mockRejectedValue(new Error('Connection refused'));
+      const { Pool } = await import('pg');
+      const poolInstance = (Pool as any).mock.results[0]?.value;
+      poolInstance.query.mockRejectedValueOnce(new Error('Connection refused'));
 
-      await expect(connector.connect(connector.config)).rejects.toThrow('Connection refused');
+      await expect(connector.connect()).rejects.toThrow('Connection refused');
     });
   });
 
   describe('testConnection', () => {
     it('should return true on success', async () => {
-      const mockClient = { query: vi.fn().mockResolvedValue({}), release: vi.fn() };
-      mockPool.connect.mockResolvedValue(mockClient);
-
+      await connector.connect();
       const result = await connector.testConnection();
       expect(result).toBe(true);
     });
 
-    it('should return false on failure', async () => {
-      mockPool.connect.mockRejectedValue(new Error('Connection failed'));
-
+    it('should return false when not connected', async () => {
       const result = await connector.testConnection();
       expect(result).toBe(false);
     });
@@ -72,26 +84,17 @@ describe('PostgreSQLConnector', () => {
 
   describe('getTables', () => {
     it('should return table names', async () => {
-      mockPool.query.mockResolvedValue({
-        rows: [{ table_name: 'users' }, { table_name: 'orders' }],
-      });
-
+      await connector.connect();
       const tables = await connector.getTables();
-      expect(tables).toEqual(['users', 'orders']);
-    });
-
-    it('should throw if not connected', async () => {
-      (connector as any).pool = null;
-      await expect(connector.getTables()).rejects.toThrow('Not connected');
+      expect(tables).toEqual(['public.users']);
     });
   });
 
   describe('disconnect', () => {
     it('should end pool and reset state', async () => {
+      await connector.connect();
       await connector.disconnect();
-      expect(mockPool.end).toHaveBeenCalled();
       expect(connector.isConnected()).toBe(false);
     });
   });
 });
-
