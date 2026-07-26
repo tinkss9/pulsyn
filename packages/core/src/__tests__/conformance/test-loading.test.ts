@@ -9,6 +9,9 @@ describe('Loading Conformance', () => {
   beforeEach(async () => {
     target = getTargetConnector();
     await target.connect();
+    // Reset dynamic table tracking
+    const pg = await import('pg');
+    (pg as any).__mockPool.__resetTables();
   });
 
   afterEach(async () => {
@@ -36,13 +39,12 @@ describe('Loading Conformance', () => {
     expect(result.errors).toBe(0);
   });
 
-  // TODO: createTableIfNeeded mock doesn't track created state — not yet implemented
-  it.skip('should create table if it does not exist', async () => {
+  it('should create table if it does not exist', async () => {
     const schema = {
-      columns: [
-        { name: 'id', type: 'integer', primaryKey: true, nullable: false },
-        { name: 'value', type: 'varchar', primaryKey: false, nullable: true },
-      ],
+      columns: {
+        id: 'integer',
+        value: 'varchar',
+      },
     };
 
     const newTable = 'conformance_auto_create_table';
@@ -52,16 +54,15 @@ describe('Loading Conformance', () => {
     expect(result.created).toBe(true);
 
     const tables = await target.getTables();
-    const found = tables.find((t: any) => t.name === newTable);
+    const found = tables.find((t: string) => t.includes(newTable));
     expect(found).toBeDefined();
   });
 
-  // TODO: createTableIfNeeded doesn't track existing tables — not yet implemented
-  it.skip('should not error when creating an existing table', async () => {
+  it('should not error when creating an existing table', async () => {
     const schema = {
-      columns: [
-        { name: 'id', type: 'integer', primaryKey: true, nullable: false },
-      ],
+      columns: {
+        id: 'integer',
+      },
     };
 
     await target.createTableIfNeeded(TEST_TABLE, schema);
@@ -69,8 +70,7 @@ describe('Loading Conformance', () => {
     expect(result.created).toBe(false);
   });
 
-  // TODO: writeBatch partial failure tracking not yet implemented
-  it.skip('should handle partial failures and report errors', async () => {
+  it('should handle partial failures and report errors', async () => {
     const batch = createBatch(5, 'I', 100);
     batch[2] = { ...batch[2], after: null as any };
 

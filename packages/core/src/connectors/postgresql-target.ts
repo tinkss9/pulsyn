@@ -8,6 +8,7 @@ import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 @registerTarget('postgresql')
 export class PostgreSQLTargetConnector extends BaseConnector {
   private pool: Pool | null = null;
+  private createdTables = new Set<string>();
 
   constructor(id: string, name: string, engine: string, config: DatabaseConfig, batchSize?: number) {
     super(id, name, engine, config, batchSize || 10000);
@@ -82,28 +83,34 @@ export class PostgreSQLTargetConnector extends BaseConnector {
 
   async createTableIfNeeded(table: string, schema: Record<string, any>): Promise<{ created: boolean }> {
     if (!this.pool) throw new Error('Not connected');
+    if (this.createdTables.has(table)) return { created: false };
     const [schemaName, tableName] = table.includes('.') ? table.split('.') : ['public', table];
-    const cols = Object.entries(schema)
-      .map(([name, type]) => `"${name}" ${this.mapType(type)}`)
+    const cols = Object.entries(schema.columns || schema)
+      .map(([name, type]) => {
+        const colName = typeof name === 'string' && name !== 'columns' ? name : null;
+        if (!colName) return null;
+        const colType = typeof type === 'object' ? type.type || 'TEXT' : String(type);
+        return `"${colName}" ${this.mapType(colType)}`;
+      })
+      .filter(Boolean)
       .join(', ');
     await this.pool.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
     await this.pool.query(`CREATE TABLE IF NOT EXISTS ${table} (${cols})`);
+    this.createdTables.add(table);
     return { created: true };
   }
 
   async writeBatch(table: string, events: UnifiedChangeEvent[], opts?: { mode?: string }): Promise<WriteBatchResult> {
     if (!this.pool) throw new Error('Not connected');
     const validEvents = events.filter((e) => e.after);
+    const failedRecords = events.filter((e) => !e.after);
     const deleteEvents = events.filter((e) => e.op === 'D');
-    const failedRecords: any[] = [];
     let inserted = 0;
     let merged = 0;
 
     if (opts?.mode === 'merge' && validEvents.length > 0) {
-      // Upsert mode
       merged = validEvents.length;
     } else if (validEvents.length > 0) {
-      // Insert mode
       inserted = validEvents.length;
     }
 

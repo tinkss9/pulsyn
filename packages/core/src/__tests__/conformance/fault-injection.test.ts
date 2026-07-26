@@ -91,8 +91,7 @@ describe('Fault Injection Conformance', () => {
     expect(saveCheckpoint).toHaveBeenCalledTimes(1);
   });
 
-  // TODO: Requires retry logic in connector — not yet implemented
-  it.skip('should retry on HTTP 429 (rate limit)', async () => {
+  it('should retry on HTTP 429 (rate limit)', async () => {
     let attempts = 0;
 
     vi.spyOn(source, 'extractFull').mockImplementation(async () => {
@@ -106,13 +105,12 @@ describe('Fault Injection Conformance', () => {
       return createBatch(3, 'S', 1);
     });
 
-    const events = await source.extractFull(TEST_TABLE);
+    const events = await (source as any).withRetry(() => source.extractFull(TEST_TABLE), 4);
     expect(attempts).toBe(3);
     expect(events.length).toBe(3);
   });
 
-  // TODO: Requires retry logic in connector — not yet implemented
-  it.skip('should retry on HTTP 500 (server error)', async () => {
+  it('should retry on HTTP 500 (server error)', async () => {
     let attempts = 0;
 
     vi.spyOn(source, 'extractFull').mockImplementation(async () => {
@@ -125,13 +123,12 @@ describe('Fault Injection Conformance', () => {
       return createBatch(4, 'S', 1);
     });
 
-    const events = await source.extractFull(TEST_TABLE);
+    const events = await (source as any).withRetry(() => source.extractFull(TEST_TABLE), 3);
     expect(attempts).toBe(2);
     expect(events.length).toBe(4);
   });
 
-  // TODO: Requires retry logic in connector — not yet implemented
-  it.skip('should retry on HTTP 503 (service unavailable)', async () => {
+  it('should retry on HTTP 503 (service unavailable)', async () => {
     let attempts = 0;
 
     vi.spyOn(source, 'extractFull').mockImplementation(async () => {
@@ -144,7 +141,7 @@ describe('Fault Injection Conformance', () => {
       return createBatch(2, 'S', 1);
     });
 
-    const events = await source.extractFull(TEST_TABLE);
+    const events = await (source as any).withRetry(() => source.extractFull(TEST_TABLE), 5);
     expect(attempts).toBe(4);
     expect(events.length).toBe(2);
   });

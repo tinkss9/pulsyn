@@ -8,8 +8,8 @@ import { ConnectorRegistry } from '../../connectors/registry';
 
 // Mock database drivers so conformance tests don't need real connections
 vi.mock('pg', () => {
-  let failCount = 0;
   let failRemaining = 0;
+  const createdTables = new Set<string>();
 
   const mockClient = {
     query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
@@ -18,14 +18,27 @@ vi.mock('pg', () => {
   const mockPool = {
     connect: vi.fn().mockResolvedValue(mockClient),
     query: vi.fn((sql: string, params?: any[]) => {
-      // Check if we should simulate failure
       if (failRemaining > 0) {
         failRemaining--;
         return Promise.reject(new Error('ECONNRESET: transient failure'));
       }
 
+      // Track CREATE TABLE calls
+      if (sql.includes('CREATE TABLE')) {
+        const match = sql.match(/CREATE TABLE (?:IF NOT EXISTS )?(\S+)/i);
+        if (match) createdTables.add(match[1].replace(/"/g, ''));
+        return Promise.resolve({ rows: [], rowCount: 0 });
+      }
+      if (sql.includes('CREATE SCHEMA')) {
+        return Promise.resolve({ rows: [], rowCount: 0 });
+      }
+
       if (sql.includes('information_schema.tables')) {
-        return Promise.resolve({ rows: [{ full_name: 'public.conformance_test_table' }], rowCount: 1 });
+        const baseRows = [{ full_name: 'public.conformance_test_table' }];
+        for (const t of createdTables) {
+          baseRows.push({ full_name: t.includes('.') ? t : `public.${t}` });
+        }
+        return Promise.resolve({ rows: baseRows, rowCount: baseRows.length });
       }
       if (sql.includes('information_schema.columns')) {
         return Promise.resolve({
@@ -54,6 +67,8 @@ vi.mock('pg', () => {
     end: vi.fn(),
     __setFailRemaining: (n: number) => { failRemaining = n; },
     __resetFailures: () => { failRemaining = 0; },
+    __createdTables: createdTables,
+    __resetTables: () => { createdTables.clear(); },
   };
   return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient), __mockPool: mockPool };
 });

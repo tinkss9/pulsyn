@@ -26,8 +26,10 @@ describe('CLI Config', () => {
     // Clean config for test
     if (existsSync(CONFIG_FILE)) unlinkSync(CONFIG_FILE);
 
+    // Reset module cache AND internal config path cache
     vi.resetModules();
     const config = await import('../config');
+    config._resetConfigPaths();
     loadConfig = config.loadConfig;
     saveConfig = config.saveConfig;
     updateConfig = config.updateConfig;
@@ -52,9 +54,7 @@ describe('CLI Config', () => {
       expect(config.apiKey).toBeUndefined();
     });
 
-    // TODO: These tests need the os mock to work with vitest hoisting
-    // Skipping until we find a reliable mock approach
-    it.skip('loads config from file when it exists', () => {
+    it('loads config from file when it exists', () => {
       mkdirSync(CONFIG_DIR, { recursive: true });
       writeFileSync(CONFIG_FILE, JSON.stringify({
         baseUrl: 'http://custom:9090',
@@ -68,7 +68,7 @@ describe('CLI Config', () => {
       expect(config.outputFormat).toBe('json');
     });
 
-    it.skip('merges with defaults for missing fields', () => {
+    it('merges with defaults for missing fields', () => {
       mkdirSync(CONFIG_DIR, { recursive: true });
       writeFileSync(CONFIG_FILE, JSON.stringify({
         baseUrl: 'http://custom:9090',
@@ -81,14 +81,14 @@ describe('CLI Config', () => {
   });
 
   describe('saveConfig', () => {
-    it.skip('creates config directory if it does not exist', () => {
+    it('creates config directory if it does not exist', () => {
       saveConfig({ baseUrl: 'http://test:8080', outputFormat: 'table' });
 
       expect(existsSync(CONFIG_DIR)).toBe(true);
       expect(existsSync(CONFIG_FILE)).toBe(true);
     });
 
-    it.skip('writes config as JSON', () => {
+    it('writes config as JSON', () => {
       saveConfig({ baseUrl: 'http://test:8080', apiKey: 'key123', outputFormat: 'json' });
 
       const raw = readFileSync(CONFIG_FILE, 'utf-8');
@@ -100,7 +100,7 @@ describe('CLI Config', () => {
   });
 
   describe('updateConfig', () => {
-    it.skip('merges partial config with existing', () => {
+    it('merges partial config with existing', () => {
       saveConfig({ baseUrl: 'http://old:8080', outputFormat: 'table' });
       const updated = updateConfig({ apiKey: 'new-key' });
 
@@ -109,7 +109,7 @@ describe('CLI Config', () => {
       expect(updated.outputFormat).toBe('table');
     });
 
-    it.skip('overwrites existing values', () => {
+    it('overwrites existing values', () => {
       saveConfig({ baseUrl: 'http://old:8080', outputFormat: 'table' });
       const updated = updateConfig({ baseUrl: 'http://new:9090' });
 
