@@ -18,6 +18,8 @@
     { "src": "/api/cdc/engines", "dest": "/api/cdc/engines.ts" },
     { "src": "/api/cdc/events", "dest": "/api/cdc/events.ts" },
     { "src": "/api/cdc/replicate", "dest": "/api/cdc/replicate.ts" },
+    { "src": "/api/cdc/errors", "dest": "/api/cdc/errors.ts" },
+    { "src": "/api/cdc/reset", "dest": "/api/cdc/reset.ts" },
     { "src": "/api/cron/replicate", "dest": "/api/cron/replicate.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1.ts" }
   ]

@@ -7,22 +7,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Call the replication processor function
+    // Process changes with retry logic
     const result = await query('SELECT * FROM process_pulsyn_changes()');
-    const { processed_count, error_count } = result.rows[0];
+    const row = result.rows[0];
+    const processed = parseInt(row.processed_count);
+    const errors = parseInt(row.error_count);
+    const skipped = parseInt(row.skipped_count);
+    const errorDetails = row.error_details || [];
 
-    // Get remaining unprocessed count
-    const pendingResult = await query('SELECT COUNT(*) as count FROM _pulsyn_changes WHERE processed = FALSE');
+    // Get remaining counts
+    const pendingResult = await query(
+      'SELECT COUNT(*) as count FROM _pulsyn_changes WHERE processed = FALSE AND retry_count < max_retries'
+    );
     const pending = parseInt(pendingResult.rows[0].count);
 
-    return res.json({
+    const failedResult = await query(
+      'SELECT COUNT(*) as count FROM _pulsyn_changes WHERE processed = FALSE AND retry_count >= max_retries'
+    );
+    const failed = parseInt(failedResult.rows[0].count);
+
+    // Get recent errors if requested
+    let recentErrors: any[] = [];
+    if (req.query.includeErrors === 'true') {
+      const errorsResult = await query(
+        `SELECT e.*, c.table_name, c.operation
+         FROM _pulsyn_errors e
+         JOIN _pulsyn_changes c ON c.id = e.change_id
+         ORDER BY e.created_at DESC
+         LIMIT 20`
+      );
+      recentErrors = errorsResult.rows;
+    }
+
+    const response: any = {
       data: {
-        processed: parseInt(processed_count),
-        errors: parseInt(error_count),
+        processed,
+        errors,
+        skipped,
         pendingChanges: pending,
+        failedChanges: failed,
+        errorDetails,
         timestamp: new Date().toISOString(),
       },
-    });
+    };
+
+    if (recentErrors.length > 0) {
+      data.recentErrors = recentErrors;
+    }
+
+    return res.json(response);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
