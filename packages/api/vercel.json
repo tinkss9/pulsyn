@@ -24,6 +24,7 @@
     { "src": "/api/security", "dest": "/api/security.ts" },
     { "src": "/api/blocked", "dest": "/api/blocked.ts" },
     { "src": "/api/admin-login", "dest": "/api/admin-login.ts" },
+    { "src": "/api/quota", "dest": "/api/quota.ts" },
     { "src": "/api/cron/replicate", "dest": "/api/cron/replicate.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1.ts" }
   ]
