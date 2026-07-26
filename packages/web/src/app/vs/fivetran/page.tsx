@@ -15,7 +15,7 @@ const COMPARISON = [
   { feature: 'Latency', pulsyn: '< 1 second', fivetran: '15+ minutes', winner: 'pulsyn' },
   { feature: 'Pricing Model', pulsyn: 'Flat monthly tier', fivetran: 'MAR-based (unpredictable)', winner: 'pulsyn' },
   { feature: 'Starting Price', pulsyn: '$0 (Community)', fivetran: '$0 (limited)', winner: 'tie' },
-  { feature: 'Pro Plan', pulsyn: '$300/mo flat', fivetran: '$500-2,000+/mo (usage-based)', winner: 'pulsyn' },
+  { feature: 'Pro Plan', pulsyn: '$499/mo flat', fivetran: '$500-2,000+/mo (usage-based)', winner: 'pulsyn' },
   { feature: 'CLI Access', pulsyn: 'Yes (35+ commands)', fivetran: 'No', winner: 'pulsyn' },
   { feature: 'MCP Server', pulsyn: 'Yes (26 tools)', fivetran: 'No', winner: 'pulsyn' },
   { feature: 'API-First', pulsyn: 'Yes (REST + OpenAPI)', fivetran: 'Limited', winner: 'pulsyn' },
@@ -67,8 +67,8 @@ export default function FivetranComparison() {
               want API/CLI/MCP access, or need self-hosted deployment.
             </p>
             <p className="text-gray-300 text-lg">
-              <strong>Cost savings:</strong> Pulsyn Pro ($300/mo) vs Fivetran equivalent ($500-2,000+/mo) 
-              = <strong>40-85% savings</strong> with better latency.
+              <strong>Cost savings:</strong> Pulsyn Pro ($499/mo) vs Fivetran equivalent ($500-2,000+/mo) 
+              = <strong>up to 75% savings</strong> with better latency.
             </p>
           </div>
         </div>

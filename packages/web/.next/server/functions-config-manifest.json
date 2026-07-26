@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/use-cases/ai-data-pipeline":{},"/vs/airbyte":{},"/vs/fivetran":{},"/use-cases/real-time-analytics":{},"/vs/debezium":{},"/vs/confluent":{}}}
+{"version":1,"functions":{"/use-cases/real-time-analytics":{},"/vs/confluent":{},"/use-cases/ai-data-pipeline":{},"/vs/debezium":{},"/vs/fivetran":{},"/vs/airbyte":{}}}

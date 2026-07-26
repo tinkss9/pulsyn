@@ -187,6 +187,25 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Hero Video */}
+      <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-[#0d1117] border border-white/10 rounded-xl overflow-hidden shadow-2xl shadow-black/50">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-auto"
+              poster="/hero-poster.png"
+            >
+              <source src="/hero-video.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <p className="text-center text-gray-500 text-sm mt-3">75-second demo: Real-time CDC from PostgreSQL to Snowflake</p>
+        </div>
+      </section>
+
       {/* Stats Bar */}
       <section className="py-12 px-6 border-y border-white/5">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
