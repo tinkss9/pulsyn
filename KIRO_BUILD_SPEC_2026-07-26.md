@@ -140,6 +140,74 @@ Each file must be:
 
 ---
 
+## PART 6: MORE SAAS CONNECTORS (30 more to reach 100+)
+
+Build these connectors to match Fivetran/Airbyte coverage:
+
+### Video/Communication
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 1 | Zoom | `@zoom/meetings-sdk` | Meeting data, recordings |
+| 2 | Google Meet | REST API | Meeting data |
+| 3 | Microsoft Teams | `@microsoft/microsoft-graph-client` | Team messaging, meetings |
+| 4 | Loom | REST API | Video recordings |
+
+### Design/Creative
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 5 | Figma | REST API | Design files, comments |
+| 6 | Canva | REST API | Design templates |
+
+### Productivity
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 7 | Google Sheets | `googleapis` | Spreadsheet data |
+| 8 | Google Drive | `googleapis` | File metadata |
+| 9 | Dropbox | `dropbox` | File metadata |
+| 10 | OneDrive | `@microsoft/microsoft-graph-client` | File metadata |
+| 11 | Coda | REST API | Documents, tables |
+| 12 | Coda | REST API | Documents, tables |
+
+### Infrastructure/DevOps
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 13 | Cloudflare | `@cloudflare/workers-types` | Analytics, DNS |
+| 14 | Vercel | REST API | Deployments, analytics |
+| 15 | Netlify | `@netlify/api` | Deployments |
+| 16 | Datadog | `@datadog/datadog-api-client` | Monitoring, metrics |
+| 17 | New Relic | REST API | APM, observability |
+| 18 | Grafana | REST API | Dashboards |
+
+### Payments/Billing
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 19 | Chargebee | `chargebee` | Subscription billing |
+| 20 | Recurly | `recurly` | Subscription billing |
+| 21 | Square | `square` | Payments |
+
+### Support/Success
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 22 | PagerDuty | REST API | Incident management |
+| 23 | Opsgenie | REST API | Alerting |
+
+### Marketing/Analytics
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 24 | Google Ads | `google-ads-api` | Ad campaigns |
+| 25 | Meta Ads | `facebook-nodejs-business-sdk` | Facebook/Instagram ads |
+| 26 | LinkedIn Ads | REST API | B2B advertising |
+
+### Other SaaS
+| # | Connector | npm Package | Use Case |
+|---|-----------|-------------|----------|
+| 27 | Retool | REST API | Internal tools |
+| 28 | Metabase | REST API | BI dashboards |
+| 29 | Circle | REST API | Community platform |
+| 30 | Webflow | REST API | Website builder |
+
+---
+
 ## AFTER YOU'RE DONE
 
 1. Save all files to the paths above

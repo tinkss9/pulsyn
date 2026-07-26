@@ -91,6 +91,16 @@ export { CockroachDBConnector } from './connectors/cockroachdb';
 export { MailchimpConnector } from './connectors/mailchimp';
 export { BrevoConnector } from './connectors/brevo';
 export { KlaviyoConnector } from './connectors/klaviyo';
+export { ZoomConnector } from './connectors/zoom';
+export { CalendlyConnector } from './connectors/calendly';
+export { FigmaConnector } from './connectors/figma';
+export { GoogleSheetsConnector } from './connectors/google-sheets';
+export { DropboxConnector } from './connectors/dropbox';
+export { CloudflareConnector } from './connectors/cloudflare';
+export { DatadogConnector } from './connectors/datadog';
+export { PagerDutyConnector } from './connectors/pagerduty';
+export { ChargebeeConnector } from './connectors/chargebee';
+export { WebflowConnector } from './connectors/webflow';
 export { ConnectorRegistry, registerSource, registerTarget } from './connectors/registry';
 
 // Connectors — Target
