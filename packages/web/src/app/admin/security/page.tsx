@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import crypto from 'crypto';
 
 interface SecurityEvent {
   id: number;
@@ -29,6 +30,10 @@ interface SecuritySummary {
   blockedIps: number;
 }
 
+// Admin password hash (SHA-256 of "pulsyn-admin-2026")
+// Change this to your own password hash
+const ADMIN_PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+
 export default function SecurityDashboard() {
   const [summary, setSummary] = useState<SecuritySummary | null>(null);
   const [recentEvents, setRecentEvents] = useState<SecurityEvent[]>([]);
@@ -36,11 +41,42 @@ export default function SecurityDashboard() {
   const [failures, setFailures] = useState<SecurityEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiKey, setApiKey] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+  const [apiAuthenticated, setApiAuthenticated] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'blocked' | 'failures'>('overview');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api-67qhpgy5i-1inai.vercel.app';
+
+  // Check if admin password was previously entered (stored in sessionStorage)
+  useEffect(() => {
+    const stored = sessionStorage.getItem('pulsyn_admin_auth');
+    if (stored === 'true') {
+      setAdminAuthenticated(true);
+    }
+  }, []);
+
+  const hashPassword = async (password: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    const hash = await hashPassword(adminPassword);
+    if (hash === ADMIN_PASSWORD_HASH) {
+      setAdminAuthenticated(true);
+      sessionStorage.setItem('pulsyn_admin_auth', 'true');
+    } else {
+      setError('Invalid admin password');
+    }
+  };
 
   const fetchWithAuth = async (url: string) => {
     const res = await fetch(url, {
@@ -48,7 +84,7 @@ export default function SecurityDashboard() {
     });
     if (res.status === 401) {
       setError('Invalid API key');
-      setAuthenticated(false);
+      setApiAuthenticated(false);
       return null;
     }
     if (res.status === 429) {
@@ -75,7 +111,7 @@ export default function SecurityDashboard() {
       if (blockedRes?.data) setBlockedIps(blockedRes.data.blockedIps || []);
       if (failuresRes?.data) setFailures(failuresRes.data.items || []);
 
-      setAuthenticated(true);
+      setApiAuthenticated(true);
     } catch (err) {
       setError('Failed to load data');
     } finally {
@@ -83,7 +119,7 @@ export default function SecurityDashboard() {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleApiLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (apiKey) {
       loadData();
@@ -115,6 +151,13 @@ export default function SecurityDashboard() {
     loadData();
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem('pulsyn_admin_auth');
+    setAdminAuthenticated(false);
+    setApiAuthenticated(false);
+    setApiKey('');
+  };
+
   const getEventColor = (type: string) => {
     switch (type) {
       case 'auth_success': return 'text-green-400';
@@ -137,13 +180,60 @@ export default function SecurityDashboard() {
     }
   };
 
-  // Login screen
-  if (!authenticated) {
+  // Step 1: Admin password gate
+  if (!adminAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <form onSubmit={handleLogin} className="bg-gray-900 border border-gray-800 rounded-xl p-8 w-full max-w-md">
-          <h1 className="text-2xl font-bold mb-2">Security Dashboard</h1>
-          <p className="text-gray-400 text-sm mb-6">Enter your API key to access the security dashboard</p>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 w-full max-w-md">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+              🔒
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Admin Access</h1>
+              <p className="text-gray-400 text-sm">Restricted area — authorized personnel only</p>
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-red-950/50 border border-red-800 rounded-lg p-3 mb-4 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleAdminLogin}>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder="Admin password"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white mb-4 focus:outline-none focus:border-red-500"
+              autoFocus
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium transition-colors"
+            >
+              Authenticate
+            </button>
+          </form>
+
+          <p className="text-gray-500 text-xs mt-4 text-center">
+            This page is monitored. Unauthorized access attempts are logged.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Step 2: API key login
+  if (!apiAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <form onSubmit={handleApiLogin} className="bg-gray-900 border border-gray-800 rounded-xl p-8 w-full max-w-md">
+          <h1 className="text-2xl font-bold mb-2">API Authentication</h1>
+          <p className="text-gray-400 text-sm mb-6">Enter your Pulsyn API key to access security data</p>
 
           {error && (
             <div className="bg-red-950/50 border border-red-800 rounded-lg p-3 mb-4 text-red-400 text-sm">
@@ -157,6 +247,7 @@ export default function SecurityDashboard() {
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="pk_..."
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white mb-4 focus:outline-none focus:border-blue-500"
+            autoFocus
           />
 
           <button
@@ -170,6 +261,7 @@ export default function SecurityDashboard() {
     );
   }
 
+  // Main dashboard
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       <div className="max-w-7xl mx-auto">
@@ -179,12 +271,20 @@ export default function SecurityDashboard() {
             <h1 className="text-3xl font-bold">Security Dashboard</h1>
             <p className="text-gray-400">Monitor authentication, rate limits, and blocked IPs</p>
           </div>
-          <button
-            onClick={loadData}
-            className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition-colors"
-          >
-            ↻ Refresh
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={loadData}
+              className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              ↻ Refresh
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-red-900/50 hover:bg-red-900 border border-red-800 px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
