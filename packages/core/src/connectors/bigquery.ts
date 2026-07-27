@@ -10,6 +10,7 @@ export class BigQueryConnector extends BaseConnector {
   private client: BigQuery | null = null;
   private dataset: Dataset | null = null;
   private cdcActive = false;
+  private cdcInterval: ReturnType<typeof setInterval> | null = null;
 
   async connect(config: DatabaseConfig): Promise<void> {
     try {
@@ -58,6 +59,7 @@ export class BigQueryConnector extends BaseConnector {
     const [metadata] = await tableRef.getMetadata();
     const fields = metadata.schema?.fields || [];
     return {
+      name: table,
       table,
       columns: fields.map((f: any) => ({
         name: f.name,
@@ -65,7 +67,8 @@ export class BigQueryConnector extends BaseConnector {
         nullable: f.mode !== 'REQUIRED',
         defaultValue: f.defaultValueExpression || null,
       })),
-      primaryKeys: [], // BigQuery has no traditional PKs
+      primaryKey: [],
+      primaryKeys: [],
     };
   }
 
@@ -79,7 +82,8 @@ export class BigQueryConnector extends BaseConnector {
     const wmCol = this.config.watermarkColumn || '_PARTITIONTIME';
     let lastWatermark: string | null = null;
 
-    while (this.cdcActive && this.client) {
+    this.cdcInterval = setInterval(async () => {
+      if (!this.cdcActive || !this.client) return;
       try {
         const tables = await this.getTables();
         for (const table of tables) {
@@ -89,19 +93,28 @@ export class BigQueryConnector extends BaseConnector {
 
           const [rows] = await this.client!.query({ query });
           for (const row of rows) {
-            cb({ op: 'I', table, before: null, after: row, ts: new Date() });
+            cb({
+              op: 'I',
+              table,
+              before: null,
+              after: row,
+              ts: new Date(),
+            });
             if (row[wmCol]) lastWatermark = row[wmCol].value || row[wmCol].toString();
           }
         }
-        await new Promise((r) => setTimeout(r, 10000));
       } catch {
-        if (this.cdcActive) await new Promise((r) => setTimeout(r, 30000));
+        // Retry on next interval
       }
-    }
+    }, 10000);
   }
 
   async stopCDC(): Promise<void> {
     this.cdcActive = false;
+    if (this.cdcInterval) {
+      clearInterval(this.cdcInterval);
+      this.cdcInterval = null;
+    }
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
@@ -114,7 +127,13 @@ export class BigQueryConnector extends BaseConnector {
       const [rows] = await this.client.query({ query });
       if (rows.length === 0) break;
       for (const row of rows) {
-        events.push(createEvent('S', table, row, null, null, { source: 'bigquery' }));
+        events.push(createEvent({
+          op: 'S',
+          table,
+          after: row,
+          before: null,
+          sourceMetadata: { source: 'bigquery' },
+        }));
       }
       offset += rows.length;
       if (rows.length < this.batchSize) break;
@@ -122,9 +141,10 @@ export class BigQueryConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.client) throw new Error('Not connected');
-    const wmCol = this.config.watermarkColumn || '_PARTITIONTIME';
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || '_PARTITIONTIME';
+    const watermark = opts?.watermarkValue || null;
     const events: UnifiedChangeEvent[] = [];
 
     const query = watermark
@@ -134,7 +154,13 @@ export class BigQueryConnector extends BaseConnector {
     const [rows] = await this.client.query({ query });
     for (const row of rows) {
       const wm = row[wmCol]?.value || row[wmCol]?.toString() || null;
-      events.push(createEvent('I', table, row, null, wm, { source: 'bigquery' }));
+      events.push(createEvent({
+        op: 'I',
+        table,
+        after: row,
+        before: null,
+        sourceMetadata: { source: 'bigquery', pk: wm },
+      }));
     }
     return events;
   }
@@ -146,8 +172,7 @@ export class BigQueryConnector extends BaseConnector {
     return Number(rows[0]?.cnt || 0);
   }
 
-  async getPrimaryKey(table: string): Promise<string> {
-    return '_PARTITIONTIME'; // BigQuery uses partition for ordering
+  async getPrimaryKey(): Promise<string> {
+    return '_PARTITIONTIME';
   }
 }
-

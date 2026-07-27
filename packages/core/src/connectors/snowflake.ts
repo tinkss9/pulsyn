@@ -9,6 +9,7 @@ import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 export class SnowflakeConnector extends BaseConnector {
   private connection: snowflake.Connection | null = null;
   private cdcActive = false;
+  private cdcInterval: ReturnType<typeof setInterval> | null = null;
 
   async connect(config: DatabaseConfig): Promise<void> {
     try {
@@ -39,7 +40,7 @@ export class SnowflakeConnector extends BaseConnector {
       await this.stopCDC();
       if (this.connection) {
         await new Promise<void>((resolve) => {
-          this.connection!.destroy((err) => resolve());
+          this.connection!.destroy(() => resolve());
         });
         this.connection = null;
       }
@@ -96,11 +97,14 @@ export class SnowflakeConnector extends BaseConnector {
       `SHOW PRIMARY KEYS IN TABLE ${schema}.${tableName}`
     );
     return {
+      name: table,
       table,
       columns: cols.map((c) => ({
         name: c.COLUMN_NAME, type: c.DATA_TYPE,
         nullable: c.IS_NULLABLE === 'YES', defaultValue: c.COLUMN_DEFAULT,
+        primaryKey: pks.some((r: any) => (r.column_name || r.COLUMN_NAME) === c.COLUMN_NAME),
       })),
+      primaryKey: pks.map((r) => r.column_name || r.COLUMN_NAME),
       primaryKeys: pks.map((r) => r.column_name || r.COLUMN_NAME),
     };
   }
@@ -124,7 +128,13 @@ export class SnowflakeConnector extends BaseConnector {
               const op = row.METADATA$ACTION === 'INSERT' ? 'I'
                 : row.METADATA$ACTION === 'DELETE' ? 'D' : 'U';
               const { 'METADATA$ACTION': _a, 'METADATA$ISUPDATE': _u, 'METADATA$ROW_ID': _r, ...data } = row;
-              cb({ op, table: stream.table_name, before: op === 'D' ? data : null, after: op !== 'D' ? data : null, ts: new Date() });
+              cb({
+                op,
+                table: stream.table_name,
+                before: op === 'D' ? data : null,
+                after: op !== 'D' ? data : null,
+                ts: new Date(),
+              });
             }
           }
         }
@@ -137,6 +147,10 @@ export class SnowflakeConnector extends BaseConnector {
 
   async stopCDC(): Promise<void> {
     this.cdcActive = false;
+    if (this.cdcInterval) {
+      clearInterval(this.cdcInterval);
+      this.cdcInterval = null;
+    }
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
@@ -154,7 +168,13 @@ export class SnowflakeConnector extends BaseConnector {
       const rows = await this.executeQuery(query, binds);
       if (rows.length === 0) break;
       for (const row of rows) {
-        events.push(createEvent('S', table, row, null, row[pk]?.toString() || null, { source: 'snowflake' }));
+        events.push(createEvent({
+          op: 'S',
+          table,
+          after: row,
+          before: null,
+          sourceMetadata: { source: 'snowflake', pk: row[pk]?.toString() || null },
+        }));
       }
       lastKey = rows[rows.length - 1][pk];
       if (rows.length < this.batchSize) break;
@@ -162,31 +182,26 @@ export class SnowflakeConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.connection) throw new Error('Not connected');
-    // Use CHANGES clause for incremental
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || 'UPDATED_AT';
+    const watermark = opts?.watermarkValue || null;
     const events: UnifiedChangeEvent[] = [];
-    try {
-      const query = watermark
-        ? `SELECT * FROM ${table} CHANGES(INFORMATION => DEFAULT) AT(TIMESTAMP => '${watermark}'::TIMESTAMP_LTZ)`
-        : `SELECT * FROM ${table} CHANGES(INFORMATION => DEFAULT) AT(OFFSET => -3600)`;
-      const rows = await this.executeQuery(query);
-      for (const row of rows) {
-        const op = row.METADATA$ACTION === 'INSERT' ? 'I' : row.METADATA$ACTION === 'DELETE' ? 'D' : 'U';
-        const { 'METADATA$ACTION': _a, 'METADATA$ISUPDATE': _u, 'METADATA$ROW_ID': _r, ...data } = row;
-        events.push(createEvent(op, table, op !== 'D' ? data : null, op === 'D' ? data : null, null, { source: 'snowflake' }));
-      }
-    } catch {
-      // Fallback to watermark column
-      const wmCol = this.config.watermarkColumn || 'UPDATED_AT';
-      const query = watermark
-        ? `SELECT * FROM ${table} WHERE ${wmCol} > ? ORDER BY ${wmCol} LIMIT ?`
-        : `SELECT * FROM ${table} ORDER BY ${wmCol} LIMIT ?`;
-      const binds = watermark ? [watermark, this.batchSize] : [this.batchSize];
-      const rows = await this.executeQuery(query, binds);
-      for (const row of rows) {
-        events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'snowflake' }));
-      }
+
+    const query = watermark
+      ? `SELECT * FROM ${table} WHERE ${wmCol} > ? ORDER BY ${wmCol} LIMIT ?`
+      : `SELECT * FROM ${table} ORDER BY ${wmCol} LIMIT ?`;
+    const binds = watermark ? [watermark, this.batchSize] : [this.batchSize];
+    const rows = await this.executeQuery(query, binds);
+
+    for (const row of rows) {
+      events.push(createEvent({
+        op: 'I',
+        table,
+        after: row,
+        before: null,
+        sourceMetadata: { source: 'snowflake', pk: row[wmCol]?.toString() || null },
+      }));
     }
     return events;
   }
@@ -197,9 +212,7 @@ export class SnowflakeConnector extends BaseConnector {
     return rows[0]?.CNT || 0;
   }
 
-  async getPrimaryKey(table: string): Promise<string> {
-    const schema = await this.getTableSchema(table);
-    return schema.primaryKeys[0] || 'ID';
+  async getPrimaryKey(): Promise<string> {
+    return 'ID';
   }
 }
-

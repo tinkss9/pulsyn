@@ -9,6 +9,7 @@ import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 export class MySQLConnector extends BaseConnector {
   private pool: Pool | null = null;
   private cdcActive = false;
+  private cdcInterval: ReturnType<typeof setInterval> | null = null;
 
   async connect(config?: DatabaseConfig): Promise<void> {
     return this.withRetry(async () => {
@@ -123,11 +124,61 @@ export class MySQLConnector extends BaseConnector {
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
-    throw new Error('MySQL CDC not yet implemented — use polling-based extractIncremental');
+    if (!this.pool) throw new Error('Not connected');
+    this.cdcActive = true;
+
+    // Poll-based CDC using updated_at or timestamp columns
+    // For true binlog CDC, MySQL requires binlog access which needs server config
+    // This polling approach works with any MySQL setup
+    const tables = await this.getTables();
+    const watermarks: Record<string, string | null> = {};
+    for (const table of tables) {
+      watermarks[table] = null;
+    }
+
+    this.cdcInterval = setInterval(async () => {
+      if (!this.cdcActive || !this.pool) return;
+      try {
+        for (const table of tables) {
+          // Try to find a watermark column
+          const schema = await this.getTableSchema(table);
+          const wmCol = schema.columns.find((c: any) =>
+            ['updated_at', 'updatedAt', 'modified_at', 'modifiedAt', 'created_at', 'createdAt'].includes(c.name)
+          )?.name;
+
+          if (!wmCol) continue;
+
+          const watermark = watermarks[table];
+          const q = watermark
+            ? `SELECT * FROM ${table} WHERE ${wmCol} > ? ORDER BY ${wmCol} LIMIT ${this.batchSize}`
+            : `SELECT * FROM ${table} ORDER BY ${wmCol} DESC LIMIT ${this.batchSize}`;
+          const p = watermark ? [watermark] : [];
+          const [rows] = await this.pool.query(q, p);
+
+          for (const row of rows as any[]) {
+            const op = watermark ? 'I' : 'S';
+            callback({
+              op,
+              table,
+              before: null,
+              after: row,
+              ts: new Date(),
+            });
+            watermarks[table] = row[wmCol]?.toString() || watermarks[table];
+          }
+        }
+      } catch {
+        // Retry on next interval
+      }
+    }, 5000);
   }
 
   async stopCDC(): Promise<void> {
     this.cdcActive = false;
+    if (this.cdcInterval) {
+      clearInterval(this.cdcInterval);
+      this.cdcInterval = null;
+    }
   }
 
   async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
@@ -138,12 +189,47 @@ export class MySQLConnector extends BaseConnector {
     const [rows] = await this.pool.query(`SELECT * FROM ${table} LIMIT ? OFFSET ?`, [limit, offset]);
     for (const row of rows as any[]) {
       events.push(createEvent({
-        op: 'S', table,
+        op: 'S',
+        table,
         after: row,
         before: null,
         sourceMetadata: { source: 'mysql' },
       }));
     }
     return events;
+  }
+
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    if (!this.pool) throw new Error('Not connected');
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || 'updated_at';
+    const watermark = opts?.watermarkValue || null;
+    const events: UnifiedChangeEvent[] = [];
+
+    const q = watermark
+      ? `SELECT * FROM ${table} WHERE ${wmCol} > ? ORDER BY ${wmCol} LIMIT ?`
+      : `SELECT * FROM ${table} ORDER BY ${wmCol} LIMIT ?`;
+    const p = watermark ? [watermark, this.batchSize] : [this.batchSize];
+    const [rows] = await this.pool.query(q, p);
+
+    for (const row of rows as any[]) {
+      events.push(createEvent({
+        op: 'I',
+        table,
+        after: row,
+        before: null,
+        sourceMetadata: { source: 'mysql', pk: row[wmCol]?.toString() || null },
+      }));
+    }
+    return events;
+  }
+
+  async estimateRowCount(table: string): Promise<number> {
+    if (!this.pool) throw new Error('Not connected');
+    const [rows] = await this.pool.query(`SELECT COUNT(*) AS cnt FROM ${table}`);
+    return (rows as any[])[0]?.cnt || 0;
+  }
+
+  async getPrimaryKey(): Promise<string> {
+    return 'id';
   }
 }
