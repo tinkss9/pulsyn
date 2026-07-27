@@ -26,6 +26,12 @@ export default function AirbyteComparison() {
       <Header />
 
       <section className="pt-32 pb-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <ComparisonDisclaimer />
+        </div>
+      </section>
+
+      <section className="py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-pulsyn-950/50 border border-pulsyn-800 rounded-full px-4 py-1.5 mb-6">
             <span className="text-pulsyn-400 text-sm font-medium">Comparison</span>

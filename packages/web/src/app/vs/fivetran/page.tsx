@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
+import { ComparisonDisclaimer } from '@/components/ComparisonDisclaimer';
 
 export const metadata: Metadata = {
   title: 'Pulsyn vs Fivetran — Real-time CDC vs Batch ETL',
@@ -44,6 +45,13 @@ export default function FivetranComparison() {
             Fivetran is a batch ETL tool. Pulsyn is a real-time CDC platform. 
             If you need sub-second latency, Pulsyn is the clear choice.
           </p>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="py-4 px-6">
+        <div className="max-w-4xl mx-auto">
+          <ComparisonDisclaimer />
         </div>
       </section>
 
