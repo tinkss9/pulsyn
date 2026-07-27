@@ -103,17 +103,19 @@ export class MySQLConnector extends BaseConnector {
          ORDER BY ordinal_position`,
         [this.config.database, table]
       );
-      const pkSet = new Set((pks as any[]).map((r) => r.column_name));
+      const pkSet = new Set((pks as any[]).map((r: any) => r.column_name || r.COLUMN_NAME));
       return {
         name: table,
         table,
-        columns: (cols as any[]).map((c) => ({
-          name: c.column_name, type: c.data_type,
-          nullable: c.is_nullable === 'YES', defaultValue: c.column_default,
-          primaryKey: pkSet.has(c.column_name),
+        columns: (cols as any[]).map((c: any) => ({
+          name: c.column_name || c.COLUMN_NAME,
+          type: c.data_type || c.DATA_TYPE,
+          nullable: (c.is_nullable || c.IS_NULLABLE) === 'YES',
+          defaultValue: c.column_default || c.COLUMN_DEFAULT,
+          primaryKey: pkSet.has(c.column_name || c.COLUMN_NAME),
         })),
-        primaryKey: (pks as any[]).map((r) => r.column_name),
-        primaryKeys: (pks as any[]).map((r) => r.column_name),
+        primaryKey: (pks as any[]).map((r: any) => r.column_name || r.COLUMN_NAME),
+        primaryKeys: (pks as any[]).map((r: any) => r.column_name || r.COLUMN_NAME),
       };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
