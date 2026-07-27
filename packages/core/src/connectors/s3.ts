@@ -17,6 +17,8 @@ interface S3Config extends DatabaseConfig {
   secretAccessKey?: string;
   fileFormat?: 'csv' | 'json' | 'jsonl';
   delimiter?: string;
+  endpoint?: string;
+  forcePathStyle?: boolean;
 }
 
 @registerSource('s3')
@@ -40,6 +42,8 @@ export class S3Connector extends BaseConnector {
 
       this.client = new S3Client({
         region: sc.region || 'us-east-1',
+        endpoint: sc.endpoint,
+        forcePathStyle: sc.forcePathStyle,
         credentials: sc.accessKeyId ? {
           accessKeyId: sc.accessKeyId,
           secretAccessKey: sc.secretAccessKey || '',
@@ -111,17 +115,17 @@ export class S3Connector extends BaseConnector {
     if (!this.client) throw new Error('Not connected');
     try {
       const key = await this.findFirstFile(table);
-      if (!key) return { table, columns: [], primaryKeys: [] };
+      if (!key) return { name: table, table, columns: [], primaryKeys: [], primaryKey: [] };
 
       const content = await this.downloadFile(key);
       const sample = this.parseContent(content);
-      if (sample.length === 0) return { table, columns: [], primaryKeys: [] };
+      if (sample.length === 0) return { name: table, table, columns: [], primaryKeys: [], primaryKey: [] };
 
       const columns = Object.entries(sample[0]).map(([name, value]) => ({
         name, type: typeof value === 'number' ? 'number' : 'string',
         nullable: true, defaultValue: null,
       }));
-      return { table, columns, primaryKeys: columns.length > 0 ? [columns[0].name] : [] };
+      return { name: table, table, columns, primaryKeys: columns.length > 0 ? [columns[0].name] : [], primaryKey: columns.length > 0 ? [columns[0].name] : [] };
     } catch (error) {
       throw new Error(`Failed to get schema for ${table}: ${(error as Error).message}`);
     }
@@ -168,9 +172,9 @@ export class S3Connector extends BaseConnector {
     for (const file of files) {
       try {
         const content = await this.downloadFile(file);
-        const records = this.parseContent(content);
+        const records = this.parseContent(content, file);
         for (let i = 0; i < records.length; i++) {
-          events.push(createEvent('S', table, records[i], null, `${file}:${i}`, { source: 's3', key: file }));
+          events.push(createEvent({ op: 'S', table, after: records[i], before: null, sourceMetadata: { source: 's3', key: file } }));
         }
       } catch (error) {
         throw new Error(`Failed to extract ${file}: ${(error as Error).message}`);
@@ -179,23 +183,31 @@ export class S3Connector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.client) throw new Error('Not connected');
     const events: UnifiedChangeEvent[] = [];
-    const wmDate = watermark ? new Date(watermark) : new Date(0);
+    const watermark = opts?.watermarkValue || null;
     const files = await this.listTableFiles(table);
     const newFiles = files.filter((f) => !watermark || f > watermark);
 
     for (const file of newFiles.slice(0, 10)) {
       try {
         const content = await this.downloadFile(file);
-        const records = this.parseContent(content);
+        const records = this.parseContent(content, file);
         for (let i = 0; i < records.length; i++) {
-          events.push(createEvent('I', table, records[i], null, file, { source: 's3', key: file }));
+          events.push(createEvent({ op: 'I', table, after: records[i], before: null, sourceMetadata: { source: 's3', key: file } }));
         }
       } catch { continue; }
     }
     return events;
+  }
+
+  async estimateRowCount(_table: string): Promise<number> {
+    return 0;
+  }
+
+  async getPrimaryKey(): Promise<string> {
+    return 'key';
   }
 
   private async downloadFile(key: string): Promise<string> {
@@ -203,9 +215,12 @@ export class S3Connector extends BaseConnector {
     return await res.Body!.transformToString('utf-8');
   }
 
-  private parseContent(content: string): Record<string, any>[] {
-    if (this.fileFormat === 'json') return JSON.parse(content);
-    if (this.fileFormat === 'jsonl') {
+  private parseContent(content: string, key?: string): Record<string, any>[] {
+    if (!content.trim()) return [];
+    const ext = key ? key.split('.').pop()?.toLowerCase() : '';
+    const format = ext === 'json' ? 'json' : ext === 'jsonl' ? 'jsonl' : this.fileFormat;
+    if (format === 'json') return JSON.parse(content);
+    if (format === 'jsonl') {
       return content.trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
     }
     return parse(content, { columns: true, delimiter: this.delimiter, skip_empty_lines: true, trim: true });
@@ -227,4 +242,3 @@ export class S3Connector extends BaseConnector {
     return res.Contents || [];
   }
 }
-

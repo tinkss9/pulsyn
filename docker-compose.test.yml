@@ -22,9 +22,10 @@ services:
     ports: ['27017:27017']
     environment: { MONGO_INITDB_ROOT_USERNAME: test, MONGO_INITDB_ROOT_PASSWORD: test }
   localstack:
-    image: localstack/localstack
-    ports: ['4566:4566']
-    environment: { SERVICES: 's3,dynamodb,kinesis,sqs', DEFAULT_REGION: 'ap-southeast-2' }
+    image: minio/minio:latest
+    ports: ['4566:9000', '4567:9001']
+    environment: { MINIO_ROOT_USER: test, MINIO_ROOT_PASSWORD: testtest }
+    command: server /data --console-address ":9001"
   wiremock:
     image: wiremock/wiremock:latest
     ports: ['8080:8080']

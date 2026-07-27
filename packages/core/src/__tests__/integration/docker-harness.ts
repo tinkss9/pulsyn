@@ -92,6 +92,8 @@ export function getTestConfig(service: string): Record<string, any> {
       port: parseInt(process.env.TEST_LOCALSTACK_PORT || '4566'),
       region: 'us-east-1',
       endpoint: `http://${process.env.TEST_LOCALSTACK_HOST || 'localhost'}:${process.env.TEST_LOCALSTACK_PORT || '4566'}`,
+      accessKeyId: 'test',
+      secretAccessKey: 'testtest',
     },
   };
   return configs[service] || {};

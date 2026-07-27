@@ -15,7 +15,7 @@ export class MongoDBConnector extends BaseConnector {
   async connect(config: DatabaseConfig): Promise<void> {
     try {
       this.config = config;
-      const uri = config.connectionString || this.buildUri(config);
+      const uri = (config as any).connectionString || this.buildUri(config);
       this.client = new MongoClient(uri, {
         maxPoolSize: 10,
         minPoolSize: 2,
@@ -32,10 +32,24 @@ export class MongoDBConnector extends BaseConnector {
   }
 
   private buildUri(config: DatabaseConfig): string {
-    const auth = config.username ? `${config.username}:${config.password}@` : '';
+    const user = config.username || (config as any).user;
+    const auth = user ? `${user}:${config.password}@` : '';
     const host = `${config.host}:${config.port || 27017}`;
-    const opts = config.ssl ? '?tls=true&tlsAllowInvalidCertificates=true' : '';
-    return `mongodb://${auth}${host}/${config.database}${opts}`;
+    const authSource = (config as any).authSource || (user ? 'admin' : '');
+    const opts = [
+      config.ssl ? 'tls=true&tlsAllowInvalidCertificates=true' : '',
+      authSource ? `authSource=${authSource}` : '',
+    ].filter(Boolean).join('&');
+    return `mongodb://${auth}${host}/${config.database}${opts ? '?' + opts : ''}`;
+  }
+
+  async query(collection: string, filter?: any): Promise<any[]> {
+    if (!this.db) throw new Error('Not connected');
+    return this.db.collection(collection).find(filter || {}).toArray();
+  }
+
+  getDb(): Db | null {
+    return this.db;
   }
 
   async disconnect(): Promise<void> {
@@ -87,7 +101,7 @@ export class MongoDBConnector extends BaseConnector {
       defaultValue: null,
     }));
 
-    return { table, columns, primaryKeys: ['_id'] };
+    return { name: table, table, columns, primaryKey: ['_id'], primaryKeys: ['_id'] };
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
@@ -146,7 +160,12 @@ export class MongoDBConnector extends BaseConnector {
         .find().sort({ _id: 1 }).skip(skip).limit(this.batchSize).toArray();
       if (docs.length === 0) break;
       for (const doc of docs) {
-        events.push(createEvent('S', table, doc, null, doc._id?.toString() || null, { source: 'mongodb' }));
+        events.push(createEvent({
+          op: 'S', table,
+          after: doc,
+          before: null,
+          sourceMetadata: { source: 'mongodb', pk: doc._id?.toString() || null },
+        }));
       }
       skip += docs.length;
       if (docs.length < this.batchSize) break;
@@ -154,15 +173,21 @@ export class MongoDBConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.db) throw new Error('Not connected');
-    const wmCol = this.config.watermarkColumn || 'updatedAt';
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || 'updatedAt';
+    const watermark = opts?.watermarkValue || null;
     const events: UnifiedChangeEvent[] = [];
     const filter = watermark ? { [wmCol]: { $gt: new Date(watermark) } } : {};
     const docs = await this.db.collection(table)
       .find(filter).sort({ [wmCol]: 1 }).limit(this.batchSize).toArray();
     for (const doc of docs) {
-      events.push(createEvent('I', table, doc, null, doc[wmCol]?.toISOString() || null, { source: 'mongodb' }));
+      events.push(createEvent({
+        op: 'I', table,
+        after: doc,
+        before: null,
+        sourceMetadata: { source: 'mongodb', pk: doc[wmCol]?.toISOString() || null },
+      }));
     }
     return events;
   }
@@ -176,4 +201,3 @@ export class MongoDBConnector extends BaseConnector {
     return '_id';
   }
 }
-

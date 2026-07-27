@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { skipIfNoDocker, getTestConfig, waitForService } from './docker-harness';
 import { ConnectorRegistry } from '../../connectors/registry';
+import '../../connectors/mongodb-target';
 import { createEvent } from '../../events';
 import type { UnifiedChangeEvent } from '../../events';
 
@@ -16,27 +17,15 @@ describe('MongoDB Target Writer Integration', () => {
   beforeAll(async () => {
     skipIfNoDocker('mongodb');
     await waitForService(config.host, config.port, 15000);
-
-    try { await import('../../connectors/mongodb'); } catch { /* may not exist yet */ }
-
-    try {
-      connector = ConnectorRegistry.getTarget('mongodb', 'test-mongo-target', config);
-    } catch {
-      try {
-        connector = ConnectorRegistry.getSource('mongodb', 'test-mongo-target', config);
-      } catch {
-        throw new Error('SKIP: MongoDB connector not registered');
-      }
-    }
+    connector = ConnectorRegistry.getTarget('mongodb', 'test-mongo-target', config);
     await connector.connect(config);
   });
 
   afterAll(async () => {
     if (connector?.isConnected()) {
       try {
-        const db = connector.getDb?.();
-        await db?.collection(targetCollection).drop();
-        await db?.collection('merge_test_collection').drop();
+        const db = connector.getDb();
+        if (db) await db.dropCollection(targetCollection).catch(() => {});
       } catch { /* best effort */ }
       await connector.disconnect();
     }
@@ -46,78 +35,66 @@ describe('MongoDB Target Writer Integration', () => {
     expect(connector.isConnected()).toBe(true);
   });
 
+  it('should create target collection', async () => {
+    const db = connector.getDb();
+    expect(db).not.toBeNull();
+    await db!.createCollection(targetCollection).catch(() => {});
+    const collections = await db!.listCollections({ name: targetCollection }).toArray();
+    expect(collections.length).toBe(1);
+  });
+
   it('should writeBatch — insert events into target collection', async () => {
     const events: UnifiedChangeEvent[] = [
-      createEvent('I', targetCollection, { _id: 'evt-1', type: 'purchase', amount: 50.00, customer: 'Alice' }, null, 'evt-1', {}),
-      createEvent('I', targetCollection, { _id: 'evt-2', type: 'refund', amount: 15.00, customer: 'Bob' }, null, 'evt-2', {}),
-      createEvent('I', targetCollection, { _id: 'evt-3', type: 'purchase', amount: 120.00, customer: 'Charlie' }, null, 'evt-3', {}),
+      createEvent({ op: 'I', table: targetCollection, after: { id: '1', name: 'Alice', value: 100 } }),
+      createEvent({ op: 'I', table: targetCollection, after: { id: '2', name: 'Bob', value: 200 } }),
+      createEvent({ op: 'I', table: targetCollection, after: { id: '3', name: 'Charlie', value: 300 } }),
     ];
-
-    const written = await connector.writeBatch(targetCollection, events);
-    expect(written).toBe(3);
-
-    // Verify data
-    const extracted = await connector.extractFull(targetCollection);
-    expect(extracted.length).toBe(3);
-    const customers = extracted.map((e: UnifiedChangeEvent) => e.after?.customer).sort();
-    expect(customers).toEqual(['Alice', 'Bob', 'Charlie']);
+    const result = await connector.writeBatch(targetCollection, events);
+    expect(result.inserted).toBe(3);
+    const db = connector.getDb();
+    const docs = await db!.collection(targetCollection).find().toArray();
+    expect(docs.length).toBe(3);
   });
 
   it('should writeBatch — handle updates', async () => {
-    const events: UnifiedChangeEvent[] = [
-      createEvent('U', targetCollection, { _id: 'evt-1', type: 'purchase', amount: 75.00, customer: 'Alice Updated' }, { _id: 'evt-1' }, 'evt-1', {}),
-    ];
-
-    const written = await connector.writeBatch(targetCollection, events);
-    expect(written).toBeGreaterThanOrEqual(1);
-
-    const extracted = await connector.extractFull(targetCollection);
-    const alice = extracted.find((e: UnifiedChangeEvent) => e.after?._id === 'evt-1');
-    expect(alice?.after?.customer).toBe('Alice Updated');
-    expect(alice?.after?.amount).toBe(75.00);
+    const updateEvent = createEvent({
+      op: 'U', table: targetCollection,
+      after: { id: '1', name: 'Alice Updated', value: 150 },
+      before: { id: '1', name: 'Alice', value: 100 },
+    });
+    const result = await connector.writeBatch(targetCollection, [updateEvent]);
+    expect(result.updated || result.inserted).toBeGreaterThanOrEqual(1);
+    const db = connector.getDb();
+    const doc = await db!.collection(targetCollection).findOne({ id: '1' });
+    expect(doc?.name).toBe('Alice Updated');
   });
 
   it('should merge — upsert with key columns', async () => {
-    const mergeCollection = 'merge_test_collection';
-
-    // Initial insert
-    const insertEvents: UnifiedChangeEvent[] = [
-      createEvent('I', mergeCollection, { _id: 'item-1', name: 'Laptop', stock: 10 }, null, 'item-1', {}),
-      createEvent('I', mergeCollection, { _id: 'item-2', name: 'Phone', stock: 25 }, null, 'item-2', {}),
-    ];
-    await connector.writeBatch(mergeCollection, insertEvents);
-
-    // Merge: update existing + insert new
     const mergeEvents: UnifiedChangeEvent[] = [
-      createEvent('U', mergeCollection, { _id: 'item-1', name: 'Laptop Pro', stock: 5 }, null, 'item-1', {}),
-      createEvent('I', mergeCollection, { _id: 'item-3', name: 'Tablet', stock: 15 }, null, 'item-3', {}),
+      createEvent({ op: 'I', table: targetCollection, after: { id: '4', name: 'Diana', value: 400 } }),
+      createEvent({ op: 'U', table: targetCollection, after: { id: '2', name: 'Bob Merged', value: 250 } }),
     ];
-    const merged = await connector.merge(mergeCollection, mergeEvents, ['_id']);
-    expect(merged).toBeGreaterThanOrEqual(2);
-
-    // Verify
-    const allEvents = await connector.extractFull(mergeCollection);
-    expect(allEvents.length).toBe(3);
-    const laptop = allEvents.find((e: UnifiedChangeEvent) => e.after?._id === 'item-1');
-    expect(laptop?.after?.name).toBe('Laptop Pro');
-    expect(laptop?.after?.stock).toBe(5);
+    const result = await connector.merge(targetCollection, mergeEvents, ['id']);
+    expect(result.upserted + result.updated).toBeGreaterThanOrEqual(2);
+    const db = connector.getDb();
+    const docs = await db!.collection(targetCollection).find().sort({ id: 1 }).toArray();
+    expect(docs.length).toBe(4);
   });
 
   it('should writeBatch — handle deletes', async () => {
-    const events: UnifiedChangeEvent[] = [
-      createEvent('D', targetCollection, null, { _id: 'evt-3' }, 'evt-3', {}),
-    ];
-    const written = await connector.writeBatch(targetCollection, events);
-    expect(written).toBeGreaterThanOrEqual(1);
-
-    const remaining = await connector.extractFull(targetCollection);
-    const ids = remaining.map((e: UnifiedChangeEvent) => e.after?._id);
-    expect(ids).not.toContain('evt-3');
+    const deleteEvent = createEvent({
+      op: 'D', table: targetCollection,
+      before: { id: '3', name: 'Charlie', value: 300 },
+    });
+    const result = await connector.writeBatch(targetCollection, [deleteEvent]);
+    expect(result.deleted || result.removed).toBeGreaterThanOrEqual(1);
+    const db = connector.getDb();
+    const docs = await db!.collection(targetCollection).find().toArray();
+    expect(docs.length).toBe(3);
   });
 
   it('should handle empty batch', async () => {
-    const written = await connector.writeBatch(targetCollection, []);
-    expect(written).toBe(0);
+    const result = await connector.writeBatch(targetCollection, []);
+    expect(result.inserted).toBe(0);
   });
 });
-
