@@ -48,6 +48,17 @@ export class MySQLConnector extends BaseConnector {
     }
   }
 
+  async query(sql: string, params?: any[]): Promise<any> {
+    if (!this.pool) throw new Error('Not connected');
+    const [rows] = await this.pool.query(sql, params);
+    return rows;
+  }
+
+  async getClient(): Promise<any> {
+    if (!this.pool) throw new Error('Not connected');
+    return this.pool.getConnection();
+  }
+
   async testConnection(): Promise<boolean> {
     try {
       if (!this.pool) return false;

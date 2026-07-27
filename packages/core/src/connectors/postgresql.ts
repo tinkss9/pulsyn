@@ -48,6 +48,16 @@ export class PostgreSQLConnector extends BaseConnector {
     }
   }
 
+  async query(sql: string, params?: any[]): Promise<any> {
+    if (!this.pool) throw new Error('Not connected');
+    return this.pool.query(sql, params);
+  }
+
+  async getClient(): Promise<any> {
+    if (!this.pool) throw new Error('Not connected');
+    return this.pool.connect();
+  }
+
   async testConnection(): Promise<boolean> {
     try {
       if (!this.pool) return false;

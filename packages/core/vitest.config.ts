@@ -7,7 +7,7 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      '**/integration/**', // Integration tests need Docker — run explicitly with: vitest run src/__tests__/integration/
+      '**/integration/**',
     ],
     coverage: {
       provider: 'v8',

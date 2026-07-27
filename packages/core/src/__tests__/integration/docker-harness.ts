@@ -3,6 +3,7 @@
 // Used by integration tests to skip if required services aren't available
 
 import { execSync } from 'child_process';
+import { resolve } from 'path';
 
 /**
  * Check if a specific Docker Compose service is running.
@@ -10,9 +11,10 @@ import { execSync } from 'child_process';
  */
 export function isServiceRunning(service: string): boolean {
   try {
+    const projectRoot = resolve(__dirname, '../../../../../');
     const result = execSync(
-      `docker compose -f ../../docker-compose.test.yml ps ${service} --format json`,
-      { encoding: 'utf-8', timeout: 5000 }
+      `docker compose -f docker-compose.test.yml ps ${service} --format json`,
+      { encoding: 'utf-8', timeout: 5000, cwd: projectRoot }
     );
     return result.includes('running');
   } catch {
@@ -64,20 +66,22 @@ export function getTestConfig(service: string): Record<string, any> {
       host: process.env.TEST_PG_HOST || 'localhost',
       port: parseInt(process.env.TEST_PG_PORT || '5432'),
       database: process.env.TEST_PG_DB || 'testdb',
-      username: process.env.TEST_PG_USER || 'postgres',
-      password: process.env.TEST_PG_PASS || 'postgres',
+      username: process.env.TEST_PG_USER || 'test',
+      password: process.env.TEST_PG_PASS || 'test',
     },
     mysql: {
       host: process.env.TEST_MYSQL_HOST || 'localhost',
       port: parseInt(process.env.TEST_MYSQL_PORT || '3306'),
       database: process.env.TEST_MYSQL_DB || 'testdb',
       username: process.env.TEST_MYSQL_USER || 'root',
-      password: process.env.TEST_MYSQL_PASS || 'root',
+      password: process.env.TEST_MYSQL_PASS || 'test',
     },
     mongodb: {
       host: process.env.TEST_MONGO_HOST || 'localhost',
       port: parseInt(process.env.TEST_MONGO_PORT || '27017'),
       database: process.env.TEST_MONGO_DB || 'testdb',
+      username: process.env.TEST_MONGO_USER || 'test',
+      password: process.env.TEST_MONGO_PASS || 'test',
     },
     redis: {
       host: process.env.TEST_REDIS_HOST || 'localhost',
@@ -92,4 +96,3 @@ export function getTestConfig(service: string): Record<string, any> {
   };
   return configs[service] || {};
 }
-
