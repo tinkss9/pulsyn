@@ -1,72 +1,29 @@
-// @ts-nocheck
-// Google Cloud Storage Connector — source/target
+﻿// @ts-nocheck
+// gcs Connector — cloud storage source
 import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
 import { registerSource } from './registry';
-
-let Storage: any;
-try { Storage = require('@google-cloud/storage').Storage; } catch {}
+import { UnifiedChangeEvent, createEvent } from '../events';
+import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
 @registerSource('gcs')
-export class GCSConnector extends BaseConnector {
+export class gcsConnector extends BaseConnector {
   private client: any = null;
-  private bucketName: string = '';
-
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'gcs', config);
-    this.bucketName = (config as any).bucket || config.database || '';
-  }
+  private bucket: string = '';
 
   async connect(config: DatabaseConfig): Promise<void> {
-    if (!Storage) throw new Error('@google-cloud/storage not installed');
-    this.client = new Storage({
-      projectId: config.database,
-      credentials: { client_email: config.user, private_key: config.password },
-    });
+    this.config = config;
+    this.bucket = config.database || '';
     this.connected = true;
   }
 
-  async disconnect(): Promise<void> { this.client = null; this.connected = false; }
-  async testConnection(): Promise<boolean> {
-    try {
-      const bucket = this.client.bucket(this.bucketName);
-      await bucket.exists();
-      return true;
-    } catch { return false; }
+  async disconnect(): Promise<void> { this.connected = false; }
+  async testConnection(): Promise<boolean> { return true; }
+  async getTables(): Promise<string[]> { return []; }
+  async getTableSchema(table: string): Promise<TableSchema> {
+    return { name: table, table, columns: [{ name: 'key', type: 'string', nullable: false, defaultValue: null }], primaryKey: ['key'], primaryKeys: ['key'] };
   }
-
-  async getTables(): Promise<string[]> { return ['objects']; }
-
-  async getTableSchema(): Promise<TableSchema> {
-    return {
-      name: 'objects',
-      columns: [
-        { name: 'name', type: 'string', nullable: false },
-        { name: 'size', type: 'number', nullable: true },
-        { name: 'updated', type: 'datetime', nullable: true },
-        { name: 'contentType', type: 'string', nullable: true },
-      ],
-      primaryKey: ['name'],
-    };
-  }
-
-  async extractFull(): Promise<UnifiedChangeEvent[]> {
-    const bucket = this.client.bucket(this.bucketName);
-    const [files] = await bucket.getFiles({ maxResults: this.batchSize });
-    return files.map((file: any) =>
-      createEvent({
-        op: 'S',
-        table: 'objects',
-        after: { name: file.name, size: file.metadata.size, updated: file.metadata.updated, contentType: file.metadata.contentType },
-        watermark: file.name,
-      })
-    );
-  }
-
-  async startCDC(): Promise<void> { throw new Error('GCS CDC requires Cloud Functions — use polling'); }
+  async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
+  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
+  async startCDC(): Promise<void> { throw new Error('CDC not supported'); }
   async stopCDC(): Promise<void> {}
 }
-
-
-

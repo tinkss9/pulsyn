@@ -1,12 +1,12 @@
 ﻿// @ts-nocheck
-// azure-blob Connector — cloud storage source
+// linode-object Connector — cloud storage source
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
 import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
-@registerSource('azure-blob')
-export class azureblobConnector extends BaseConnector {
+@registerSource('linode-object')
+export class linodeobjectConnector extends BaseConnector {
   private client: any = null;
   private bucket: string = '';
 
