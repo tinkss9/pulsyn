@@ -16,7 +16,7 @@ const config: ConnectorTestConfig = {
     forcePathStyle: true,
     region: 'us-east-1',
   } as any,
-  testTables: [],
+  testTables: ['data/users.csv', 'data/orders.json'],
   skipCDC: true,
   skipBenchmark: false,
   maxConnectionLatencyMs: 5000,

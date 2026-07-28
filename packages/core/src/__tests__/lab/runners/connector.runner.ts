@@ -27,7 +27,7 @@ const STUB_ENGINES = [
   'pulsar', 'rabbitmq', 'activemq', 'nats', 'mqtt',
   'gcs', 'azure-blob', 'backblaze-b2', 'wasabi', 'linode-object',
   'metabase', 'superset', 'grafana', 'redash', 'mode',
-  'databricks', 'kinesis', 's3',
+  'databricks', 'kinesis',
 ];
 
 // Engines that don't throw on invalid host/credentials
