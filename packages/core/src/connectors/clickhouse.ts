@@ -22,7 +22,7 @@ export class ClickHouseConnector extends BaseConnector {
     if (!createClient) throw new Error('@clickhouse/client not installed');
     this.client = createClient({
       host: `http://${config.host}:${config.port || 8123}`,
-      username: config.user, password: config.password, database: config.database,
+      username: config.username || config.user, password: config.password, database: config.database,
     });
     this.connected = true;
   }
@@ -31,6 +31,7 @@ export class ClickHouseConnector extends BaseConnector {
   async testConnection(): Promise<boolean> { try { await this.client.query({ query: 'SELECT 1' }); return true; } catch { return false; } }
 
   async getTables(): Promise<string[]> {
+    if (!this.client) throw new Error('Not connected');
     const result = await this.client.query({ query: `SELECT name FROM system.tables WHERE database = '${this.config.database}' AND engine != 'MaterializedView' ORDER BY name` });
     return (await result.json()).data.map((r: any) => r.name);
   }
