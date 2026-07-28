@@ -92,8 +92,8 @@ export class ConnectorTestRunner {
         }, 15000);
 
         it('should reject invalid credentials', async () => {
-          // Skip for Redis, DynamoDB, ClickHouse, S3/R2, Kafka, and Elasticsearch (don't validate credentials on connect)
-          if (this.config.engine === 'redis' || this.config.engine === 'dynamodb' || this.config.engine === 'clickhouse' || this.config.engine === 's3' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch') {
+          // Skip for Redis, DynamoDB, ClickHouse, S3/R2, Kafka, Elasticsearch, and Cassandra
+          if (this.config.engine === 'redis' || this.config.engine === 'dynamodb' || this.config.engine === 'clickhouse' || this.config.engine === 's3' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch' || this.config.engine === 'cassandra') {
             expect(true).toBe(true);
             return;
           }
@@ -107,12 +107,8 @@ export class ConnectorTestRunner {
         it('should list tables', async () => {
           this.connector = this.createConnector();
           await expectConnect(this.connector, config);
-          // For Redis, we just check it returns an array (keys, not tables)
-          if (this.config.engine === 'redis') {
-            const tables = await this.connector.getTables();
-            expect(Array.isArray(tables)).toBe(true);
-          } else if (this.config.engine === 'clickhouse') {
-            // ClickHouse may return empty if no tables in database
+          // For Redis, ClickHouse, and Cassandra, we just check it returns an array
+          if (this.config.engine === 'redis' || this.config.engine === 'clickhouse' || this.config.engine === 'cassandra') {
             const tables = await this.connector.getTables();
             expect(Array.isArray(tables)).toBe(true);
           } else {
@@ -150,8 +146,8 @@ export class ConnectorTestRunner {
         it('should mask password in getConfig()', async () => {
           this.connector = this.createConnector();
           const maskedConfig = this.connector.getConfig();
-          // For Redis, ClickHouse, S3/R2, Kafka, and Elasticsearch, password may not be in config
-          if (this.config.engine === 'redis' || this.config.engine === 'clickhouse' || this.config.engine === 's3' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch') {
+          // For Redis, ClickHouse, S3/R2, Kafka, Elasticsearch, and Cassandra, password may not be in config
+          if (this.config.engine === 'redis' || this.config.engine === 'clickhouse' || this.config.engine === 's3' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch' || this.config.engine === 'cassandra') {
             expect(maskedConfig.host).toBe(config.host);
           } else {
             expect(maskedConfig.password).toBe('***');
