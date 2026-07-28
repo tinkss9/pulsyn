@@ -169,7 +169,7 @@ export class MSSQLConnector extends BaseConnector {
       const result = await req.query(query);
       if (result.recordset.length === 0) break;
       for (const row of result.recordset) {
-        events.push(createEvent('S', table, row, null, row[pk]?.toString() || null, { source: 'mssql' }));
+        events.push(createEvent({ op: 'S', table, after: row, before: null, sourceMetadata: { source: 'mssql', pk: row[pk]?.toString() || null } }));
       }
       lastKey = result.recordset[result.recordset.length - 1][pk];
       if (result.recordset.length < this.batchSize) break;
@@ -191,7 +191,7 @@ export class MSSQLConnector extends BaseConnector {
     }
     const result = await req.query(query);
     for (const row of result.recordset) {
-      events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'mssql' }));
+      events.push(createEvent({ op: 'I', table, after: row, before: null, sourceMetadata: { source: 'mssql', pk: row[wmCol]?.toString() || null } }));
     }
     return events;
   }
