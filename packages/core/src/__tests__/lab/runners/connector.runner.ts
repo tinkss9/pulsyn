@@ -7,6 +7,7 @@ import type { DatabaseConfig, TableSchema, UnifiedChangeEvent } from '../../../t
 import { ConnectorRegistry } from '../../../connectors/registry';
 import {
   expectConnect, expectDisconnect, expectTestConnection,
+  expectConnectFails,
   expectGetTables, expectGetTableSchema, expectPrimaryKey,
   expectExtractFull, expectExtractIncremental,
   expectCDCStart, expectCDCStop, expectCDCEvent,
