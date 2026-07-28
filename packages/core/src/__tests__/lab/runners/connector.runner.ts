@@ -28,6 +28,7 @@ const STUB_ENGINES = [
   'gcs', 'azure-blob', 'backblaze-b2', 'wasabi', 'linode-object',
   'metabase', 'superset', 'grafana', 'redash', 'mode',
   'databricks', 'kinesis',
+  'hubspot', 'shopify', 'stripe',
 ];
 
 // Engines that don't throw on invalid host/credentials
