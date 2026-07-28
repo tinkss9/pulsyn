@@ -134,7 +134,7 @@ export class ElasticsearchConnector extends BaseConnector {
 
     while (hits.length > 0) {
       for (const hit of hits) {
-        events.push(createEvent('S', table, hit._source, null, hit._id || null, { source: 'elasticsearch', _seq_no: hit._seq_no }));
+        events.push(createEvent({ op: 'S', table, after: hit._source, watermark: hit._id || null, sourceMetadata: { source: 'elasticsearch', _seq_no: hit._seq_no } }));
       }
 
       if (!scrollId) break;
@@ -171,7 +171,7 @@ export class ElasticsearchConnector extends BaseConnector {
     const hits = (result as any).hits?.hits || [];
     for (const hit of hits) {
       const wm = hit._source?.[wmCol]?.toString() || hit._seq_no?.toString() || null;
-      events.push(createEvent('I', table, hit._source, null, wm, { source: 'elasticsearch' }));
+      events.push(createEvent({ op: 'I', table, after: hit._source, watermark: wm, sourceMetadata: { source: 'elasticsearch' } }));
     }
     return events;
   }
