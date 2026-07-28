@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Header from '@/components/Header';
 import type { Metadata } from 'next';
+import { ComparisonDisclaimer } from '@/components/ComparisonDisclaimer';
 
 export const metadata: Metadata = {
   title: 'Pulsyn vs Airbyte — Real-time CDC vs Open-source ETL',
