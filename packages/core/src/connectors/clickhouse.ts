@@ -15,7 +15,7 @@ export class ClickHouseConnector extends BaseConnector {
   private client: any = null;
 
   constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'clickhouse', config);
+    super(id, name, 'clickhouse', config as any);
   }
 
   async connect(config: DatabaseConfig): Promise<void> {

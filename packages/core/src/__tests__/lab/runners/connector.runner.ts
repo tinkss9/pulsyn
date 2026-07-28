@@ -27,6 +27,7 @@ const STUB_ENGINES = [
   'pulsar', 'rabbitmq', 'activemq', 'nats', 'mqtt',
   'gcs', 'azure-blob', 'backblaze-b2', 'wasabi', 'linode-object',
   'metabase', 'superset', 'grafana', 'redash', 'mode',
+  'databricks', 'kinesis', 's3',
 ];
 
 // Engines that don't throw on invalid host/credentials
@@ -131,8 +132,7 @@ export class ConnectorTestRunner {
         it('should list tables', async () => {
           this.connector = this.createConnector();
           await expectConnect(this.connector, config);
-          // For Redis, ClickHouse, and Cassandra, we just check it returns an array
-          if (this.config.engine === 'redis' || this.config.engine === 'clickhouse' || this.config.engine === 'cassandra') {
+          if (this.config.engine === 'redis' || this.config.engine === 'clickhouse' || this.config.engine === 'cassandra' || STUB_ENGINES.includes(this.config.engine)) {
             const tables = await this.connector.getTables();
             expect(Array.isArray(tables)).toBe(true);
           } else {

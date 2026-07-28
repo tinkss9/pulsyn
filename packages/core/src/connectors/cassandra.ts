@@ -15,7 +15,7 @@ export class CassandraConnector extends BaseConnector {
   private client: any = null;
 
   constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'cassandra', config);
+    super(id, name, 'cassandra', config as any);
   }
 
   async connect(config: DatabaseConfig): Promise<void> {
