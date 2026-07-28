@@ -1,19 +1,19 @@
 ﻿// @ts-nocheck
-// linear Connector — SaaS source
+// trello Connector — SaaS source
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
 import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
-@registerSource('linear')
-export class linearConnector extends BaseConnector {
+@registerSource('trello')
+export class trelloConnector extends BaseConnector {
   private apiKey: string = '';
   private baseUrl: string = '';
 
   async connect(config: DatabaseConfig): Promise<void> {
     this.config = config;
     this.apiKey = config.password || '';
-    this.baseUrl = config.host || 'https://api.linear.com';
+    this.baseUrl = config.host || 'https://api.trello.com';
     this.connected = true;
   }
 
