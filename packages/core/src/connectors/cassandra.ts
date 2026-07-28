@@ -23,7 +23,7 @@ export class CassandraConnector extends BaseConnector {
     this.client = new cassandra.Client({
       contactPoints: (config.host || '').split(','),
       localDataCenter: (config as any).datacenter || 'datacenter1',
-      credentials: { username: config.user, password: config.password },
+      credentials: config.user && config.password ? { username: config.user, password: config.password } : undefined,
     });
     if (config.database) await this.client.execute(`USE ${config.database}`);
     this.connected = true;

@@ -9,7 +9,7 @@ const config: ConnectorTestConfig = {
   config: {
     host: process.env.TEST_CASSANDRA_HOST || 'localhost',
     port: parseInt(process.env.TEST_CASSANDRA_PORT || '9042'),
-    database: process.env.TEST_CASSANDRA_DB || 'default',
+    database: process.env.TEST_CASSANDRA_DB || 'testdb',
     username: process.env.TEST_CASSANDRA_USER || '',
     password: process.env.TEST_CASSANDRA_PASS || '',
   },
