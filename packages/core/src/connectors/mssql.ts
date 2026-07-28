@@ -177,9 +177,10 @@ export class MSSQLConnector extends BaseConnector {
     return events;
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
-    const wmCol = this.config.watermarkColumn || 'updated_at';
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || 'created_at';
+    const watermark = opts?.watermarkValue || null;
     const events: UnifiedChangeEvent[] = [];
     const req = this.pool.request().input('batchSize', sql.Int, this.batchSize);
     let query: string;
