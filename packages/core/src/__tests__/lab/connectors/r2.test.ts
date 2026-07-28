@@ -23,7 +23,6 @@ const config: ConnectorTestConfig = {
     region: 'auto',
     ssl: true,
     prefix: 'pulsyn-test/',
-    fileFormat: 'json',
   } as any,
   testTables: ['data/users.csv', 'data/orders.json'],
   skipCDC: true,
