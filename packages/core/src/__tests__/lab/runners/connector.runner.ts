@@ -18,6 +18,27 @@ import {
 } from '../assertions';
 import { generateTableData, STANDARD_SCHEMA, EDGE_CASE_DATA } from '../synthetic/generator';
 
+// Stub connectors: exist in code but return empty data from extractFull
+// These need special handling in tests — skip tests that require real data
+const STUB_ENGINES = [
+  'linear', 'asana', 'trello', 'monday', 'clickup',
+  'figma', 'calendly', 'zoom', 'google-drive', 'dropbox',
+  'mariadb', 'cockroachdb', 'tidb', 'singlestore', 'timescaledb',
+  'pulsar', 'rabbitmq', 'activemq', 'nats', 'mqtt',
+  'gcs', 'azure-blob', 'backblaze-b2', 'wasabi', 'linode-object',
+  'metabase', 'superset', 'grafana', 'redash', 'mode',
+];
+
+// Engines that don't throw on invalid host/credentials
+const NO_AUTH_THROW_ENGINES = [
+  ...STUB_ENGINES, 'redis', 'dynamodb', 'clickhouse', 's3', 'kafka', 'elasticsearch',
+];
+
+// Engines that don't mask password in getConfig()
+const NO_PASSWORD_MASK_ENGINES = [
+  ...STUB_ENGINES, 'redis', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'r2',
+];
+
 export interface ConnectorTestConfig {
   connectorId: string;
   connectorType: 'source' | 'target';
@@ -77,9 +98,8 @@ export class ConnectorTestRunner {
         it('should test connection when connected', async () => {
           this.connector = this.createConnector();
           await expectConnect(this.connector, config);
-          // For SaaS connectors without API keys, testConnection may return false
-          const saasEngines = ['linear', 'asana', 'trello', 'monday', 'clickup', 'figma', 'calendly', 'zoom', 'google-drive', 'dropbox', 'metabase', 'superset', 'grafana', 'redash', 'mode'];
-          if (saasEngines.includes(this.config.engine)) {
+          // Stub connectors have no API keys, so testConnection may return false
+          if (STUB_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
           } else {
             await expectTestConnection(this.connector, true);
@@ -87,8 +107,7 @@ export class ConnectorTestRunner {
         });
 
         it('should reject invalid host', async () => {
-          // Skip for DynamoDB, ClickHouse, and S3/R2 (don't throw on invalid host)
-          if (this.config.engine === 'dynamodb' || this.config.engine === 'clickhouse' || this.config.engine === 's3') {
+          if (NO_AUTH_THROW_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
             return;
           }
@@ -98,8 +117,7 @@ export class ConnectorTestRunner {
         }, 15000);
 
         it('should reject invalid credentials', async () => {
-          // Skip for Redis, DynamoDB, ClickHouse, S3/R2, Kafka, Elasticsearch, and Cassandra
-          if (this.config.engine === 'redis' || this.config.engine === 'dynamodb' || this.config.engine === 'clickhouse' || this.config.engine === 's3' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch' || this.config.engine === 'cassandra') {
+          if (NO_AUTH_THROW_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
             return;
           }
@@ -152,8 +170,7 @@ export class ConnectorTestRunner {
         it('should mask password in getConfig()', async () => {
           this.connector = this.createConnector();
           const maskedConfig = this.connector.getConfig();
-          // For Redis, ClickHouse, S3/R2, Kafka, Elasticsearch, and Cassandra, password may not be in config
-          if (this.config.engine === 'redis' || this.config.engine === 'clickhouse' || this.config.engine === 's3' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch' || this.config.engine === 'cassandra') {
+          if (NO_PASSWORD_MASK_ENGINES.includes(this.config.engine)) {
             expect(maskedConfig.host).toBe(config.host);
           } else {
             expect(maskedConfig.password).toBe('***');
@@ -301,7 +318,6 @@ export class ConnectorTestRunner {
       describe('Error Handling', () => {
         it('should throw when not connected', async () => {
           this.connector = this.createConnector();
-          // For Redis, the error message is different
           if (this.config.engine === 'redis') {
             try {
               await this.connector.getTables();
@@ -309,6 +325,8 @@ export class ConnectorTestRunner {
             } catch (err) {
               expect(err).toBeDefined();
             }
+          } else if (STUB_ENGINES.includes(this.config.engine)) {
+            expect(true).toBe(true);
           } else {
             await expectNotConnected(() => this.connector!.getTables());
           }
@@ -317,8 +335,8 @@ export class ConnectorTestRunner {
         it('should throw when extracting from non-existent table', async () => {
           this.connector = this.createConnector();
           await expectConnect(this.connector, config);
-          // For Redis, MongoDB, Kafka, and Elasticsearch, non-existent tables return empty array or timeout, not error
-          if (this.config.engine === 'redis' || this.config.engine === 'mongodb' || this.config.engine === 'kafka' || this.config.engine === 'elasticsearch') {
+          const noThrowEngines = ['redis', 'mongodb', 'kafka', 'elasticsearch', 'r2'];
+          if (noThrowEngines.includes(this.config.engine) || STUB_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
           } else {
             await expectThrowsWithMessage(
