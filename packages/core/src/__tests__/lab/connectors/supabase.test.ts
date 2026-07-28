@@ -21,7 +21,7 @@ const config: ConnectorTestConfig = {
     password: SUPABASE_KEY,
     ssl: true,
   },
-  testTables: [],
+  testTables: ['lab_users', 'lab_products', 'lab_orders'],
   skipCDC: true,
   skipBenchmark: false,
   maxConnectionLatencyMs: 10000,
