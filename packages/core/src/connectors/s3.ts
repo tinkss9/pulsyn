@@ -219,11 +219,13 @@ export class S3Connector extends BaseConnector {
     if (!content.trim()) return [];
     const ext = key ? key.split('.').pop()?.toLowerCase() : '';
     const format = ext === 'json' ? 'json' : ext === 'jsonl' ? 'jsonl' : this.fileFormat;
-    if (format === 'json') return JSON.parse(content);
+    // Strip BOM if present
+    const cleanContent = content.replace(/^\uFEFF/, '');
+    if (format === 'json') return JSON.parse(cleanContent);
     if (format === 'jsonl') {
-      return content.trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
+      return cleanContent.trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
     }
-    return parse(content, { columns: true, delimiter: this.delimiter, skip_empty_lines: true, trim: true });
+    return parse(cleanContent, { columns: true, delimiter: this.delimiter, skip_empty_lines: true, trim: true });
   }
 
   private async findFirstFile(table: string): Promise<string | null> {
