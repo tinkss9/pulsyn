@@ -14,11 +14,12 @@ const config: ConnectorTestConfig = {
     password: process.env.TEST_KAFKA_PASS || '',
     ssl: false,
   },
-  testTables: [],
+  testTables: ['testdb'],
   skipCDC: true,
   skipBenchmark: true,
   maxConnectionLatencyMs: 15000,
   minExtractThroughput: 50,
+  testTimeout: 15000,
 };
 
 const runner = createConnectorTests(config);

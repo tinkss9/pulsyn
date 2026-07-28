@@ -135,7 +135,7 @@ export class KafkaConnector extends BaseConnector {
       await consumer.subscribe({ topics: [table], fromBeginning: true });
 
       let done = false;
-      const timeout = setTimeout(() => { done = true; }, 30000);
+      const timeout = setTimeout(() => { done = true; }, 3000);
 
       await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
@@ -186,7 +186,7 @@ export class KafkaConnector extends BaseConnector {
       }
 
       let done = false;
-      setTimeout(() => { done = true; }, 10000);
+      setTimeout(() => { done = true; }, 4000);
 
       await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
@@ -199,7 +199,7 @@ export class KafkaConnector extends BaseConnector {
         },
       });
 
-      await new Promise((r) => setTimeout(r, 10000));
+      await new Promise((r) => setTimeout(r, 4000));
       await consumer.disconnect();
     } catch (error) {
       try { await consumer.disconnect(); } catch { /* ignore */ }
