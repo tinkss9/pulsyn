@@ -13,7 +13,8 @@ export class ElasticsearchConnector extends BaseConnector {
   async connect(config: DatabaseConfig): Promise<void> {
     try {
       this.config = config;
-      const node = config.host.startsWith('http') ? config.host : `https://${config.host}:${config.port || 9200}`;
+      const protocol = config.ssl ? 'https' : 'http';
+      const node = config.host.startsWith('http') ? config.host : `${protocol}://${config.host}:${config.port || 9200}`;
       this.client = new ElasticClient({
         node,
         auth: config.username ? { username: config.username, password: config.password } : undefined,
