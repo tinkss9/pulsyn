@@ -35,11 +35,16 @@ export class RedisConnector extends BaseConnector {
   async disconnect(): Promise<void> {
     try {
       await this.stopCDC();
-      await this.subscriber.quit();
-      await this.client.quit();
+      if (this.subscriber) {
+        await this.subscriber.quit().catch(() => {});
+      }
+      if (this.client) {
+        await this.client.quit().catch(() => {});
+      }
       this.connected = false;
     } catch (error) {
-      throw new Error(`Redis disconnect failed: ${(error as Error).message}`);
+      // Ignore errors on disconnect
+      this.connected = false;
     }
   }
 
