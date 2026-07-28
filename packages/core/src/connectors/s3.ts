@@ -118,7 +118,7 @@ export class S3Connector extends BaseConnector {
       if (!key) return { name: table, table, columns: [], primaryKeys: [], primaryKey: [] };
 
       const content = await this.downloadFile(key);
-      const sample = this.parseContent(content);
+      const sample = this.parseContent(content, key);
       if (sample.length === 0) return { name: table, table, columns: [], primaryKeys: [], primaryKey: [] };
 
       const columns = Object.entries(sample[0]).map(([name, value]) => ({
