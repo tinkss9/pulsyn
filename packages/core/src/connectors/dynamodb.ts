@@ -150,7 +150,7 @@ export class DynamoDBConnector extends BaseConnector {
       }));
       for (const item of result.Items || []) {
         const row = unmarshall(item);
-        events.push(createEvent('S', table, row, null, null, { source: 'dynamodb' }));
+        events.push(createEvent({ op: 'S', table, after: row, before: null, sourceMetadata: { source: 'dynamodb' } }));
       }
       lastKey = result.LastEvaluatedKey;
     } while (lastKey);
@@ -176,7 +176,7 @@ export class DynamoDBConnector extends BaseConnector {
     const result = await this.client.send(new ScanCommand(params));
     for (const item of result.Items || []) {
       const row = unmarshall(item);
-      events.push(createEvent('I', table, row, null, row[wmCol]?.toString() || null, { source: 'dynamodb' }));
+      events.push(createEvent({ op: 'I', table, after: row, before: null, sourceMetadata: { source: 'dynamodb', pk: row[wmCol]?.toString() || null } }));
     }
     return events;
   }

@@ -9,9 +9,10 @@ const config: ConnectorTestConfig = {
   config: {
     host: process.env.TEST_CLICKHOUSE_HOST || 'localhost',
     port: parseInt(process.env.TEST_CLICKHOUSE_PORT || '8123'),
-    database: process.env.TEST_CLICKHOUSE_DB || 'default',
-    username: process.env.TEST_CLICKHOUSE_USER || 'default',
-    password: process.env.TEST_CLICKHOUSE_PASS || '',
+    database: process.env.TEST_CLICKHOUSE_DB || 'testdb',
+    username: process.env.TEST_CLICKHOUSE_USER || 'test',
+    password: process.env.TEST_CLICKHOUSE_PASS || 'test',
+    user: process.env.TEST_CLICKHOUSE_USER || 'test',
   },
   testTables: [],
   skipCDC: true,
