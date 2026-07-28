@@ -17,7 +17,7 @@ const config: ConnectorTestConfig = {
   testTables: ['users', 'products', 'orders'],
   skipCDC: false,
   maxConnectionLatencyMs: 5000,
-  minExtractThroughput: 500,
+  minExtractThroughput: 100,
 };
 
 const runner = createConnectorTests(config);

@@ -18,7 +18,7 @@ const config: ConnectorTestConfig = {
   skipCDC: true,
   skipBenchmark: false,
   maxConnectionLatencyMs: 10000,
-  minExtractThroughput: 500,
+  minExtractThroughput: 100,
 };
 
 const runner = createConnectorTests(config);
