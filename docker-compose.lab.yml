@@ -1,0 +1,141 @@
+# Connector Testing Lab — Docker Compose
+# All databases needed for connector testing
+
+version: '3.8'
+
+services:
+  # === TIER 1 DATABASES ===
+  
+  postgres:
+    image: postgres:16
+    ports: ['5432:5432']
+    environment: 
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testdb
+    command: ['postgres', '-c', 'wal_level=logical', '-c', 'max_replication_slots=10']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mysql:
+    image: mysql:8.0
+    ports: ['3306:3306']
+    environment: 
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: testdb
+    command: ['--binlog-format=ROW', '--log-bin=mysql-bin', '--server-id=1']
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7
+    ports: ['27017:27017']
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', 'db.adminCommand("ping")']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports: ['6379:6379']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports: ['1433:1433']
+    environment: 
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: 'Test@12345'
+    healthcheck:
+      test: ['CMD-SHELL', '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Test@12345" -Q "SELECT 1" -C']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # === TIER 2 DATABASES ===
+
+  cassandra:
+    image: cassandra:4
+    ports: ['9042:9042']
+    environment:
+      CASSANDRA_CLUSTER_NAME: test-cluster
+    healthcheck:
+      test: ['CMD-SHELL', 'cqlsh -e "DESCRIBE KEYSPACES"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    ports: ['9200:9200', '9300:9300']
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: 'false'
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:9200/_cluster/health || exit 1']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # === STREAMING ===
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports: ['9092:9092']
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    healthcheck:
+      test: ['CMD-SHELL', 'kafka-broker-api-versions --bootstrap-server localhost:9092']
+      interval: 15s
+      timeout: 15s
+      retries: 5
+
+  # === OBJECT STORAGE ===
+
+  minio:
+    image: minio/minio:latest
+    ports: ['4566:9000', '4567:9001']
+    environment:
+      MINIO_ROOT_USER: test
+      MINIO_ROOT_PASSWORD: testtest
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # === UTILITY SERVICES ===
+
+  wiremock:
+    image: wiremock/wiremock:latest
+    ports: ['8080:8080']
+    volumes: ['./fixtures/wiremock:/home/wiremock/mappings']
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:8080/__admin/ || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 5
