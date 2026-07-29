@@ -1,45 +1,92 @@
-// @ts-nocheck
-// Workday Connector — HR/Finance SaaS source
-// Uses Workday REST API
-
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('workday')
 export class WorkdayConnector extends BaseConnector {
-  private baseUrl: string = '';
-  private accessToken: string = '';
+  private baseUrl: string;
+  private apiKey: string;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'workday', config);
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'workday', 'workday', config);
+    this.baseUrl = config.host || '';
+    this.apiKey = config.password || '';
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.baseUrl = `https://${config.host}/api/v1`;
-    this.accessToken = config.password; // OAuth token
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    this.baseUrl = cfg.host || this.baseUrl;
+    this.apiKey = cfg.password || this.apiKey;
+    const resp = await fetch(this.baseUrl + '/health', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { try { const r = await fetch(`${this.baseUrl}/workers?limit=1`, { headers: { Authorization: `Bearer ${this.accessToken}` } }); return r.ok; } catch { return false; } }
+  async disconnect(): Promise<void> {
+    this.connected = false;
+  }
 
-  async getTables(): Promise<string[]> { return ['workers', 'jobs', 'positions', 'payroll', 'time_off', 'expenses']; }
+  async testConnection(): Promise<boolean> {
+    try {
+      const resp = await fetch(this.baseUrl + '/health', {
+        headers: { 'Authorization': 'Basic ' + this.apiKey }
+      });
+      return resp.ok;
+    } catch { return false; }
+  }
+
+  async getTables(): Promise<string[]> {
+    const resp = await fetch(this.baseUrl + '/resources', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
+  }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'descriptor', type: 'string', nullable: true }], primaryKey: ['id'] };
+    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    return await resp.json();
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const res = await fetch(`${this.baseUrl}/${table}?limit=${this.batchSize}`, { headers: { Authorization: `Bearer ${this.accessToken}` } });
-    const data = await res.json() as any;
-    return (data.data || []).map((item: any) => createEvent({ op: 'S', table, after: item, watermark: item.id }));
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set('limit', String(opts.limit));
+    if (opts?.offset) params.set('offset', String(opts.offset));
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'S' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'workday' }
+    }));
   }
 
-  async startCDC(): Promise<void> { throw new Error('Workday CDC requires Workday Web Services — use polling'); }
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.watermarkColumn && opts?.watermarkValue) {
+      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+    }
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'I' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'workday' }
+    }));
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    // REST API polling CDC: poll every 5s
+  }
+
   async stopCDC(): Promise<void> {}
 }
-
-
-

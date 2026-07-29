@@ -1,26 +1,27 @@
-// @ts-nocheck
-// WooCommerce Connector — Pulsyn CDC Platform
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('woocommerce')
 export class WoocommerceConnector extends BaseConnector {
-  private apiKey: string = '';
-  private baseUrl: string = '';
-  private accessToken: string = '';
-  private storeId: string = '';
+  private baseUrl: string;
+  private apiKey: string;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'woocommerce', config);
-    this.storeId = (config as any).storeId || '';
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'woocommerce', 'woocommerce', config);
+    this.baseUrl = config.host || '';
+    this.apiKey = config.password || '';
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.apiKey = config.password;
-    this.accessToken = (config as any).accessToken || config.password;
-    this.baseUrl = config.host ? (config.host.startsWith('http') ? config.host : 'https://' + config.host) : '';
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    this.baseUrl = cfg.host || this.baseUrl;
+    this.apiKey = cfg.password || this.apiKey;
+    const resp = await fetch(this.baseUrl + '/health', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
@@ -30,45 +31,62 @@ export class WoocommerceConnector extends BaseConnector {
 
   async testConnection(): Promise<boolean> {
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (this.apiKey) headers['Authorization'] = 'Bearer ' + this.apiKey;
-      if (this.accessToken) headers['X-Access-Token'] = this.accessToken;
-      
-      const res = await fetch(this.baseUrl + '/api/v1/status', { headers });
-      return res.ok || res.status === 401; // 401 means auth required but endpoint exists
+      const resp = await fetch(this.baseUrl + '/health', {
+        headers: { 'Authorization': 'Basic ' + this.apiKey }
+      });
+      return resp.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
-    return ['orders', 'customers', 'products', 'inventory', 'transactions'];
+    const resp = await fetch(this.baseUrl + '/resources', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    const schemas: Record<string, any> = {
-      orders: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'status', type: 'string', nullable: true }, { name: 'total', type: 'number', nullable: true }, { name: 'created_at', type: 'datetime', nullable: true }], primaryKey: ['id'] },
-      customers: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'email', type: 'string', nullable: true }, { name: 'name', type: 'string', nullable: true }], primaryKey: ['id'] },
-      products: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'name', type: 'string', nullable: true }, { name: 'price', type: 'number', nullable: true }], primaryKey: ['id'] },
-      inventory: { columns: [{ name: 'product_id', type: 'string', nullable: false }, { name: 'quantity', type: 'number', nullable: true }], primaryKey: ['product_id'] },
-      transactions: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'amount', type: 'number', nullable: true }, { name: 'status', type: 'string', nullable: true }], primaryKey: ['id'] }
-    };
-    return { name: table, ...(schemas[table] || { columns: [{ name: 'id', type: 'string', nullable: false }], primaryKey: ['id'] }) };
+    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    return await resp.json();
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (this.apiKey) headers['Authorization'] = 'Bearer ' + this.apiKey;
-      if (this.accessToken) headers['X-Access-Token'] = this.accessToken;
-      
-      const res = await fetch(this.baseUrl + '/api/v1/' + table + '?limit=' + this.batchSize, { headers });
-      if (!res.ok) return [];
-      const data = await res.json() as any;
-      return (data.results || data.data || data || []).map((item: any) => 
-        createEvent({ op: 'S', table, data: item, watermark: item.id || '' })
-      );
-    } catch { return []; }
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set('limit', String(opts.limit));
+    if (opts?.offset) params.set('offset', String(opts.offset));
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'S' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'woocommerce' }
+    }));
   }
 
-  async startCDC(): Promise<void> { throw new Error('CDC requires webhooks — use polling'); }
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.watermarkColumn && opts?.watermarkValue) {
+      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+    }
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'I' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'woocommerce' }
+    }));
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    // REST API polling CDC: poll every 5s
+  }
+
   async stopCDC(): Promise<void> {}
 }

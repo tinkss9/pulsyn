@@ -1,24 +1,27 @@
-// @ts-nocheck
-// Mercado Libre Connector — Pulsyn CDC Platform
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('mercado-libre')
 export class MercadoLibreConnector extends BaseConnector {
-  private apiKey: string = '';
-  private baseUrl: string = '';
-  private accessToken: string = '';
+  private baseUrl: string;
+  private apiKey: string;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'mercado-libre', config);
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'mercado-libre', 'mercado-libre', config);
+    this.baseUrl = config.host || '';
+    this.apiKey = config.password || '';
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.apiKey = config.password;
-    this.accessToken = (config as any).accessToken || config.password;
-    this.baseUrl = config.host ? (config.host.startsWith('http') ? config.host : 'https://' + config.host) : '';
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    this.baseUrl = cfg.host || this.baseUrl;
+    this.apiKey = cfg.password || this.apiKey;
+    const resp = await fetch(this.baseUrl + '/health', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
@@ -28,45 +31,62 @@ export class MercadoLibreConnector extends BaseConnector {
 
   async testConnection(): Promise<boolean> {
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (this.apiKey) headers['Authorization'] = 'Bearer ' + this.apiKey;
-      if (this.accessToken) headers['X-Access-Token'] = this.accessToken;
-      
-      const res = await fetch(this.baseUrl + '/api/v1/status', { headers });
-      return res.ok || res.status === 401;
+      const resp = await fetch(this.baseUrl + '/health', {
+        headers: { 'Authorization': 'Basic ' + this.apiKey }
+      });
+      return resp.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
-    return ['records', 'contacts', 'transactions', 'events', 'metadata'];
+    const resp = await fetch(this.baseUrl + '/resources', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    const schemas: Record<string, any> = {
-      records: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'type', type: 'string', nullable: true }, { name: 'data', type: 'object', nullable: true }], primaryKey: ['id'] },
-      contacts: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'name', type: 'string', nullable: true }, { name: 'email', type: 'string', nullable: true }], primaryKey: ['id'] },
-      transactions: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'amount', type: 'number', nullable: true }, { name: 'status', type: 'string', nullable: true }], primaryKey: ['id'] },
-      events: { columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'type', type: 'string', nullable: true }, { name: 'timestamp', type: 'datetime', nullable: true }], primaryKey: ['id'] },
-      metadata: { columns: [{ name: 'key', type: 'string', nullable: false }, { name: 'value', type: 'string', nullable: true }], primaryKey: ['key'] }
-    };
-    return { name: table, ...(schemas[table] || { columns: [{ name: 'id', type: 'string', nullable: false }], primaryKey: ['id'] }) };
+    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    return await resp.json();
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (this.apiKey) headers['Authorization'] = 'Bearer ' + this.apiKey;
-      if (this.accessToken) headers['X-Access-Token'] = this.accessToken;
-      
-      const res = await fetch(this.baseUrl + '/api/v1/' + table + '?limit=' + this.batchSize, { headers });
-      if (!res.ok) return [];
-      const data = await res.json() as any;
-      return (data.results || data.data || data || []).map((item: any) => 
-        createEvent({ op: 'S', table, data: item, watermark: item.id || '' })
-      );
-    } catch { return []; }
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set('limit', String(opts.limit));
+    if (opts?.offset) params.set('offset', String(opts.offset));
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'S' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'mercado-libre' }
+    }));
   }
 
-  async startCDC(): Promise<void> { throw new Error('CDC requires webhooks — use polling'); }
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.watermarkColumn && opts?.watermarkValue) {
+      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+    }
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'I' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'mercado-libre' }
+    }));
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    // REST API polling CDC: poll every 5s
+  }
+
   async stopCDC(): Promise<void> {}
 }

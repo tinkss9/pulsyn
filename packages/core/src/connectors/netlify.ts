@@ -1,27 +1,35 @@
-// @ts-nocheck
-// Netlify Connector — deployments source
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('netlify')
 export class NetlifyConnector extends BaseConnector {
-  private token: string = '';
-  constructor(id: string, name: string, config: DatabaseConfig) { super(id, name, 'netlify', config); }
-  async connect(config: DatabaseConfig): Promise<void> { this.token = config.password; this.connected = true; }
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { try { const r = await fetch('https://api.netlify.com/api/v1/accounts', { headers: { Authorization: `Bearer ${this.token}` } }); return r.ok; } catch { return false; } }
-  async getTables(): Promise<string[]> { return ['sites', 'deployments']; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { name: table, columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'name', type: 'string', nullable: true }, { name: 'created_at', type: 'datetime', nullable: true }], primaryKey: ['id'] }; }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const r = await fetch(`https://api.netlify.com/api/v1/${table}`, { headers: { Authorization: `Bearer ${this.token}` } });
-    const d = await r.json() as any;
-    return (d || []).map((i: any) => createEvent({ op: 'S', table, after: i, watermark: i.id }));
+  private baseUrl: string;
+
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'netlify', 'netlify', config);
+    this.baseUrl = config.host || '';
   }
-  async startCDC(): Promise<void> { throw new Error('Netlify CDC requires webhooks'); }
+
+  async connect(config?: DatabaseConfig): Promise<void> {
+    this.baseUrl = (config || this.config).host || this.baseUrl;
+    this.connected = true;
+  }
+
+  async disconnect(): Promise<void> { this.connected = false; }
+  async testConnection(): Promise<boolean> { return this.connected; }
+  async getTables(): Promise<string[]> { return []; }
+  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
+
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    return [];
+  }
+
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    return [];
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
   async stopCDC(): Promise<void> {}
 }
-
-
-

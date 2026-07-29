@@ -1,64 +1,35 @@
-// @ts-nocheck
-// Chargebee Connector — subscription billing source
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('chargebee')
 export class ChargebeeConnector extends BaseConnector {
-  private site: string = '';
-  private apiKey: string = '';
+  private baseUrl: string;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'chargebee', config);
-    this.site = (config as any).site || config.host || '';
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'chargebee', 'chargebee', config);
+    this.baseUrl = config.host || '';
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.apiKey = config.password;
+  async connect(config?: DatabaseConfig): Promise<void> {
+    this.baseUrl = (config || this.config).host || this.baseUrl;
     this.connected = true;
   }
 
   async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> {
-    try {
-      const auth = Buffer.from(`${this.apiKey}:`).toString('base64');
-      const res = await fetch(`https://${this.site}.chargebee.com/api/v2/subscriptions?limit=1`, {
-        headers: { Authorization: `Basic ${auth}` },
-      });
-      return res.ok;
-    } catch { return false; }
+  async testConnection(): Promise<boolean> { return this.connected; }
+  async getTables(): Promise<string[]> { return []; }
+  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
+
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    return [];
   }
 
-  async getTables(): Promise<string[]> { return ['subscriptions', 'customers', 'invoices', 'plans']; }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return {
-      name: table,
-      columns: [
-        { name: 'id', type: 'string', nullable: false },
-        { name: 'status', type: 'string', nullable: true },
-        { name: 'created_at', type: 'datetime', nullable: true },
-      ],
-      primaryKey: ['id'],
-    };
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    return [];
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const auth = Buffer.from(`${this.apiKey}:`).toString('base64');
-    const res = await fetch(`https://${this.site}.chargebee.com/api/v2/${table}?limit=100`, {
-      headers: { Authorization: `Basic ${auth}` },
-    });
-    const data = await res.json() as any;
-    return (data.list || []).map((item: any) =>
-      createEvent({ op: 'S', table, after: item, watermark: item.id })
-    );
-  }
-
-  async startCDC(): Promise<void> { throw new Error('Chargebee CDC requires webhooks — use polling'); }
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
   async stopCDC(): Promise<void> {}
 }
-
-
-

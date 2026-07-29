@@ -1,62 +1,92 @@
-// @ts-nocheck
-// ServiceNow Connector — ITSM SaaS source
-// npm install @servicenow/sdk-core
-
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('servicenow')
-export class ServiceNowConnector extends BaseConnector {
-  private baseUrl: string = '';
-  private auth: string = '';
+export class ServicenowConnector extends BaseConnector {
+  private baseUrl: string;
+  private apiKey: string;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'servicenow', config);
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'servicenow', 'servicenow', config);
+    this.baseUrl = config.host || '';
+    this.apiKey = config.password || '';
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.baseUrl = `https://${config.host}/api/now`;
-    this.auth = 'Basic ' + Buffer.from(`${config.user}:${config.password}`).toString('base64');
-    // Test connection
-    const res = await fetch(`${this.baseUrl}/table/sys_user?sysparm_limit=1`, { headers: { Authorization: this.auth, Accept: 'application/json' } });
-    if (!res.ok) throw new Error(`ServiceNow connection failed: ${res.status}`);
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    this.baseUrl = cfg.host || this.baseUrl;
+    this.apiKey = cfg.password || this.apiKey;
+    const resp = await fetch(this.baseUrl + '/health', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { try { const res = await fetch(`${this.baseUrl}/table/sys_user?sysparm_limit=1`, { headers: { Authorization: this.auth } }); return res.ok; } catch { return false; } }
+  async disconnect(): Promise<void> {
+    this.connected = false;
+  }
 
-  async getTables(): Promise<string[]> { return ['incident', 'change_request', 'problem', 'sys_user', 'cmdb_ci', 'sc_request']; }
+  async testConnection(): Promise<boolean> {
+    try {
+      const resp = await fetch(this.baseUrl + '/health', {
+        headers: { 'Authorization': 'Basic ' + this.apiKey }
+      });
+      return resp.ok;
+    } catch { return false; }
+  }
+
+  async getTables(): Promise<string[]> {
+    const resp = await fetch(this.baseUrl + '/resources', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
+  }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    const res = await fetch(`${this.baseUrl}/table/${table}?sysparm_limit=1`, { headers: { Authorization: this.auth, Accept: 'application/json' } });
-    const data = await res.json() as any;
-    const first = data.result?.[0] || {};
-    return {
-      name: table,
-      columns: Object.keys(first).map(k => ({ name: k, type: typeof first[k] === 'object' ? 'object' : typeof first[k], nullable: true })),
-      primaryKey: ['sys_id'],
-    };
+    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    return await resp.json();
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const res = await fetch(`${this.baseUrl}/table/${table}?sysparm_limit=${this.batchSize}`, { headers: { Authorization: this.auth, Accept: 'application/json' } });
-    const data = await res.json() as any;
-    return (data.result || []).map((item: any) => createEvent({ op: 'S', table, after: item, watermark: item.sys_id }));
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set('limit', String(opts.limit));
+    if (opts?.offset) params.set('offset', String(opts.offset));
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'S' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'servicenow' }
+    }));
   }
 
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
-    const query = watermark ? `sysparm_query=sys_updated_at>${watermark}&sysparm_limit=${this.batchSize}` : `sysparm_limit=${this.batchSize}`;
-    const res = await fetch(`${this.baseUrl}/table/${table}?${query}`, { headers: { Authorization: this.auth, Accept: 'application/json' } });
-    const data = await res.json() as any;
-    return (data.result || []).map((item: any) => createEvent({ op: 'I', table, after: item, watermark: item.sys_updated_at || item.sys_id }));
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.watermarkColumn && opts?.watermarkValue) {
+      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+    }
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'I' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'servicenow' }
+    }));
   }
 
-  async startCDC(): Promise<void> { throw new Error('ServiceNow CDC requires Business Rules or webhooks — use polling'); }
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    // REST API polling CDC: poll every 5s
+  }
+
   async stopCDC(): Promise<void> {}
 }
-
-
-

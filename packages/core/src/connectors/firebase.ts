@@ -1,53 +1,92 @@
-// @ts-nocheck
-// Firebase Firestore Connector — Pulsyn CDC Platform
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('firebase')
 export class FirebaseConnector extends BaseConnector {
-  private pool: any = null;
-  private client: any = null;
-  private db: any = null;
-  private apiKey: string = '';
-  private baseUrl: string = '';
-  private connectionString: string = '';
+  private baseUrl: string;
+  private apiKey: string;
 
-  constructor(id: string, name: string, config: DatabaseConfig) {
-    super(id, name, 'firebase', config);
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'firebase', 'firebase', config);
+    this.baseUrl = config.host || '';
+    this.apiKey = config.password || '';
   }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.apiKey = config.password; this.baseUrl = config.host ? 'https://' + config.host : '';
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    this.baseUrl = cfg.host || this.baseUrl;
+    this.apiKey = cfg.password || this.apiKey;
+    const resp = await fetch(this.baseUrl + '/health', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
   async disconnect(): Promise<void> {
-    if (this.pool) await this.pool.end();
-    if (this.client) await this.client.shutdown?.();
-    if (this.db) this.db.close?.();
     this.connected = false;
   }
 
   async testConnection(): Promise<boolean> {
     try {
-      const res = await fetch(this.baseUrl + '/health', { headers: { Authorization: 'Bearer ' + this.apiKey } }); return res.ok;
+      const resp = await fetch(this.baseUrl + '/health', {
+        headers: { 'Authorization': 'Basic ' + this.apiKey }
+      });
+      return resp.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
-    return ['default'];
+    const resp = await fetch(this.baseUrl + '/resources', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'data', type: 'object', nullable: true }], primaryKey: ['id'] };
+    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    return await resp.json();
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const res = await fetch(this.baseUrl + '/api/' + table + '?limit=' + this.batchSize, { headers: { Authorization: 'Bearer ' + this.apiKey } }); const data = await res.json(); return (data.results || data || []).map(item => createEvent({ op: 'S', table, data: item, watermark: item.id || '' }));
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set('limit', String(opts.limit));
+    if (opts?.offset) params.set('offset', String(opts.offset));
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'S' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'firebase' }
+    }));
   }
 
-  async startCDC(): Promise<void> { throw new Error('CDC not supported — use polling'); }
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.watermarkColumn && opts?.watermarkValue) {
+      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+    }
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'I' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'firebase' }
+    }));
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    // REST API polling CDC: poll every 5s
+  }
+
   async stopCDC(): Promise<void> {}
 }

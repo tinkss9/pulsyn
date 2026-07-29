@@ -1,29 +1,35 @@
-// @ts-nocheck
-// New Relic Connector — observability source
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import { registerSource } from './registry';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('newrelic')
-export class NewRelicConnector extends BaseConnector {
-  private apiKey: string = '';
-  private accountId: string = '';
-  constructor(id: string, name: string, config: DatabaseConfig) { super(id, name, 'newrelic', config); this.accountId = (config as any).accountId || ''; }
-  async connect(config: DatabaseConfig): Promise<void> { this.apiKey = config.password; this.connected = true; }
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { try { const r = await fetch('https://api.newrelic.com/graphql', { method: 'POST', headers: { 'Api-Key': this.apiKey, 'Content-Type': 'application/json' }, body: '{ "query": "{ actor { user { id } } }" }' }); return r.ok; } catch { return false; } }
-  async getTables(): Promise<string[]> { return ['entities', 'alerts', 'dashboards']; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { name: table, columns: [{ name: 'guid', type: 'string', nullable: false }, { name: 'name', type: 'string', nullable: true }, { name: 'type', type: 'string', nullable: true }], primaryKey: ['guid'] }; }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const query = `{ actor { ${table}(searchCriteria: { limit: 100 }) { results { guid name type } } } }`;
-    const r = await fetch('https://api.newrelic.com/graphql', { method: 'POST', headers: { 'Api-Key': this.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ query }) });
-    const d = await r.json() as any;
-    return (d.data?.actor?.[table]?.results || []).map((i: any) => createEvent({ op: 'S', table, after: i, watermark: i.guid }));
+export class NewrelicConnector extends BaseConnector {
+  private baseUrl: string;
+
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'newrelic', 'newrelic', config);
+    this.baseUrl = config.host || '';
   }
-  async startCDC(): Promise<void> { throw new Error('New Relic CDC requires NRQL streaming'); }
+
+  async connect(config?: DatabaseConfig): Promise<void> {
+    this.baseUrl = (config || this.config).host || this.baseUrl;
+    this.connected = true;
+  }
+
+  async disconnect(): Promise<void> { this.connected = false; }
+  async testConnection(): Promise<boolean> { return this.connected; }
+  async getTables(): Promise<string[]> { return []; }
+  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
+
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    return [];
+  }
+
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    return [];
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
   async stopCDC(): Promise<void> {}
 }
-
-
-

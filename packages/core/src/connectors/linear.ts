@@ -1,53 +1,35 @@
-﻿// @ts-nocheck
-// linear Connector — SaaS source
-import { BaseConnector } from './base';
-import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('linear')
-export class linearConnector extends BaseConnector {
-  private apiKey: string = '';
-  private baseUrl: string = '';
+export class LinearConnector extends BaseConnector {
+  private baseUrl: string;
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.apiKey = config.password || '';
-    this.baseUrl = config.host || 'https://api.linear.com';
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'linear', 'linear', config);
+    this.baseUrl = config.host || '';
+  }
+
+  async connect(config?: DatabaseConfig): Promise<void> {
+    this.baseUrl = (config || this.config).host || this.baseUrl;
     this.connected = true;
   }
 
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
+  async disconnect(): Promise<void> { this.connected = false; }
+  async testConnection(): Promise<boolean> { return this.connected; }
+  async getTables(): Promise<string[]> { return []; }
+  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
 
-  async testConnection(): Promise<boolean> {
-    return !!this.apiKey;
-  }
-
-  async getTables(): Promise<string[]> {
-    return ['tasks', 'projects', 'users', 'boards'];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return {
-      name: table,
-      table,
-      columns: [
-        { name: 'id', type: 'string', nullable: false, defaultValue: null },
-        { name: 'name', type: 'string', nullable: true, defaultValue: null },
-        { name: 'created_at', type: 'timestamp', nullable: true, defaultValue: null },
-      ],
-      primaryKey: ['id'],
-      primaryKeys: ['id'],
-    };
-  }
-
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
     return [];
   }
 
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> {
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     return [];
   }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
+  async stopCDC(): Promise<void> {}
 }

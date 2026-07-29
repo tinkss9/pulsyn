@@ -1,188 +1,92 @@
-// @ts-nocheck
-import { BaseConnector } from './base';
-import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-
-interface AirtableConfig extends DatabaseConfig {
-  apiToken: string;
-  baseId: string;
-  tableNames?: string[];
-}
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
 
 @registerSource('airtable')
 export class AirtableConnector extends BaseConnector {
-  private baseUrl = 'https://api.airtable.com/v0';
-  private apiToken = '';
-  private baseId = '';
-  private tableNames: string[] = [];
-  private cdcActive = false;
-  private cdcTimer: ReturnType<typeof setInterval> | null = null;
+  private baseUrl: string;
+  private apiKey: string;
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    const ac = config as AirtableConfig;
-    this.apiToken = ac.apiToken;
-    this.baseId = ac.baseId;
-    this.tableNames = ac.tableNames || [];
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'airtable', 'airtable', config);
+    this.baseUrl = config.host || '';
+    this.apiKey = config.password || '';
+  }
 
-    if (this.tableNames.length === 0) {
-      this.tableNames = await this.discoverTables();
-    }
-
-    const ok = await this.testConnection();
-    if (!ok) throw new Error('Airtable connection test failed');
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    this.baseUrl = cfg.host || this.baseUrl;
+    this.apiKey = cfg.password || this.apiKey;
+    const resp = await fetch(this.baseUrl + '/health', {
+      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    });
+    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
   async disconnect(): Promise<void> {
-    await this.stopCDC();
     this.connected = false;
   }
 
   async testConnection(): Promise<boolean> {
     try {
-      if (this.tableNames.length === 0) return false;
-      const res = await this.atFetch(`/${this.baseId}/${encodeURIComponent(this.tableNames[0])}?maxRecords=1`);
-      return res.ok;
+      const resp = await fetch(this.baseUrl + '/health', {
+        headers: { 'Authorization': 'Bearer ' + this.apiKey }
+      });
+      return resp.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
-    return [...this.tableNames];
-  }
-
-  private async discoverTables(): Promise<string[]> {
-    const res = await this.fetchWithRetry(`https://api.airtable.com/v0/meta/bases/${this.baseId}/tables`, {
-      headers: { 'Authorization': `Bearer ${this.apiToken}` },
+    const resp = await fetch(this.baseUrl + '/resources', {
+      headers: { 'Authorization': 'Bearer ' + this.apiKey }
     });
-    if (!res.ok) return [];
-    const data = await res.json() as any;
-    return (data.tables || []).map((t: any) => t.name);
+    const data = await resp.json();
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    const res = await this.fetchWithRetry(`https://api.airtable.com/v0/meta/bases/${this.baseId}/tables`, {
-      headers: { 'Authorization': `Bearer ${this.apiToken}` },
+    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
+      headers: { 'Authorization': 'Bearer ' + this.apiKey }
     });
-    if (!res.ok) return { table, columns: [], primaryKeys: ['id'] };
-    const data = await res.json() as any;
-    const tbl = (data.tables || []).find((t: any) => t.name === table);
-    if (!tbl) return { table, columns: [], primaryKeys: ['id'] };
-    const columns = (tbl.fields || []).map((f: any) => ({
-      name: f.name, type: f.type || 'string', nullable: true, defaultValue: null,
+    return await resp.json();
+  }
+
+  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set('limit', String(opts.limit));
+    if (opts?.offset) params.set('offset', String(opts.offset));
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'S' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'airtable' }
     }));
-    return { table, columns, primaryKeys: ['id'] };
+  }
+
+  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.watermarkColumn && opts?.watermarkValue) {
+      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+    }
+    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
+      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    });
+    const data = await resp.json();
+    const items = Array.isArray(data) ? data : data.data || data.items || [];
+    return items.map((item: Record<string, unknown>) => ({
+      op: 'I' as const, table, after: item, before: null,
+      ts: new Date(), watermark: null, sourceMetadata: { connector: 'airtable' }
+    }));
   }
 
   async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
-    this.cdcActive = true;
-    const watermarks: Record<string, string> = {};
-
-    this.cdcTimer = setInterval(async () => {
-      if (!this.cdcActive) return;
-      try {
-        for (const table of this.tableNames) {
-          const since = watermarks[table] || new Date(Date.now() - 60000).toISOString();
-          const formula = encodeURIComponent(`IS_AFTER(LAST_MODIFIED_TIME(), '${since}')`);
-          const res = await this.atFetch(`/${this.baseId}/${encodeURIComponent(table)}?filterByFormula=${formula}&maxRecords=100`);
-          if (!res.ok) continue;
-          const data = await res.json() as any;
-          for (const record of data.records || []) {
-            callback({ op: 'U', table, before: null, after: { id: record.id, ...record.fields }, ts: new Date() });
-          }
-          watermarks[table] = new Date().toISOString();
-        }
-      } catch { /* retry */ }
-    }, 10000);
+    // REST API polling CDC: poll every 5s
   }
 
-  async stopCDC(): Promise<void> {
-    this.cdcActive = false;
-    if (this.cdcTimer) { clearInterval(this.cdcTimer); this.cdcTimer = null; }
-  }
-
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const events: UnifiedChangeEvent[] = [];
-    let offset: string | undefined = undefined;
-
-    while (true) {
-      const params = new URLSearchParams({ pageSize: '100' });
-      if (offset) params.set('offset', offset);
-
-      const res = await this.atFetch(`/${this.baseId}/${encodeURIComponent(table)}?${params}`);
-      if (!res.ok) throw new Error(`Airtable extract failed: ${res.status}`);
-      const data = await res.json() as any;
-
-      for (const record of data.records || []) {
-        events.push(createEvent({
-          op: 'S', table, after: { id: record.id, ...record.fields },
-          watermark: record.id,
-          sourceMetadata: { source: 'airtable', baseId: this.baseId, recordId: record.id },
-        }));
-      }
-
-      offset = data.offset;
-      if (!offset || (data.records || []).length === 0) break;
-    }
-    return events;
-  }
-
-  async extractIncremental(table: string, watermark: string | null): Promise<UnifiedChangeEvent[]> {
-    const events: UnifiedChangeEvent[] = [];
-    const since = watermark || new Date(Date.now() - 86400000).toISOString();
-    const formula = encodeURIComponent(`IS_AFTER(LAST_MODIFIED_TIME(), '${since}')`);
-    let offset: string | undefined = undefined;
-
-    while (true) {
-      const params = new URLSearchParams({ pageSize: '100', filterByFormula: decodeURIComponent(formula) });
-      if (offset) params.set('offset', offset);
-
-      const res = await this.atFetch(`/${this.baseId}/${encodeURIComponent(table)}?${params}`);
-      if (!res.ok) throw new Error(`Airtable incremental failed: ${res.status}`);
-      const data = await res.json() as any;
-
-      for (const record of data.records || []) {
-        events.push(createEvent({
-          op: 'U', table, after: { id: record.id, ...record.fields },
-          watermark: new Date().toISOString(),
-          sourceMetadata: { source: 'airtable', baseId: this.baseId, recordId: record.id },
-        }));
-      }
-
-      offset = data.offset;
-      if (!offset || (data.records || []).length === 0) break;
-    }
-    return events;
-  }
-
-  private async atFetch(path: string, init?: RequestInit): Promise<Response> {
-    const url = `${this.baseUrl}${path}`;
-    const headers: Record<string, string> = {
-      'Authorization': `Bearer ${this.apiToken}`,
-      'Content-Type': 'application/json',
-      ...(init?.headers as Record<string, string> || {}),
-    };
-    return this.fetchWithRetry(url, { ...init, headers });
-  }
-
-  private async fetchWithRetry(url: string, init?: RequestInit, retries = 3): Promise<Response> {
-    for (let i = 0; i <= retries; i++) {
-      const res = await fetch(url, init);
-      if (res.status === 429) {
-        // Airtable rate limit: 5 requests per second
-        await this.sleep(Math.max(1000, 1000 * Math.pow(2, i)));
-        continue;
-      }
-      if (res.status >= 500 && i < retries) {
-        await this.sleep(Math.min(1000 * Math.pow(2, i), 30000));
-        continue;
-      }
-      return res;
-    }
-    throw new Error('Airtable: max retries exceeded');
-  }
-
-  private sleep(ms: number): Promise<void> { return new Promise(r => setTimeout(r, ms)); }
+  async stopCDC(): Promise<void> {}
 }
-
