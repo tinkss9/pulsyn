@@ -1,6 +1,6 @@
-import { registerSource } from '../registry';
-import { BaseConnector } from '../base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { registerSource } from './registry';
+import { BaseConnector } from './base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
 @registerSource('rethinkdb')
 export class RethinkdbConnector extends BaseConnector {

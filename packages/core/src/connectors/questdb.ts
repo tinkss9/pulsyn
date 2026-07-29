@@ -1,6 +1,6 @@
-import { registerSource } from '../registry';
-import { BaseConnector } from '../base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { registerSource } from './registry';
+import { BaseConnector } from './base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
 @registerSource('questdb')
 export class QuestdbConnector extends BaseConnector {

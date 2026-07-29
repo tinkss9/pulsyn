@@ -1,5 +1,5 @@
-﻿// @ts-nocheck
-// google-drive Connector — SaaS source
+// @ts-nocheck
+// google-drive Connector � SaaS source
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -23,4 +23,7 @@ export class googledriveConnector extends BaseConnector {
   }
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
   async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
+
+  async startCDC(callback: (event: any) => void): Promise<void> {}
+  async stopCDC(): Promise<void> {}
 }

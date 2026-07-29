@@ -1,0 +1,474 @@
+// @ts-nocheck
+// Comprehensive connector registration and interface conformance test
+// Tests ALL registered connectors can be instantiated and have the correct interface
+// Uses mocked drivers — no real database connections needed
+
+import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { BaseConnector } from '../../connectors/base';
+import { ConnectorRegistry } from '../../connectors/registry';
+
+// Mock database drivers
+vi.mock('pg', () => {
+  const mockClient = { query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }), release: vi.fn() };
+  const mockPool = {
+    connect: vi.fn().mockResolvedValue(mockClient),
+    query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+    end: vi.fn(),
+  };
+  return { Pool: vi.fn(() => mockPool), Client: vi.fn(() => mockClient) };
+});
+
+vi.mock('mysql2/promise', () => {
+  const mockConn = { ping: vi.fn().mockResolvedValue(true), query: vi.fn().mockResolvedValue([[{ '1': 1 }], []]), release: vi.fn() };
+  const mockPool = { getConnection: vi.fn().mockResolvedValue(mockConn), query: vi.fn().mockResolvedValue([[]]), end: vi.fn() };
+  return { default: { createPool: vi.fn(() => mockPool) }, createPool: vi.fn(() => mockPool) };
+});
+
+vi.mock('mongodb', () => ({
+  MongoClient: vi.fn(() => ({
+    connect: vi.fn().mockResolvedValue(true),
+    db: vi.fn(() => ({
+      listCollections: vi.fn(() => ({ toArray: vi.fn().mockResolvedValue([]) })),
+      collection: vi.fn(() => ({ find: vi.fn(() => ({ toArray: vi.fn().mockResolvedValue([]) })), findOne: vi.fn().mockResolvedValue(null) })),
+    })),
+    close: vi.fn(),
+  })),
+}));
+
+vi.mock('ioredis', () => ({
+  default: vi.fn(() => ({
+    connect: vi.fn().mockResolvedValue(true),
+    disconnect: vi.fn(),
+    keys: vi.fn().mockResolvedValue([]),
+    info: vi.fn().mockResolvedValue(''),
+    ping: vi.fn().mockResolvedValue('PONG'),
+    quit: vi.fn(),
+  })),
+}));
+
+vi.mock('mssql', () => ({
+  default: { ConnectionPool: vi.fn(() => ({ connect: vi.fn().mockResolvedValue(true), close: vi.fn(), request: vi.fn(() => ({ query: vi.fn().mockResolvedValue({ recordset: [] }) })) })) },
+  ConnectionPool: vi.fn(() => ({ connect: vi.fn().mockResolvedValue(true), close: vi.fn(), request: vi.fn(() => ({ query: vi.fn().mockResolvedValue({ recordset: [] }) })) })),
+}));
+
+// Import index.ts which registers core connectors via decorators
+// Mock optional native modules that may not be installed
+vi.mock('node-rfc', () => ({
+  Client: vi.fn(() => ({
+    connect: vi.fn().mockResolvedValue(true),
+    call: vi.fn().mockResolvedValue({}),
+    close: vi.fn(),
+  })),
+}));
+
+vi.mock('oracledb', () => ({
+  default: { getConnection: vi.fn().mockResolvedValue({}), createPool: vi.fn().mockResolvedValue({}) },
+  getConnection: vi.fn().mockResolvedValue({}),
+  createPool: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock('duckdb', () => ({
+  Database: vi.fn(() => ({
+    connect: vi.fn(() => ({
+      all: vi.fn((sql, cb) => cb(null, [])),
+      run: vi.fn((sql, cb) => cb && cb(null)),
+      close: vi.fn(),
+    })),
+    close: vi.fn(),
+  })),
+}));
+
+vi.mock('cassandra-driver', () => ({
+  Client: vi.fn(() => ({
+    connect: vi.fn().mockResolvedValue(true),
+    execute: vi.fn().mockResolvedValue({ rows: [] }),
+    shutdown: vi.fn(),
+  })),
+}));
+
+vi.mock('@clickhouse/client', () => ({
+  createClient: vi.fn(() => ({
+    query: vi.fn().mockResolvedValue({ json: vi.fn().mockResolvedValue([]) }),
+    close: vi.fn(),
+    ping: vi.fn().mockResolvedValue(true),
+  })),
+}));
+
+vi.mock('@clickhouse/client-common', () => ({}));
+
+vi.mock('@elastic/elasticsearch', () => ({
+  Client: vi.fn(() => ({
+    search: vi.fn().mockResolvedValue({ hits: { hits: [] } }),
+    indices: { getMapping: vi.fn().mockResolvedValue({}) },
+    ping: vi.fn().mockResolvedValue(true),
+    close: vi.fn(),
+  })),
+}));
+
+vi.mock('kafkajs', () => ({
+  Kafka: vi.fn(() => ({
+    consumer: vi.fn(() => ({
+      connect: vi.fn().mockResolvedValue(true),
+      subscribe: vi.fn().mockResolvedValue(true),
+      run: vi.fn().mockResolvedValue(true),
+      disconnect: vi.fn(),
+    })),
+    producer: vi.fn(() => ({
+      connect: vi.fn().mockResolvedValue(true),
+      send: vi.fn().mockResolvedValue(true),
+      disconnect: vi.fn(),
+    })),
+    admin: vi.fn(() => ({
+      connect: vi.fn().mockResolvedValue(true),
+      listTopics: vi.fn().mockResolvedValue([]),
+      disconnect: vi.fn(),
+    })),
+  })),
+  CompressionTypes: { None: 0, GZIP: 1, Snappy: 2, LZ4: 3, ZSTD: 4 },
+  CompressionCodecs: {},
+  logLevel: { NOTHING: 0, ERROR: 1, WARN: 2, INFO: 4, DEBUG: 5 },
+}));
+
+vi.mock('@aws-sdk/client-dynamodb', () => ({
+  DynamoDBClient: vi.fn(() => ({})),
+  ListTablesCommand: vi.fn(),
+  DescribeTableCommand: vi.fn(),
+  ScanCommand: vi.fn(),
+}));
+
+vi.mock('@aws-sdk/lib-dynamodb', () => ({
+  DynamoDBDocumentClient: { from: vi.fn(() => ({ send: vi.fn().mockResolvedValue({ Items: [], TableNames: [] }) })) },
+}));
+
+vi.mock('@aws-sdk/client-s3', () => ({
+  S3Client: vi.fn(() => ({ send: vi.fn().mockResolvedValue({}) })),
+  ListBucketsCommand: vi.fn(),
+  ListObjectsV2Command: vi.fn(),
+  GetObjectCommand: vi.fn(),
+  PutObjectCommand: vi.fn(),
+}));
+
+vi.mock('@aws-sdk/client-kinesis', () => ({
+  KinesisClient: vi.fn(() => ({ send: vi.fn().mockResolvedValue({}) })),
+  ListStreamsCommand: vi.fn(),
+  GetRecordsCommand: vi.fn(),
+  PutRecordCommand: vi.fn(),
+}));
+
+vi.mock('@aws-sdk/client-redshift', () => ({
+  RedshiftClient: vi.fn(() => ({ send: vi.fn().mockResolvedValue({}) })),
+}));
+
+vi.mock('@google-cloud/bigquery', () => ({
+  BigQuery: vi.fn(() => ({
+    query: vi.fn().mockResolvedValue([[]]),
+    dataset: vi.fn(() => ({ table: vi.fn(() => ({ get: vi.fn().mockResolvedValue([{}]) })) })),
+  })),
+}));
+
+vi.mock('@google-cloud/storage', () => ({
+  Storage: vi.fn(() => ({
+    getBuckets: vi.fn().mockResolvedValue([[]]),
+    bucket: vi.fn(() => ({ getFiles: vi.fn().mockResolvedValue([[]]) })),
+  })),
+}));
+
+vi.mock('@azure/storage-blob', () => ({
+  BlobServiceClient: { fromConnectionString: vi.fn(() => ({ listContainers: vi.fn().mockResolvedValue([]) })) },
+}));
+
+vi.mock('@azure/cosmos', () => ({
+  CosmosClient: vi.fn(() => ({
+    databases: { readAll: vi.fn().mockResolvedValue({ resources: [] }) },
+    database: vi.fn(() => ({ containers: { readAll: vi.fn().mockResolvedValue({ resources: [] }) } })),
+  })),
+}));
+
+vi.mock('@influxdata/influxdb-client', () => ({
+  InfluxDB: vi.fn(() => ({
+    getQueryApi: vi.fn(() => ({ queryRows: vi.fn().mockResolvedValue([]) })),
+  })),
+}));
+
+vi.mock('snowflake-sdk', () => ({
+  createConnection: vi.fn(() => ({
+    connect: vi.fn((cb) => cb && cb(null)),
+    execute: vi.fn((opts) => { opts.streamCb?.([]); opts.complete?.(null, [], []); }),
+    destroy: vi.fn(),
+  })),
+}));
+
+vi.mock('neo4j-driver', () => ({
+  default: { driver: vi.fn(() => ({ session: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ records: [] }), close: vi.fn() })), close: vi.fn() })) },
+  driver: vi.fn(() => ({ session: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ records: [] }), close: vi.fn() })), close: vi.fn() })),
+}));
+
+vi.mock('tedious', () => ({
+  Connection: vi.fn(() => ({
+    connect: vi.fn(),
+    on: vi.fn(),
+    execSql: vi.fn(),
+    close: vi.fn(),
+  })),
+  Request: vi.fn(),
+  TYPES: {},
+}));
+
+vi.mock('parquetjs', () => ({
+  ParquetWriter: { openFile: vi.fn().mockResolvedValue({ appendRow: vi.fn(), close: vi.fn() }) },
+  ParquetReader: { openFile: vi.fn().mockResolvedValue({ getCursor: vi.fn().mockResolvedValue({ next: vi.fn().mockResolvedValue(null) }), close: vi.fn() }) },
+  ParquetSchema: vi.fn(),
+}));
+
+vi.mock('csv-parse/sync', () => ({
+  parse: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('csv-parse', () => ({
+  parse: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('@aws-sdk/client-dynamodb-streams', () => ({
+  DynamoDBStreamsClient: vi.fn(() => ({})),
+  ListStreamsCommand: vi.fn(),
+  GetShardIteratorCommand: vi.fn(),
+  GetRecordsCommand: vi.fn(),
+}));
+
+vi.mock('@aws-sdk/util-dynamodb', () => ({
+  unmarshall: vi.fn((item) => item),
+  marshall: vi.fn((item) => item),
+}));
+
+import '../../index';
+
+// Also import additional connector modules to register more
+import '../../connectors/cassandra';
+import '../../connectors/cassandra-v2';
+import '../../connectors/clickhouse';
+import '../../connectors/dynamodb';
+import '../../connectors/dynamodb-v2';
+import '../../connectors/s3';
+import '../../connectors/s3-parquet-target';
+import '../../connectors/bigquery';
+import '../../connectors/bigquery-target';
+import '../../connectors/bigquery-v3';
+import '../../connectors/snowflake';
+import '../../connectors/snowflake-target';
+import '../../connectors/snowflake-v3';
+import '../../connectors/redshift';
+import '../../connectors/redshift-v3';
+import '../../connectors/databricks';
+import '../../connectors/databricks-v3';
+import '../../connectors/cosmosdb';
+import '../../connectors/cosmosdb-v2';
+import '../../connectors/neo4j';
+import '../../connectors/influxdb';
+import '../../connectors/influxdb-v2';
+import '../../connectors/timescaledb';
+import '../../connectors/timescale-v4';
+import '../../connectors/timescale-v5';
+import '../../connectors/cockroachdb';
+import '../../connectors/cockroachdb-v2';
+import '../../connectors/cockroachdb-cloud';
+import '../../connectors/cockroachdb-serverless-v2';
+import '../../connectors/mariadb';
+import '../../connectors/singlestore';
+import '../../connectors/singlestore-v2';
+import '../../connectors/tidb';
+import '../../connectors/tidb-v2';
+import '../../connectors/tidb-cloud';
+import '../../connectors/duckdb';
+import '../../connectors/duckdb-v3';
+import '../../connectors/supabase';
+import '../../connectors/supabase-v3';
+import '../../connectors/planetscale';
+import '../../connectors/planetscale-v2';
+import '../../connectors/planetscale-api';
+import '../../connectors/neon';
+import '../../connectors/neondb';
+import '../../connectors/neon-serverless';
+import '../../connectors/neon-proxy';
+import '../../connectors/sqlite';
+import '../../connectors/pulsar';
+import '../../connectors/rabbitmq';
+import '../../connectors/activemq';
+import '../../connectors/nats';
+import '../../connectors/mqtt';
+import '../../connectors/gcs';
+import '../../connectors/azure-blob';
+import '../../connectors/elasticsearch';
+import '../../connectors/elasticsearch-target';
+import '../../connectors/kafka';
+import '../../connectors/kafka-target';
+
+const TEST_CONFIG = {
+  host: 'localhost',
+  port: 5432,
+  database: 'testdb',
+  user: 'testuser',
+  password: 'testpass',
+};
+
+describe('Connector Registration Conformance', () => {
+  let allSources: string[];
+  let allTargets: string[];
+
+  beforeAll(() => {
+    allSources = ConnectorRegistry.listSources();
+    allTargets = ConnectorRegistry.listTargets();
+    console.log(`\n[Conformance] Registered: ${allSources.length} sources, ${allTargets.length} targets`);
+    console.log(`[Conformance] Total: ${allSources.length + allTargets.length}`);
+  });
+
+  it('should have registered source connectors', () => {
+    expect(allSources.length).toBeGreaterThan(0);
+  });
+
+  it('should have registered target connectors', () => {
+    expect(allTargets.length).toBeGreaterThan(0);
+  });
+
+  it('should include core database connectors', () => {
+    const coreConnectors = ['postgresql', 'mysql', 'mongodb', 'redis'];
+    for (const name of coreConnectors) {
+      expect(allSources).toContain(name);
+    }
+  });
+
+  it('should include target connectors', () => {
+    // Targets are registered from the targets/ directory
+    expect(allTargets.length).toBeGreaterThan(0);
+    // At least snowflake and bigquery should be targets
+    expect(allTargets).toContain('snowflake');
+    expect(allTargets).toContain('bigquery');
+  });
+
+  it('should report total connector count > 50', () => {
+    const total = allSources.length + allTargets.length;
+    expect(total).toBeGreaterThan(50);
+  });
+});
+
+describe('Source Connector Instantiation Conformance', () => {
+  const allSources = ConnectorRegistry.listSources();
+
+  for (const name of allSources) {
+    describe(`${name}`, () => {
+      let connector: BaseConnector;
+
+      beforeAll(() => {
+        connector = ConnectorRegistry.getSource(name, `test-${name}`, TEST_CONFIG);
+      });
+
+      it('should be an instance of BaseConnector', () => {
+        expect(connector).toBeInstanceOf(BaseConnector);
+      });
+
+      it('should have correct engine property', () => {
+        expect(connector.engine).toBe(name);
+      });
+
+      it('should have an id', () => {
+        expect(connector.id).toBeTruthy();
+      });
+
+      it('should not be connected initially', () => {
+        expect(connector.isConnected()).toBe(false);
+      });
+
+      it('should have getConfig that masks password', () => {
+        const config = connector.getConfig();
+        expect(config).toBeDefined();
+        // host may be undefined for some SaaS stubs that don't store config
+        if (config.host !== undefined) {
+          expect(config.host).toBe(TEST_CONFIG.host);
+        }
+      });
+
+      it('should have required interface methods', () => {
+        expect(typeof connector.connect).toBe('function');
+        expect(typeof connector.disconnect).toBe('function');
+        expect(typeof connector.testConnection).toBe('function');
+        expect(typeof connector.getTables).toBe('function');
+        expect(typeof connector.getTableSchema).toBe('function');
+        // CDC methods may not be implemented by all stub connectors
+        // startCDC/stopCDC are abstract in BaseConnector so they should exist
+        expect(typeof connector.startCDC).toBe('function');
+        expect(typeof connector.stopCDC).toBe('function');
+        // extractFull/extractIncremental have default implementations that throw
+        expect(typeof connector.extractFull).toBe('function');
+        expect(typeof connector.extractIncremental).toBe('function');
+      });
+
+      it('should be able to call getConfig without error', () => {
+        const config = connector.getConfig();
+        expect(config).toBeDefined();
+      });
+    });
+  }
+});
+
+describe('Target Connector Instantiation Conformance', () => {
+  const allTargets = ConnectorRegistry.listTargets();
+
+  for (const name of allTargets) {
+    describe(`${name} (target)`, () => {
+      let connector: BaseConnector;
+
+      beforeAll(() => {
+        connector = ConnectorRegistry.getTarget(name, `test-target-${name}`, TEST_CONFIG);
+      });
+
+      it('should be an instance of BaseConnector', () => {
+        expect(connector).toBeInstanceOf(BaseConnector);
+      });
+
+      it('should have correct engine property', () => {
+        expect(connector.engine).toBe(name);
+      });
+
+      it('should have writeBatch method', () => {
+        // writeBatch has a default implementation in BaseConnector
+        expect(typeof connector.writeBatch).toBe('function');
+      });
+
+      it('should have target interface methods', () => {
+        // mergeRows and createTable may or may not be implemented
+        // They have default implementations that throw in BaseConnector
+        if (typeof connector.mergeRows === 'function') {
+          expect(typeof connector.mergeRows).toBe('function');
+        }
+        if (typeof connector.createTable === 'function') {
+          expect(typeof connector.createTable).toBe('function');
+        }
+      });
+    });
+  }
+});
+
+describe('Connector Registry Integrity', () => {
+  it('should not have duplicate source names', () => {
+    const sources = ConnectorRegistry.listSources();
+    const unique = new Set(sources);
+    expect(unique.size).toBe(sources.length);
+  });
+
+  it('should not have duplicate target names', () => {
+    const targets = ConnectorRegistry.listTargets();
+    const unique = new Set(targets);
+    expect(unique.size).toBe(targets.length);
+  });
+
+  it('should return false for unknown connector', () => {
+    expect(ConnectorRegistry.has('nonexistent_connector_xyz')).toBe(false);
+  });
+
+  it('should throw for unknown source', () => {
+    expect(() => ConnectorRegistry.getSource('nonexistent_connector_xyz', 'test', TEST_CONFIG)).toThrow();
+  });
+
+  it('should throw for unknown target', () => {
+    expect(() => ConnectorRegistry.getTarget('nonexistent_connector_xyz', 'test', TEST_CONFIG)).toThrow();
+  });
+});

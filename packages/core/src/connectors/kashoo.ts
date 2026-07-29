@@ -1,7 +1,7 @@
-import { registerSource } from '../registry';
-import { BaseConnector } from '../base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
-import { UnifiedChangeEvent } from '../../events';
+import { registerSource } from './registry';
+import { BaseConnector } from './base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import { UnifiedChangeEvent } from '../events';
 
 @registerSource('kashoo')
 export class KashooConnector extends BaseConnector {

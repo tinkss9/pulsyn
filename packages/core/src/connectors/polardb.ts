@@ -1,6 +1,6 @@
-import { registerSource } from '../registry';
-import { BaseConnector } from '../base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { registerSource } from './registry';
+import { BaseConnector } from './base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
 @registerSource('polardb')
 export class PolardbConnector extends BaseConnector {

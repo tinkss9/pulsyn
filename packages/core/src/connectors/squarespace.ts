@@ -1,7 +1,7 @@
-import { registerSource } from '../registry';
-import { BaseConnector } from '../base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
-import { UnifiedChangeEvent } from '../../events';
+import { registerSource } from './registry';
+import { BaseConnector } from './base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import { UnifiedChangeEvent } from '../events';
 
 @registerSource('squarespace')
 export class SquarespaceConnector extends BaseConnector {

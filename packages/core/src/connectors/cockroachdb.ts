@@ -1,5 +1,5 @@
-﻿// @ts-nocheck
-// cockroachdb Connector — database source
+// @ts-nocheck
+// cockroachdb Connector � database source
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -37,4 +37,7 @@ export class cockroachdbConnector extends BaseConnector {
   async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> {
     return [];
   }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
+  async stopCDC(): Promise<void> {}
 }
