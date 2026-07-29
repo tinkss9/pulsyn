@@ -24,7 +24,16 @@
     "format": "prettier --write .",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "cert:run": "npx tsx scripts/auto-certify/controller.ts",
+    "cert:run-local": "NODE_ENV=test npx tsx scripts/auto-certify/controller.ts",
+    "cert:monitor": "npx tsx scripts/auto-certify/monitor.ts",
+    "cert:report": "npx tsx scripts/auto-certify/report.ts",
+    "cert:setup": "npx tsx scripts/auto-certify/setup.ts",
+    "blitz": "npx tsx scripts/overnight-blitz/orchestrator.ts",
+    "blitz:start": "bash scripts/overnight-blitz/start.sh",
+    "blitz:log": "tail -f overnight-blitz.log",
+    "blitz:status": "cat docs/lab/results/OVERNIGHT_BLITZ_FINAL.json | jq '.'"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.1096.0",

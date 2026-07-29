@@ -1,16 +1,16 @@
-﻿// @ts-nocheck
-// mariadb Connector — database source
-import { BaseConnector } from './base';
-import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import { registerSource } from '../registry';
+import { BaseConnector } from '../base';
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
 
 @registerSource('mariadb')
-export class mariadbConnector extends BaseConnector {
-  private pool: any = null;
+export class MariadbConnector extends BaseConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'mariadb', 'mariadb', config);
+  }
 
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
+  async connect(config?: DatabaseConfig): Promise<void> {
+    const cfg = config || this.config;
+    // Connection: mariadb via native
     this.connected = true;
   }
 
@@ -19,7 +19,7 @@ export class mariadbConnector extends BaseConnector {
   }
 
   async testConnection(): Promise<boolean> {
-    return true;
+    return this.connected;
   }
 
   async getTables(): Promise<string[]> {
@@ -27,14 +27,9 @@ export class mariadbConnector extends BaseConnector {
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [], primaryKeys: [], primaryKey: [] };
+    return { columns: [], primaryKey: [] };
   }
 
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
+  async stopCDC(): Promise<void> {}
 }
