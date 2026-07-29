@@ -748,7 +748,7 @@ export class ${pascal(m.name)}Connector extends BaseConnector {
       headers: { 'Authorization': '${m.authType === 'bearer' ? 'Bearer' : 'Basic'} ' + this.apiKey }
     });
     const data = await resp.json();
-    return Array.isArray(data) ? data.map((r: any) => r.name || r.id) : [];
+    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
@@ -767,7 +767,7 @@ export class ${pascal(m.name)}Connector extends BaseConnector {
     });
     const data = await resp.json();
     const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: any) => ({
+    return items.map((item: Record<string, unknown>) => ({
       op: 'S' as const, table, after: item, before: null,
       ts: new Date(), watermark: null, sourceMetadata: { connector: '${m.name}' }
     }));
@@ -783,7 +783,7 @@ export class ${pascal(m.name)}Connector extends BaseConnector {
     });
     const data = await resp.json();
     const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: any) => ({
+    return items.map((item: Record<string, unknown>) => ({
       op: 'I' as const, table, after: item, before: null,
       ts: new Date(), watermark: null, sourceMetadata: { connector: '${m.name}' }
     }));
@@ -1218,8 +1218,8 @@ export type { ConnectorMeta } from './base';
       execSync(`git commit -m "${msg}"`, { cwd: this.cwd, stdio: 'pipe' });
       this.state.commits.push(msg);
       this.log(`[GIT] Committed: ${msg}`);
-    } catch (err: any) {
-      this.log(`[GIT] Commit failed: ${err.message || err}`);
+    } catch (err: unknown) {
+      this.log(`[GIT] Commit failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
