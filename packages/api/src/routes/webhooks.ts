@@ -1,7 +1,7 @@
 // Pulsyn Stripe Webhook Handler
 // Processes Stripe events for subscription lifecycle
 
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import { getWebhookSecret, constructWebhookEvent } from '../billing/stripe';
 import {
   updateSubscriptionStatus,
@@ -209,5 +209,4 @@ function mapStripeStatus(stripeStatus: string): 'active' | 'past_due' | 'cancele
   return statusMap[stripeStatus] || 'active';
 }
 
-// Need to import express for raw body parsing
-import express from 'express';
+
