@@ -1,25 +1,70 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+
+interface ApiKey {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+  last_used_at: string | null;
+}
 
 export default function ApiKeysPage() {
-  const [apiKeys, setApiKeys] = useState<Array<{ id: string; name: string; key: string; created: string; lastUsed: string }>>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [newKey, setNewKey] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [orgId, setOrgId] = useState<string | null>(null);
 
-  const handleCreate = () => {
-    if (!newKeyName.trim()) return;
-    const newKey = {
-      id: `key-${Date.now()}`,
-      name: newKeyName,
-      key: `pk_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-      created: new Date().toISOString(),
-      lastUsed: 'Never',
-    };
-    setApiKeys([...apiKeys, newKey]);
-    setNewKeyName('');
-    setShowNew(false);
+  const loadKeys = useCallback(async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('pulsyn_user') || '{}');
+      const id = userData.organizationId;
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+      setOrgId(id);
+
+      const res = await fetch(`/api/auth/keys/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setApiKeys(data.data || []);
+      }
+    } catch {
+      // Silently fail — show empty state
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadKeys();
+  }, [loadKeys]);
+
+  const handleCreate = async () => {
+    if (!newKeyName.trim() || !orgId) return;
+
+    try {
+      const res = await fetch('/api/auth/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ organizationId: orgId, name: newKeyName }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setNewKey(data.data.apiKey);
+        setNewKeyName('');
+        setShowNew(false);
+        loadKeys();
+      }
+    } catch {
+      // Handle error
+    }
   };
 
   const handleCopy = (id: string, key: string) => {
@@ -28,9 +73,17 @@ export default function ApiKeysPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = (id: string) => {
-    if (!confirm('Delete this API key? Any integrations using it will stop working.')) return;
-    setApiKeys(apiKeys.filter(k => k.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Revoke this API key? Any integrations using it will stop working.')) return;
+
+    try {
+      const res = await fetch(`/api/auth/keys/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        loadKeys();
+      }
+    } catch {
+      // Handle error
+    }
   };
 
   return (
@@ -47,6 +100,30 @@ export default function ApiKeysPage() {
           Create API Key
         </button>
       </div>
+
+      {/* New key display */}
+      {newKey && (
+        <div className="bg-amber-950/30 border border-amber-800 rounded-xl p-4 mb-6">
+          <p className="text-amber-400 text-sm font-medium mb-2">New API key created — save it now</p>
+          <div className="bg-gray-800 rounded-lg p-3 mb-3">
+            <code className="text-green-400 text-sm break-all font-mono">{newKey}</code>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigator.clipboard.writeText(newKey)}
+              className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-sm"
+            >
+              Copy
+            </button>
+            <button
+              onClick={() => setNewKey(null)}
+              className="text-gray-400 hover:text-white px-3 py-1.5 text-sm"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Info */}
       <div className="bg-pulsyn-950/30 border border-pulsyn-800 rounded-xl p-4 mb-6">
@@ -67,6 +144,7 @@ export default function ApiKeysPage() {
               onChange={e => setNewKeyName(e.target.value)}
               className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-pulsyn-500"
               autoFocus
+              onKeyDown={e => e.key === 'Enter' && handleCreate()}
             />
             <button
               onClick={handleCreate}
@@ -75,7 +153,7 @@ export default function ApiKeysPage() {
               Create
             </button>
             <button
-              onClick={() => setShowNew(false)}
+              onClick={() => { setShowNew(false); setNewKeyName(''); }}
               className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               Cancel
@@ -85,7 +163,9 @@ export default function ApiKeysPage() {
       )}
 
       {/* Keys list */}
-      {apiKeys.length === 0 ? (
+      {loading ? (
+        <div className="text-center text-gray-400 py-12">Loading...</div>
+      ) : apiKeys.length === 0 ? (
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
           <div className="text-4xl mb-4">🔑</div>
           <h2 className="text-lg font-semibold mb-2">No API keys</h2>
@@ -103,42 +183,36 @@ export default function ApiKeysPage() {
             <thead>
               <tr className="border-b border-gray-800">
                 <th className="text-left text-sm font-medium text-gray-400 px-6 py-3">Name</th>
-                <th className="text-left text-sm font-medium text-gray-400 px-6 py-3">Key</th>
+                <th className="text-left text-sm font-medium text-gray-400 px-6 py-3">Status</th>
                 <th className="text-left text-sm font-medium text-gray-400 px-6 py-3">Created</th>
                 <th className="text-left text-sm font-medium text-gray-400 px-6 py-3">Last Used</th>
                 <th className="text-right text-sm font-medium text-gray-400 px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {apiKeys.map((apiKey) => (
-                <tr key={apiKey.id} className="border-b border-gray-800 last:border-0">
-                  <td className="px-6 py-4 font-medium">{apiKey.name}</td>
+              {apiKeys.map((key) => (
+                <tr key={key.id} className="border-b border-gray-800 last:border-0">
+                  <td className="px-6 py-4 font-medium">{key.name}</td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <code className="text-sm bg-gray-800 px-2 py-1 rounded">
-                        {apiKey.key.slice(0, 12)}...{apiKey.key.slice(-4)}
-                      </code>
-                      <button
-                        onClick={() => handleCopy(apiKey.id, apiKey.key)}
-                        className="text-sm text-pulsyn-400 hover:text-pulsyn-300"
-                      >
-                        {copiedId === apiKey.id ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${key.is_active ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                      {key.is_active ? 'Active' : 'Revoked'}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-400">
-                    {new Date(apiKey.created).toLocaleDateString()}
+                    {new Date(key.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-400">
-                    {apiKey.lastUsed}
+                    {key.last_used_at ? new Date(key.last_used_at).toLocaleDateString() : 'Never'}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleDelete(apiKey.id)}
-                      className="text-sm text-red-400 hover:text-red-300"
-                    >
-                      Delete
-                    </button>
+                    {key.is_active && (
+                      <button
+                        onClick={() => handleDelete(key.id)}
+                        className="text-sm text-red-400 hover:text-red-300"
+                      >
+                        Revoke
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

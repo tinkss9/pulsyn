@@ -8,12 +8,14 @@ import morgan from 'morgan';
 import { pipelineRoutes } from './routes/pipelines';
 import { connectorRoutes } from './routes/connectors';
 import { healthRoutes } from './routes/health';
+import { authRoutes } from './routes/auth';
 import { billingRoutes } from './routes/billing';
 import { webhookRoutes } from './routes/webhooks';
 import { benchmarkRoutes } from './routes/benchmarks';
 import { cdcRoutes } from './routes/cdc';
 import { openApiSpec } from './openapi';
 import { initDatabase } from './db';
+import { authenticateApiKey, rateLimitByPlan } from './middleware/auth';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -26,14 +28,17 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
 
-// Routes
+// Public routes (no auth)
 app.use('/api/health', healthRoutes);
-app.use('/api/pipelines', pipelineRoutes);
-app.use('/api/connectors', connectorRoutes);
-app.use('/api/billing', billingRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/webhooks', webhookRoutes);
-app.use('/api/benchmarks', benchmarkRoutes);
-app.use('/api/cdc', cdcRoutes);
+
+// Protected routes (require API key)
+app.use('/api/pipelines', authenticateApiKey, rateLimitByPlan, pipelineRoutes);
+app.use('/api/connectors', authenticateApiKey, rateLimitByPlan, connectorRoutes);
+app.use('/api/billing', authenticateApiKey, rateLimitByPlan, billingRoutes);
+app.use('/api/benchmarks', authenticateApiKey, rateLimitByPlan, benchmarkRoutes);
+app.use('/api/cdc', authenticateApiKey, rateLimitByPlan, cdcRoutes);
 
 // OpenAPI spec as JSON
 app.get('/api/openapi.json', (req, res) => {

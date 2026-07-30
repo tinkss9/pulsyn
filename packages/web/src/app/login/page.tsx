@@ -7,10 +7,7 @@ import { PulsynLogoFull } from '@/components/PulsynLogo';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
+  const [apiKey, setApiKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,17 +17,24 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // In production, this would call a real auth API
-      // For now, simulate login
-      const apiKey = `pk_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-      localStorage.setItem('pulsyn_api_key', apiKey);
-      localStorage.setItem('pulsyn_user', JSON.stringify({
-        email: form.email,
-      }));
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey }),
+      });
 
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Invalid API key');
+        return;
+      }
+
+      localStorage.setItem('pulsyn_api_key', apiKey);
+      localStorage.setItem('pulsyn_user', JSON.stringify(data.data));
       router.push('/dashboard');
-    } catch (err) {
-      setError('Invalid email or password.');
+    } catch {
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -39,14 +43,12 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
-        {/* Logo + Back link */}
         <div className="text-center mb-8">
           <Link href="/"><PulsynLogoFull size={32} /></Link>
-          <p className="text-gray-400 mt-2">Sign in to your account</p>
+          <p className="text-gray-400 mt-2">Sign in with your API key</p>
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 mt-2 inline-block">&larr; Back to home</Link>
         </div>
 
-        {/* Form */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
@@ -56,43 +58,21 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
-                Email
+              <label htmlFor="apiKey" className="block text-sm font-medium text-gray-300 mb-1.5">
+                API Key
               </label>
               <input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-pulsyn-500 focus:ring-1 focus:ring-pulsyn-500"
-                placeholder="john@company.com"
+                id="apiKey"
+                type="text"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-pulsyn-500 focus:ring-1 focus:ring-pulsyn-500 font-mono text-sm"
+                placeholder="pulsyn_..."
                 required
               />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-pulsyn-500 focus:ring-1 focus:ring-pulsyn-500"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="bg-gray-800 border-gray-700 rounded" />
-                <span className="text-sm text-gray-400">Remember me</span>
-              </label>
-              <a href="#" className="text-sm text-pulsyn-500 hover:text-pulsyn-400">
-                Forgot password?
-              </a>
+              <p className="text-xs text-gray-500 mt-1.5">
+                You received an API key when you signed up. It starts with <code className="text-gray-400">pulsyn_</code>.
+              </p>
             </div>
 
             <button

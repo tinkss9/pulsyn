@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Overview', icon: '📊' },
@@ -18,6 +19,32 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{ name?: string; email?: string; plan?: string } | null>(null);
+
+  useEffect(() => {
+    const apiKey = localStorage.getItem('pulsyn_api_key');
+    if (!apiKey) {
+      router.push('/login');
+      return;
+    }
+    try {
+      const userData = JSON.parse(localStorage.getItem('pulsyn_user') || '{}');
+      setUser(userData);
+    } catch {
+      setUser({});
+    }
+  }, [router]);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
+  const initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen flex">
@@ -56,11 +83,11 @@ export default function DashboardLayout({
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-pulsyn-600 rounded-full flex items-center justify-center text-sm font-medium">
-              U
+              {initial}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">User</p>
-              <p className="text-xs text-gray-500 truncate">Starter Plan</p>
+              <p className="text-sm font-medium truncate">{user.name || user.email || 'User'}</p>
+              <p className="text-xs text-gray-500 truncate">{user.plan || 'community'} plan</p>
             </div>
             <button
               onClick={() => {
