@@ -24,7 +24,7 @@ const RESOURCES: SaaSResource[] = [
 ];
 
 @registerSource('6sense')
-export class SixSenseConnector extends SaaSConnector {
+export class SixsenseConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
     super(id, '6sense', '6sense', config, {
       baseUrl: config.host || 'https://api.6sense.com/v1',

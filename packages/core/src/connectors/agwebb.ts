@@ -1,19 +1,19 @@
 // @ts-nocheck
-// FourKites Connector — Auto-generated from config
+// AgWebb Connector — Auto-generated from config
 import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
 import type { DatabaseConfig } from '../types';
 
 const RESOURCES: SaaSResource[] = [
   {
-    name: 'shipments',
-    endpoint: '/shipments',
+    name: 'fields',
+    endpoint: '/fields',
     schema: {
-      name: 'shipments',
-      table: 'shipments',
+      name: 'fields',
+      table: 'fields',
       columns: [
       { name: 'id', type: 'string', nullable: false, primaryKey: true },
-      { name: 'status', type: 'string', nullable: true },
+      { name: 'name', type: 'string', nullable: true },
       ],
       primaryKey: ['id'],
     },
@@ -22,15 +22,15 @@ const RESOURCES: SaaSResource[] = [
   },
 ];
 
-@registerSource('fourkites')
-export class FourKitesConnector extends SaaSConnector {
+@registerSource('agwebb')
+export class AgWebbConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'fourkites', 'fourkites', config, {
-      baseUrl: config.host || 'https://api.fourkites.com/v1',
+    super(id, 'agwebb', 'agwebb', config, {
+      baseUrl: config.host || 'https://api.agwebb.com/v1',
       authType: 'bearer',
       resources: RESOURCES,
       paginationType: 'cursor',
-      healthEndpoint: '/shipments',
+      healthEndpoint: '/fields',
       
     });
   }
