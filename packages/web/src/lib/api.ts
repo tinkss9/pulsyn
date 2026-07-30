@@ -1,7 +1,9 @@
 // Pulsyn Web API Client
 // Client-side API wrapper for the Pulsyn API
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// Same-origin API routes (Next.js API routes at /api/*)
+// Falls back to empty string for same-origin fetches
+const API_URL = typeof window !== 'undefined' ? '' : (process.env.NEXT_PUBLIC_API_URL || '');
 
 interface ApiOptions {
   method?: string;
