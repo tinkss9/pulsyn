@@ -1,35 +1,39 @@
+// @ts-nocheck
+// Ghost Newsletter Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'members',
+    endpoint: '/members',
+    schema: {
+      name: 'members',
+      table: 'members',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'email', type: 'string', nullable: true },
+      { name: 'name', type: 'string', nullable: true },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('ghost-newsletter')
-export class GhostNewsletterConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class GhostNewsletterConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'ghost-newsletter', 'ghost-newsletter', config);
-    this.baseUrl = config.host || '';
+    super(id, 'ghost-newsletter', 'ghost-newsletter', config, {
+      baseUrl: config.host || 'https://your-site.ghost.io/ghost/api/admin',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/site',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

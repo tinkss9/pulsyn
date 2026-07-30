@@ -29,7 +29,12 @@ const outputDir = join(__dirname, '..', 'packages', 'core', 'src', 'connectors')
 let generated = 0;
 
 for (const conn of connectors) {
-  const className = conn.displayName.replace(/[^a-zA-Z0-9]/g, '') + 'Connector';
+  let className = conn.displayName.replace(/[^a-zA-Z0-9]/g, '') + 'Connector';
+  // Fix class names starting with numbers
+  if (/^\d/.test(className)) {
+    const numberMap: Record<string, string> = { '0': 'Zero', '1': 'One', '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five', '6': 'Six', '7': 'Seven', '8': 'Eight', '9': 'Nine' };
+    className = numberMap[className[0]] + className.slice(1);
+  }
 
   const resourcesStr = conn.resources.map(r => {
     const columnsStr = r.columns.map(c =>

@@ -2037,5 +2037,1475 @@
         ]
       }
     ]
+  },
+  {
+    "engine": "agile-crm",
+    "displayName": "Agile CRM",
+    "authType": "basic",
+    "baseUrl": "https://your-domain.agilecrm.com/rest",
+    "healthEndpoint": "/api/contacts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/api/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nimble",
+    "displayName": "Nimble",
+    "authType": "bearer",
+    "baseUrl": "https://api.nimble.com/api/v1",
+    "healthEndpoint": "/contacts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "v-tiger",
+    "displayName": "VTiger",
+    "authType": "bearer",
+    "baseUrl": "https://your-instance.od2.vtiger.com/restapi/v1/vtiger/default",
+    "healthEndpoint": "/me",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/query?query=SELECT * FROM Contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "firstname", "type": "string", "nullable": true },
+          { "name": "lastname", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "infusionsoft",
+    "displayName": "Infusionsoft",
+    "authType": "bearer",
+    "baseUrl": "https://api.infusionsoft.com/crm/rest",
+    "healthEndpoint": "/oauth/connect",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "given_name", "type": "string", "nullable": true },
+          { "name": "family_name", "type": "string", "nullable": true },
+          { "name": "email_addresses", "type": "object", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "keap",
+    "displayName": "Keap",
+    "authType": "bearer",
+    "baseUrl": "https://api.infusionsoft.com/crm/rest",
+    "healthEndpoint": "/oauth/connect",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "given_name", "type": "string", "nullable": true },
+          { "name": "family_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ontraport",
+    "displayName": "Ontraport",
+    "authType": "bearer",
+    "baseUrl": "https://api.ontraport.com/1",
+    "healthEndpoint": "/objects",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/objects/contact", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "firstname", "type": "string", "nullable": true },
+          { "name": "lastname", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "date_created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pardot",
+    "displayName": "Pardot",
+    "authType": "bearer",
+    "baseUrl": "https://pi.pardot.com/api",
+    "healthEndpoint": "/v4/prospect/version",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "prospects", "endpoint": "/v4/prospects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated_at"
+      }
+    ]
+  },
+  {
+    "engine": "sfdc-marketing",
+    "displayName": "Salesforce Marketing Cloud",
+    "authType": "bearer",
+    "baseUrl": "https://your-subdomain.rest.marketingcloudapis.com",
+    "healthEndpoint": "/platform/v1/tokenContext",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/data/v1/customobjects/key:Subscribers/rowset", "idField": "SubscriberKey",
+        "columns": [
+          { "name": "SubscriberKey", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "EmailAddress", "type": "string", "nullable": true },
+          { "name": "CreatedDate", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "autopilot",
+    "displayName": "Autopilot",
+    "authType": "bearer",
+    "baseUrl": "https://api2.autopilothq.com/v1",
+    "healthEndpoint": "/contacts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "contact_id",
+        "columns": [
+          { "name": "contact_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Email", "type": "string", "nullable": true },
+          { "name": "FirstName", "type": "string", "nullable": true },
+          { "name": "LastName", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "campaign-monitor",
+    "displayName": "Campaign Monitor",
+    "authType": "bearer",
+    "baseUrl": "https://api.createsend.com/api/v3.3",
+    "healthEndpoint": "/clients.json",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/lists/{listId}/active.json", "idField": "EmailAddress",
+        "columns": [
+          { "name": "EmailAddress", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Name", "type": "string", "nullable": true },
+          { "name": "Date", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "constant-contact",
+    "displayName": "Constant Contact",
+    "authType": "bearer",
+    "baseUrl": "https://api.cc.email/v3",
+    "healthEndpoint": "/account/summary",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "contact_id",
+        "columns": [
+          { "name": "contact_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email_address", "type": "object", "nullable": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "klaviyo",
+    "displayName": "Klaviyo",
+    "authType": "bearer",
+    "baseUrl": "https://a.klaviyo.com/api",
+    "healthEndpoint": "/profiles",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "profiles", "endpoint": "/profiles", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true },
+          { "name": "updated", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated"
+      }
+    ]
+  },
+  {
+    "engine": "customerio",
+    "displayName": "Customer.io",
+    "authType": "bearer",
+    "baseUrl": "https://track.customer.io/api/v1",
+    "healthEndpoint": "/customers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "customers", "endpoint": "/customers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "eloqua",
+    "displayName": "Eloqua",
+    "authType": "basic",
+    "baseUrl": "https://secure.eloqua.com/api",
+    "healthEndpoint": "/rest/2.0/system/user",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/rest/2.0/data/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "emailAddress", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true },
+          { "name": "updatedAt", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updatedAt"
+      }
+    ]
+  },
+  {
+    "engine": "act-on",
+    "displayName": "Act-On",
+    "authType": "bearer",
+    "baseUrl": "https://restapi.actonsoftware.com/2.0",
+    "healthEndpoint": "/account/info",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contact/list", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sharp-spring",
+    "displayName": "SharpSpring",
+    "authType": "bearer",
+    "baseUrl": "https://api.sharpspring.com/pubapi/v1",
+    "healthEndpoint": "/?method=getAccountInfo",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "leads", "endpoint": "/?method=getLeads", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "emailAddress", "type": "string", "nullable": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "brevo",
+    "displayName": "Brevo",
+    "authType": "bearer",
+    "baseUrl": "https://api.brevo.com/v3",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true },
+          { "name": "modifiedAt", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "modifiedAt"
+      }
+    ]
+  },
+  {
+    "engine": "sendinblue",
+    "displayName": "Sendinblue",
+    "authType": "bearer",
+    "baseUrl": "https://api.sendinblue.com/v3",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "moengage",
+    "displayName": "MoEngage",
+    "authType": "bearer",
+    "baseUrl": "https://api-01.moengage.com/v1",
+    "healthEndpoint": "/report/user-attribute",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "users", "endpoint": "/report/user-attribute", "idField": "customer_id",
+        "columns": [
+          { "name": "customer_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "clevertap",
+    "displayName": "CleverTap",
+    "authType": "bearer",
+    "baseUrl": "https://api.clevertap.com/1",
+    "healthEndpoint": "/profiles.json",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "profiles", "endpoint": "/profiles.json", "idField": "identity",
+        "columns": [
+          { "name": "identity", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Name", "type": "string", "nullable": true },
+          { "name": "Email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "iterable",
+    "displayName": "Iterable",
+    "authType": "bearer",
+    "baseUrl": "https://api.iterable.com/api",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "users", "endpoint": "/users", "idField": "userId",
+        "columns": [
+          { "name": "userId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "braze",
+    "displayName": "Braze",
+    "authType": "bearer",
+    "baseUrl": "https://rest.iad-01.braze.com",
+    "healthEndpoint": "/users/export/ids",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "users", "endpoint": "/users/export/ids", "idField": "external_id",
+        "columns": [
+          { "name": "external_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "attentive",
+    "displayName": "Attentive",
+    "authType": "bearer",
+    "baseUrl": "https://api.attentivemobile.com/v1",
+    "healthEndpoint": "/subscribers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/subscribers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "phone", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "privy",
+    "displayName": "Privy",
+    "authType": "bearer",
+    "baseUrl": "https://privy.com/api/v1",
+    "healthEndpoint": "/accounts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "signups", "endpoint": "/signups", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "omnisend",
+    "displayName": "Omnisend",
+    "authType": "bearer",
+    "baseUrl": "https://api.omnisend.com/v3",
+    "healthEndpoint": "/contacts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "contactID",
+        "columns": [
+          { "name": "contactID", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "beehiiv",
+    "displayName": "Beehiiv",
+    "authType": "bearer",
+    "baseUrl": "https://api.beehiiv.com/v2",
+    "healthEndpoint": "/publications",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscriptions", "endpoint": "/publications/{publicationId}/subscriptions", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "substack",
+    "displayName": "Substack",
+    "authType": "bearer",
+    "baseUrl": "https://substack.com/api/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/subscribers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "buttondown",
+    "displayName": "Buttondown",
+    "authType": "bearer",
+    "baseUrl": "https://api.buttondown.email/v1",
+    "healthEndpoint": "/subscribers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/subscribers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ghost-newsletter",
+    "displayName": "Ghost Newsletter",
+    "authType": "bearer",
+    "baseUrl": "https://your-site.ghost.io/ghost/api/admin",
+    "healthEndpoint": "/site",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "members", "endpoint": "/members", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "convertkit-newsletter",
+    "displayName": "ConvertKit Newsletter",
+    "authType": "bearer",
+    "baseUrl": "https://api.convertkit.com/v4",
+    "healthEndpoint": "/account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/subscribers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email_address", "type": "string", "nullable": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tinyletter",
+    "displayName": "TinyLetter",
+    "authType": "bearer",
+    "baseUrl": "https://tinyletter.com/api",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/subscribers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mailjet",
+    "displayName": "Mailjet",
+    "authType": "basic",
+    "baseUrl": "https://api.mailjet.com/v3.1",
+    "healthEndpoint": "/REST/contact",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/REST/contact", "idField": "ID",
+        "columns": [
+          { "name": "ID", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "Email", "type": "string", "nullable": true },
+          { "name": "Name", "type": "string", "nullable": true },
+          { "name": "CreatedAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mailtrap",
+    "displayName": "Mailtrap",
+    "authType": "bearer",
+    "baseUrl": "https://mailtrap.io/api/v1",
+    "healthEndpoint": "/accounts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/api/accounts/{accountId}/inboxes/{inboxId}/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "from_email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "elastic-email",
+    "displayName": "Elastic Email",
+    "authType": "bearer",
+    "baseUrl": "https://api.elasticemail.com/v4",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "email",
+        "columns": [
+          { "name": "email", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "dateCreated", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sparkpost",
+    "displayName": "SparkPost",
+    "authType": "bearer",
+    "baseUrl": "https://api.sparkpost.com/api/v1",
+    "healthEndpoint": "/transmissions",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "transmissions", "endpoint": "/transmissions", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pepipost",
+    "displayName": "Pepipost",
+    "authType": "bearer",
+    "baseUrl": "https://api.pepipost.com/v5.1",
+    "healthEndpoint": "/stats",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "emails", "endpoint": "/stats", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mandrill",
+    "displayName": "Mandrill",
+    "authType": "bearer",
+    "baseUrl": "https://mandrillapp.com/api/1.0",
+    "healthEndpoint": "/users/info.json",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages/search.json", "idField": "_id",
+        "columns": [
+          { "name": "_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "sender", "type": "string", "nullable": true },
+          { "name": "ts", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sendpulse",
+    "displayName": "SendPulse",
+    "authType": "bearer",
+    "baseUrl": "https://api.sendpulse.com",
+    "healthEndpoint": "/addressbooks",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/addressbooks/{bookId}/emails", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "socketlabs",
+    "displayName": "SocketLabs",
+    "authType": "bearer",
+    "baseUrl": "https://api.socketlabs.com/v1",
+    "healthEndpoint": "/servers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "smtp-com",
+    "displayName": "SMTP.com",
+    "authType": "bearer",
+    "baseUrl": "https://api.smtp.com/v4",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "turbo-smtp",
+    "displayName": "Turbo SMTP",
+    "authType": "bearer",
+    "baseUrl": "https://api.turbo-smtp.com/api",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "mails", "endpoint": "/mails", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "sent_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "postmark",
+    "displayName": "Postmark",
+    "authType": "bearer",
+    "baseUrl": "https://api.postmarkapp.com",
+    "healthEndpoint": "/server",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages/outbound", "idField": "MessageID",
+        "columns": [
+          { "name": "MessageID", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Subject", "type": "string", "nullable": true },
+          { "name": "ReceivedAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "adyen",
+    "displayName": "Adyen",
+    "authType": "bearer",
+    "baseUrl": "https://pal-test.adyen.com/pal/servlet/Payment",
+    "healthEndpoint": "/v68/payments",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/v68/payments", "idField": "pspReference",
+        "columns": [
+          { "name": "pspReference", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "object", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "checkout-com",
+    "displayName": "Checkout.com",
+    "authType": "bearer",
+    "baseUrl": "https://api.sandbox.checkout.com",
+    "healthEndpoint": "/payments",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_on", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cleverbridge",
+    "displayName": "Cleverbridge",
+    "authType": "bearer",
+    "baseUrl": "https://www.cleverbridge.com/api",
+    "healthEndpoint": "/customers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "OrderId",
+        "columns": [
+          { "name": "OrderId", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "Status", "type": "string", "nullable": true },
+          { "name": "CreatedDate", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "fastspring",
+    "displayName": "FastSpring",
+    "authType": "basic",
+    "baseUrl": "https://api.fastspring.com",
+    "healthEndpoint": "/accounts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "total", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plimus",
+    "displayName": "Plimus",
+    "authType": "bearer",
+    "baseUrl": "https://www.plimus.com/api",
+    "healthEndpoint": "/orders",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "orderId",
+        "columns": [
+          { "name": "orderId", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "avangate",
+    "displayName": "Avangate",
+    "authType": "bearer",
+    "baseUrl": "https://api.avangate.com",
+    "healthEndpoint": "/orders",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "RefNo",
+        "columns": [
+          { "name": "RefNo", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Amount", "type": "number", "nullable": true },
+          { "name": "Status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "esellerate",
+    "displayName": "eSellerate",
+    "authType": "bearer",
+    "baseUrl": "https://api.esellerate.net",
+    "healthEndpoint": "/orders",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "OrderID",
+        "columns": [
+          { "name": "OrderID", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "TotalAmount", "type": "number", "nullable": true },
+          { "name": "Status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mycommerce",
+    "displayName": "MyCommerce",
+    "authType": "bearer",
+    "baseUrl": "https://api.mycommerce.com",
+    "healthEndpoint": "/orders",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "OrderId",
+        "columns": [
+          { "name": "OrderId", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "Amount", "type": "number", "nullable": true },
+          { "name": "Status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sellfy",
+    "displayName": "Sellfy",
+    "authType": "bearer",
+    "baseUrl": "https://api.sellfy.com/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "gumroad",
+    "displayName": "Gumroad",
+    "authType": "bearer",
+    "baseUrl": "https://api.gumroad.com/v2",
+    "healthEndpoint": "/product",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "lemon-squeezy",
+    "displayName": "Lemon Squeezy",
+    "authType": "bearer",
+    "baseUrl": "https://api.lemonsqueezy.com/v1",
+    "healthEndpoint": "/users/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "total", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "quadpay",
+    "displayName": "QuadPay",
+    "authType": "bearer",
+    "baseUrl": "https://api.quadpay.com",
+    "healthEndpoint": "/merchants",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sezzle",
+    "displayName": "Sezzle",
+    "authType": "bearer",
+    "baseUrl": "https://sandbox.gateway.sezzle.com/v2",
+    "healthEndpoint": "/merchant",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "uuid",
+        "columns": [
+          { "name": "uuid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount_in_cents", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bread",
+    "displayName": "Bread",
+    "authType": "bearer",
+    "baseUrl": "https://api.breadpayments.com",
+    "healthEndpoint": "/transactions",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transactions", "endpoint": "/transactions", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "splitit",
+    "displayName": "Splitit",
+    "authType": "bearer",
+    "baseUrl": "https://webapi.splitit.com",
+    "healthEndpoint": "/api/installmentplans",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "plans", "endpoint": "/api/installmentplans", "idField": "InstallmentPlanId",
+        "columns": [
+          { "name": "InstallmentPlanId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "TotalAmount", "type": "number", "nullable": true },
+          { "name": "Status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "snap-finance",
+    "displayName": "Snap Finance",
+    "authType": "bearer",
+    "baseUrl": "https://api.snapfinance.com",
+    "healthEndpoint": "/applications",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "applications", "endpoint": "/applications", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zip-pay",
+    "displayName": "Zip Pay",
+    "authType": "bearer",
+    "baseUrl": "https://api.zip.co",
+    "healthEndpoint": "/merchants",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "klarna",
+    "displayName": "Klarna",
+    "authType": "bearer",
+    "baseUrl": "https://api-na.playground.klarna.com",
+    "healthEndpoint": "/payments/v1/authorizations",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/ordermanagement/v1/orders", "idField": "order_id",
+        "columns": [
+          { "name": "order_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "affirm",
+    "displayName": "Affirm",
+    "authType": "bearer",
+    "baseUrl": "https://sandbox.affirm.com/api/v2",
+    "healthEndpoint": "/charges",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "charges", "endpoint": "/charges", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "afterpay",
+    "displayName": "Afterpay",
+    "authType": "bearer",
+    "baseUrl": "https://api-sandbox.afterpay.com/v2",
+    "healthEndpoint": "/payments",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "object", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "rapyd",
+    "displayName": "Rapyd",
+    "authType": "bearer",
+    "baseUrl": "https://sandboxapi.rapyd.net/v1",
+    "healthEndpoint": "/account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "razorpay",
+    "displayName": "Razorpay",
+    "authType": "basic",
+    "baseUrl": "https://api.razorpay.com/v1",
+    "healthEndpoint": "/payments",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "dwolla",
+    "displayName": "Dwolla",
+    "authType": "bearer",
+    "baseUrl": "https://api-sandbox.dwolla.com",
+    "healthEndpoint": "/customers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "customers", "endpoint": "/customers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "payoneer",
+    "displayName": "Payoneer",
+    "authType": "bearer",
+    "baseUrl": "https://api.payoneer.com/v2",
+    "healthEndpoint": "/payees",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payees", "endpoint": "/payees", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wise",
+    "displayName": "Wise",
+    "authType": "bearer",
+    "baseUrl": "https://api.wise.com/v3",
+    "healthEndpoint": "/profiles",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transfers", "endpoint": "/transfers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "targetAmount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wise-pay",
+    "displayName": "Wise Pay",
+    "authType": "bearer",
+    "baseUrl": "https://api.wise.com/v3",
+    "healthEndpoint": "/profiles",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "remitly",
+    "displayName": "Remitly",
+    "authType": "bearer",
+    "baseUrl": "https://api.remitly.com",
+    "healthEndpoint": "/transfers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transfers", "endpoint": "/transfers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "xoom",
+    "displayName": "Xoom",
+    "authType": "bearer",
+    "baseUrl": "https://api.xoom.com/v1",
+    "healthEndpoint": "/transfers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transfers", "endpoint": "/transfers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ria-money",
+    "displayName": "Ria Money",
+    "authType": "bearer",
+    "baseUrl": "https://api.riafinancial.com",
+    "healthEndpoint": "/transfers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transfers", "endpoint": "/transfers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "western-union",
+    "displayName": "Western Union",
+    "authType": "bearer",
+    "baseUrl": "https://api.westernunion.com",
+    "healthEndpoint": "/transfers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transfers", "endpoint": "/transfers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "moneygram",
+    "displayName": "MoneyGram",
+    "authType": "bearer",
+    "baseUrl": "https://api.moneygram.com",
+    "healthEndpoint": "/transfers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transfers", "endpoint": "/transfers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "worldpay",
+    "displayName": "Worldpay",
+    "authType": "bearer",
+    "baseUrl": "https://try.access.worldpay.com",
+    "healthEndpoint": "/payments",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nuvei",
+    "displayName": "Nuvei",
+    "authType": "bearer",
+    "baseUrl": "https://api.nuvei.com",
+    "healthEndpoint": "/payments",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "marqeta",
+    "displayName": "Marqeta",
+    "authType": "basic",
+    "baseUrl": "https://sandbox-api.marqeta.com/v3",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "cards", "endpoint": "/cards", "idField": "token",
+        "columns": [
+          { "name": "token", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "salt-edge",
+    "displayName": "Salt Edge",
+    "authType": "bearer",
+    "baseUrl": "https://www.saltedge.com/api/v5",
+    "healthEndpoint": "/customers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "balance", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "yodlee",
+    "displayName": "Yodlee",
+    "authType": "bearer",
+    "baseUrl": "https://sandbox.api.yodlee.com/ysl",
+    "healthEndpoint": "/accounts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "accountName", "type": "string", "nullable": true },
+          { "name": "balance", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mx",
+    "displayName": "MX Technologies",
+    "authType": "bearer",
+    "baseUrl": "https://int-api.mx.com",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/users/{userGuid}/accounts", "idField": "guid",
+        "columns": [
+          { "name": "guid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "balance", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "finicity",
+    "displayName": "Finicity",
+    "authType": "bearer",
+    "baseUrl": "https://api.finicity.com/aggregation/v2",
+    "healthEndpoint": "/customers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/customers/{customerId}/accounts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "balance", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plaid",
+    "displayName": "Plaid",
+    "authType": "bearer",
+    "baseUrl": "https://sandbox.plaid.com",
+    "healthEndpoint": "/accounts/get",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts/get", "idField": "account_id",
+        "columns": [
+          { "name": "account_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "type", "type": "string", "nullable": true },
+          { "name": "balances", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "teller",
+    "displayName": "Teller",
+    "authType": "bearer",
+    "baseUrl": "https://api.teller.io",
+    "healthEndpoint": "/accounts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "truelayer",
+    "displayName": "TrueLayer",
+    "authType": "bearer",
+    "baseUrl": "https://api.truelayer.com/data/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts", "idField": "account_id",
+        "columns": [
+          { "name": "account_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "account_type", "type": "string", "nullable": true },
+          { "name": "currency", "type": "string", "nullable": true }
+        ]
+      }
+    ]
   }
 ]

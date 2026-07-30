@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Salesforce Marketing Cloud Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'subscribers',
+    endpoint: '/data/v1/customobjects/key:Subscribers/rowset',
+    schema: {
+      name: 'subscribers',
+      table: 'subscribers',
+      columns: [
+      { name: 'SubscriberKey', type: 'string', nullable: false, primaryKey: true },
+      { name: 'EmailAddress', type: 'string', nullable: true },
+      { name: 'CreatedDate', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['SubscriberKey'],
+    },
+    idField: 'SubscriberKey',
+    
+  },
+];
 
 @registerSource('sfdc-marketing')
-export class SfdcMarketingConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class SalesforceMarketingCloudConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'sfdc-marketing', 'sfdc-marketing', config);
-    this.baseUrl = config.host || '';
+    super(id, 'sfdc-marketing', 'sfdc-marketing', config, {
+      baseUrl: config.host || 'https://your-subdomain.rest.marketingcloudapis.com',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/platform/v1/tokenContext',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

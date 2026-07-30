@@ -1,35 +1,39 @@
+// @ts-nocheck
+// Adyen Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'payments',
+    endpoint: '/v68/payments',
+    schema: {
+      name: 'payments',
+      table: 'payments',
+      columns: [
+      { name: 'pspReference', type: 'string', nullable: false, primaryKey: true },
+      { name: 'amount', type: 'object', nullable: true },
+      { name: 'status', type: 'string', nullable: true },
+      { name: 'createdAt', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['pspReference'],
+    },
+    idField: 'pspReference',
+    
+  },
+];
 
 @registerSource('adyen')
-export class AdyenConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class AdyenConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'adyen', 'adyen', config);
-    this.baseUrl = config.host || '';
+    super(id, 'adyen', 'adyen', config, {
+      baseUrl: config.host || 'https://pal-test.adyen.com/pal/servlet/Payment',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/v68/payments',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

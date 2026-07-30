@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Campaign Monitor Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'subscribers',
+    endpoint: '/lists/{listId}/active.json',
+    schema: {
+      name: 'subscribers',
+      table: 'subscribers',
+      columns: [
+      { name: 'EmailAddress', type: 'string', nullable: false, primaryKey: true },
+      { name: 'Name', type: 'string', nullable: true },
+      { name: 'Date', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['EmailAddress'],
+    },
+    idField: 'EmailAddress',
+    
+  },
+];
 
 @registerSource('campaign-monitor')
-export class CampaignMonitorConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class CampaignMonitorConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'campaign-monitor', 'campaign-monitor', config);
-    this.baseUrl = config.host || '';
+    super(id, 'campaign-monitor', 'campaign-monitor', config, {
+      baseUrl: config.host || 'https://api.createsend.com/api/v3.3',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/clients.json',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

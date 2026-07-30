@@ -1,35 +1,39 @@
+// @ts-nocheck
+// Mandrill Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'messages',
+    endpoint: '/messages/search.json',
+    schema: {
+      name: 'messages',
+      table: 'messages',
+      columns: [
+      { name: '_id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'subject', type: 'string', nullable: true },
+      { name: 'sender', type: 'string', nullable: true },
+      { name: 'ts', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['_id'],
+    },
+    idField: '_id',
+    
+  },
+];
 
 @registerSource('mandrill')
-export class MandrillConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class MandrillConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'mandrill', 'mandrill', config);
-    this.baseUrl = config.host || '';
+    super(id, 'mandrill', 'mandrill', config, {
+      baseUrl: config.host || 'https://mandrillapp.com/api/1.0',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/users/info.json',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }
