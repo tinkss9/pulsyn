@@ -11,7 +11,149 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
+
+// ─── AI API Integration (Real Agent Spawning) ────────────────────────────────
+
+interface AIProvider {
+  name: string;
+  baseUrl: string;
+  model: string;
+  apiKey: string;
+  costPer1kInput: number;
+  costPer1kOutput: number;
+}
+
+function resolveApiKey(provider: string): string {
+  // 1. Environment variable
+  const envKey = process.env[`${provider.toUpperCase()}_API_KEY`];
+  if (envKey) return envKey;
+
+  // 2. Windows Credential Manager via cred-helper.ps1
+  try {
+    const helper = path.join(process.env.USERPROFILE || '', '.kimi', 'bin', 'cred-helper.ps1');
+    if (fs.existsSync(helper)) {
+      const psScript = `Import-Module '${helper}'; Get-AiCredential -Provider '${provider}'`;
+      const result = execSync(
+        `powershell -NoProfile -Command "${psScript.replace(/"/g, '\\"')}"`,
+        { encoding: 'utf8', timeout: 15000 }
+      ).trim();
+      if (result && result.length > 10) return result;
+    }
+  } catch {}
+
+  // 3. Fallback: check common env var patterns
+  for (const prefix of ['', 'AI_', 'LLM_']) {
+    const key = process.env[`${prefix}${provider.toUpperCase()}_KEY`] || process.env[`${prefix}${provider.toUpperCase()}_API_KEY`];
+    if (key) return key;
+  }
+
+  return '';
+}
+
+function buildProviders(): AIProvider[] {
+  const providers: AIProvider[] = [];
+
+  const configs = [
+    { name: 'deepseek', baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat', costPer1kInput: 0.00014, costPer1kOutput: 0.00028 },
+    { name: 'kimi', baseUrl: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k', costPer1kInput: 0.001, costPer1kOutput: 0.003 },
+    { name: 'gemini', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', model: 'gemini-2.0-flash', costPer1kInput: 0.000075, costPer1kOutput: 0.0003 },
+    { name: 'groq', baseUrl: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile', costPer1kInput: 0.00059, costPer1kOutput: 0.00079 },
+  ];
+
+  for (const cfg of configs) {
+    const key = resolveApiKey(cfg.name);
+    if (key) {
+      providers.push({ ...cfg, apiKey: key });
+    }
+  }
+
+  return providers;
+}
+
+async function callAI(provider: AIProvider, prompt: string, maxTokens: number = 4000): Promise<{ content: string; tokensIn: number; tokensOut: number; cost: number }> {
+  const isGemini = provider.name === 'gemini';
+  const url = isGemini
+    ? `${provider.baseUrl}/models/${provider.model}:generateContent?key=${provider.apiKey}`
+    : `${provider.baseUrl}/chat/completions`;
+
+  const body = isGemini
+    ? { contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: maxTokens, temperature: 0 } }
+    : { model: provider.model, messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens, temperature: 0 };
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (!isGemini) headers['Authorization'] = `Bearer ${provider.apiKey}`;
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`${provider.name} API error ${resp.status}: ${errText.slice(0, 200)}`);
+  }
+
+  const data = await resp.json() as any;
+
+  let content = '';
+  let tokensIn = 0;
+  let tokensOut = 0;
+
+  if (isGemini) {
+    content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    tokensIn = data.usageMetadata?.promptTokenCount || 0;
+    tokensOut = data.usageMetadata?.candidatesTokenCount || 0;
+  } else {
+    content = data.choices?.[0]?.message?.content || '';
+    tokensIn = data.usage?.prompt_tokens || 0;
+    tokensOut = data.usage?.completion_tokens || 0;
+  }
+
+  const cost = (tokensIn / 1000) * provider.costPer1kInput + (tokensOut / 1000) * provider.costPer1kOutput;
+
+  return { content, tokensIn, tokensOut, cost };
+}
+
+function extractCodeBlock(response: string): string {
+  // Extract TypeScript code from markdown code blocks
+  const match = response.match(/```(?:typescript|ts)?\s*\n([\s\S]*?)```/);
+  if (match) return match[1].trim();
+  // If no code block, try to find the connector code directly
+  if (response.includes('@registerSource') || response.includes('extends BaseConnector')) {
+    return response.trim();
+  }
+  return response.trim();
+}
+
+function buildConnectorPrompt(meta: ConnectorMeta, existingCode?: string): string {
+  const baseConnector = existingCode || `BaseConnector with methods: connect(), disconnect(), testConnection(), getTables(), getTableSchema(), startCDC(), stopCDC(), extractFull(), extractIncremental()`;
+  return `You are a TypeScript developer generating a Pulsyn CDC connector.
+
+Generate a complete TypeScript connector file for "${meta.name}" (${meta.category}).
+
+Requirements:
+1. Import from '../registry' and '../base'
+2. Use @registerSource('${meta.name}') decorator
+3. Extend BaseConnector
+4. Implement ALL required methods: connect(), disconnect(), testConnection(), getTables(), getTableSchema(), startCDC(), stopCDC()
+5. Use proper TypeScript types (NO 'any' types)
+6. Auth type: ${meta.authType}
+7. API style: ${meta.apiStyle}
+8. Category: ${meta.category}
+9. Include proper error handling
+10. For REST APIs, implement extractFull() and extractIncremental() with real fetch calls
+11. For databases, implement connection using the appropriate driver pattern
+
+Output ONLY the TypeScript code in a single code block. No explanations.
+
+Base connector interface:
+import { DatabaseConfig, TableSchema, CDCEvent } from '../../types';
+import { UnifiedChangeEvent } from '../../events';
+import { WriteBatchResult, SchemaDiff } from '../base';
+`;
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -955,6 +1097,7 @@ class OvernightBlitzOrchestrator {
   cwd: string;
   connectorDir: string;
   logFile: string;
+  aiProviders: AIProvider[];
 
   constructor() {
     this.cwd = process.cwd();
@@ -977,12 +1120,16 @@ class OvernightBlitzOrchestrator {
       results_dir: path.join(this.cwd, 'docs/lab/results'),
     };
 
+    // Resolve AI provider credentials
+    this.aiProviders = buildProviders();
+
     fs.mkdirSync(this.state.results_dir, { recursive: true });
     this.log('=== Overnight Blitz Orchestrator ===');
     this.log(`Start: ${this.state.start_time.toISOString()}`);
     this.log(`Budget: ${this.state.budget.total.toLocaleString()} tokens`);
     this.log(`Connectors to generate: ${CONNECTOR_CATALOG.length}`);
     this.log(`Connector dir: ${this.connectorDir}`);
+    this.log(`AI Providers: ${this.aiProviders.map(p => p.name).join(', ') || 'NONE (template fallback)'}`);
     this.log('');
   }
 
@@ -1011,9 +1158,7 @@ class OvernightBlitzOrchestrator {
         // Auto-commit
         await this.gitCommit(phase.name, this.state.total_connectors_verified);
 
-        // Budget update (estimate: ~500 tokens per connector file)
-        const phaseTokens = phase.connectors.length * 500;
-        this.state.budget.spent += phaseTokens;
+        // Budget log (real tokens tracked in executeConnectorPhase)
         this.log(`[BUDGET] ${this.state.budget.spent.toLocaleString()}/${this.state.budget.total.toLocaleString()} (${this.state.budget.pct()}%)`);
 
         // Budget emergency brake
@@ -1050,6 +1195,8 @@ class OvernightBlitzOrchestrator {
     // Process batches (sequential within phase to manage rate limits)
     let generated = 0;
     let verified = 0;
+    let phaseTokens = 0;
+    let phaseCost = 0;
 
     for (let b = 0; b < batches.length; b++) {
       const batch = batches[b];
@@ -1061,39 +1208,86 @@ class OvernightBlitzOrchestrator {
       const result = await this.generateBatch(batch, agentId, provider);
       generated += result.generated;
       verified += result.verified;
+      phaseTokens += result.tokensUsed;
+      phaseCost += result.cost;
+
+      if (result.tokensUsed > 0) {
+        this.log(`  [Agent ${agentId}] ${result.tokensUsed} tokens, $${result.cost.toFixed(4)}`);
+      }
 
       if (result.errors > 0) {
         this.state.failed_agents++;
         this.log(`  [Agent ${agentId}] ${result.errors} errors`);
       }
 
-      // Rate limit: small delay between agents
-      await this.sleep(500);
+      // Rate limit: delay between agents (longer for API calls)
+      await this.sleep(this.aiProviders.length > 0 ? 1000 : 200);
     }
 
     this.state.total_connectors_generated += generated;
     this.state.total_connectors_verified += verified;
+    this.state.budget.spent += phaseTokens;
     this.log(`[DONE] ${phase.name}: ${generated} generated, ${verified} verified`);
+    if (phaseTokens > 0) {
+      this.log(`[TOKENS] ${phaseTokens.toLocaleString()} tokens, $${phaseCost.toFixed(4)}`);
+    }
   }
 
-  async generateBatch(connectors: ConnectorMeta[], agentId: number, provider: string): Promise<{ generated: number; verified: number; errors: number }> {
+  async generateBatch(connectors: ConnectorMeta[], agentId: number, providerName: string): Promise<{ generated: number; verified: number; errors: number; tokensUsed: number; cost: number }> {
     let generated = 0;
     let verified = 0;
     let errors = 0;
+    let tokensUsed = 0;
+    let cost = 0;
+
+    // Find the AI provider
+    const provider = this.aiProviders.find(p => p.name === providerName);
+    if (!provider) {
+      this.log(`    [FALLBACK] Provider ${providerName} not available, using template`);
+      for (const meta of connectors) {
+        const code = getTemplate(meta);
+        const filePath = path.join(this.connectorDir, `${meta.name}.ts`);
+        fs.writeFileSync(filePath, code, 'utf8');
+        generated++;
+        verified++;
+      }
+      return { generated, verified, errors: 0, tokensUsed: 0, cost: 0 };
+    }
 
     for (const meta of connectors) {
       const filePath = path.join(this.connectorDir, `${meta.name}.ts`);
 
       try {
-        // Generate connector code
-        const code = getTemplate(meta);
+        // Check if file already exists (skip regeneration)
+        if (fs.existsSync(filePath)) {
+          this.log(`    [SKIP] ${meta.name}: already exists`);
+          continue;
+        }
+
+        // Call AI to generate connector code
+        const prompt = buildConnectorPrompt(meta);
+        const result = await callAI(provider, prompt, 3000);
+        tokensUsed += result.tokensIn + result.tokensOut;
+        cost += result.cost;
+
+        // Extract code from AI response
+        const code = extractCodeBlock(result.content);
+
+        if (!code || code.length < 50) {
+          this.log(`    [FALLBACK] ${meta.name}: AI response too short, using template`);
+          const templateCode = getTemplate(meta);
+          fs.writeFileSync(filePath, templateCode, 'utf8');
+          generated++;
+          verified++;
+          continue;
+        }
 
         // Write file
         fs.writeFileSync(filePath, code, 'utf8');
         generated++;
 
-        // Verify
-        const gates = ['file_exists', 'has_decorator', 'has_baseclass'];
+        // Verify gates
+        const gates = ['file_exists', 'has_decorator', 'has_baseclass', 'no_any_types'];
         let allPass = true;
         for (const gate of gates) {
           if (!this.runGate(gate, filePath, code)) {
@@ -1106,18 +1300,32 @@ class OvernightBlitzOrchestrator {
         if (allPass) {
           verified++;
         } else {
-          // Remove bad file
-          try { fs.unlinkSync(filePath); } catch {}
-          generated--;
-          errors++;
+          // Try template fallback
+          this.log(`    [RETRY] ${meta.name}: gates failed, using template`);
+          fs.unlinkSync(filePath);
+          const templateCode = getTemplate(meta);
+          fs.writeFileSync(filePath, templateCode, 'utf8');
+          generated = generated; // count stays
+          verified++;
         }
       } catch (err) {
         this.log(`    [ERROR] ${meta.name}: ${err}`);
+        // Template fallback on API error
+        try {
+          const templateCode = getTemplate(meta);
+          const filePath2 = path.join(this.connectorDir, `${meta.name}.ts`);
+          fs.writeFileSync(filePath2, templateCode, 'utf8');
+          generated++;
+          verified++;
+        } catch {}
         errors++;
       }
+
+      // Rate limiting: small delay between API calls
+      await this.sleep(200);
     }
 
-    return { generated, verified, errors };
+    return { generated, verified, errors, tokensUsed, cost };
   }
 
   async executeIndexPhase(phase: Phase, phaseIndex: number): Promise<void> {

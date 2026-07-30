@@ -42,3 +42,13 @@ tmp/
 temp/
 
 .vercel
+
+# Next.js
+.next/
+
+# Supabase local
+supabase/
+
+# Temp files
+temp_imports.txt
+temp_*
