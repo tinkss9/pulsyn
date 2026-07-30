@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Couchbase Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'buckets',
+    endpoint: '/pools/default/buckets',
+    schema: {
+      name: 'buckets',
+      table: 'buckets',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      { name: 'type', type: 'string', nullable: true },
+      { name: 'items', type: 'number', nullable: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('couchbase')
-export class CouchbaseConnector extends BaseConnector {
+export class CouchbaseConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'couchbase', 'couchbase', config);
+    super(id, 'couchbase', 'couchbase', config, {
+      baseUrl: config.host || 'http://localhost:8091',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/pools',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: couchbase via rest
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

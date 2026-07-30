@@ -1,35 +1,36 @@
+// @ts-nocheck
+// IndexTank Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'indexes',
+    endpoint: '/indexes',
+    schema: {
+      name: 'indexes',
+      table: 'indexes',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('indextank')
-export class IndextankConnector extends BaseConnector {
+export class IndexTankConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'indextank', 'indextank', config);
+    super(id, 'indextank', 'indextank', config, {
+      baseUrl: config.host || 'https://api.indextank.com/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/indexes',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: indextank via rest
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

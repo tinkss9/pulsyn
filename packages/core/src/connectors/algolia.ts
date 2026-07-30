@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Algolia Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'indices',
+    endpoint: '/indexes',
+    schema: {
+      name: 'indices',
+      table: 'indices',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      { name: 'entries', type: 'number', nullable: true },
+      { name: 'createdAt', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('algolia')
-export class AlgoliaConnector extends BaseConnector {
+export class AlgoliaConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'algolia', 'algolia', config);
+    super(id, 'algolia', 'algolia', config, {
+      baseUrl: config.host || 'https://your-app-id-dsn.algolia.net/1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/indexes',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: algolia via rest
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Buffer Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'posts',
+    endpoint: '/updates',
+    schema: {
+      name: 'posts',
+      table: 'posts',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'text', type: 'string', nullable: true },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('buffer')
-export class BufferConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class BufferConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'buffer', 'buffer', config);
-    this.baseUrl = config.host || '';
+    super(id, 'buffer', 'buffer', config, {
+      baseUrl: config.host || 'https://api.bufferapp.com/1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/profiles',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }
