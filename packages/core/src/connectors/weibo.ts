@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Weibo Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'statuses',
+    endpoint: '/statuses/user_timeline',
+    schema: {
+      name: 'statuses',
+      table: 'statuses',
+      columns: [
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
+      { name: 'text', type: 'string', nullable: true },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('weibo')
-export class WeiboConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class WeiboConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'weibo', 'weibo', config);
-    this.baseUrl = config.host || '';
+    super(id, 'weibo', 'weibo', config, {
+      baseUrl: config.host || 'https://api.weibo.com/2',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/account/profile/basic',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

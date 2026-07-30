@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Zinc Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'orders',
+    endpoint: '/orders',
+    schema: {
+      name: 'orders',
+      table: 'orders',
+      columns: [
+      { name: 'request_id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'status', type: 'string', nullable: true },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['request_id'],
+    },
+    idField: 'request_id',
+    
+  },
+];
 
 @registerSource('zinc')
-export class ZincConnector extends BaseConnector {
+export class ZincConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'zinc', 'zinc', config);
+    super(id, 'zinc', 'zinc', config, {
+      baseUrl: config.host || 'https://api.zinc.io/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/orders',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: zinc via rest
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

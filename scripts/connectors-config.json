@@ -13211,5 +13211,449 @@
         ]
       }
     ]
+  },
+  {
+    "engine": "vidyard-v2",
+    "displayName": "Vidyard v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.vidyard.com/v1",
+    "healthEndpoint": "/players",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "videos", "endpoint": "/players", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "visma",
+    "displayName": "Visma",
+    "authType": "bearer",
+    "baseUrl": "https://api.visma.net/v1",
+    "healthEndpoint": "/customers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/invoices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "invoiceNumber", "type": "string", "nullable": true },
+          { "name": "amount", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vonage",
+    "displayName": "Vonage",
+    "authType": "bearer",
+    "baseUrl": "https://rest.nexmo.com",
+    "healthEndpoint": "/account/get-balance",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/search/messages", "idField": "message-id",
+        "columns": [
+          { "name": "message-id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "to", "type": "string", "nullable": true },
+          { "name": "from", "type": "string", "nullable": true },
+          { "name": "date-received", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vonage-cc",
+    "displayName": "Vonage CC",
+    "authType": "bearer",
+    "baseUrl": "https://api.nexmo.com/v1/calls",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "calls", "endpoint": "/", "idField": "uuid",
+        "columns": [
+          { "name": "uuid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "direction", "type": "string", "nullable": true },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vonage-v2",
+    "displayName": "Vonage v2",
+    "authType": "bearer",
+    "baseUrl": "https://rest.nexmo.com",
+    "healthEndpoint": "/account/get-balance",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "conversations", "endpoint": "/conversations", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "votebuilder",
+    "displayName": "VoteBuilder",
+    "authType": "bearer",
+    "baseUrl": "https://api.votebuilder.com/v1",
+    "healthEndpoint": "/voters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "voters", "endpoint": "/voters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "waystar",
+    "displayName": "Waystar",
+    "authType": "bearer",
+    "baseUrl": "https://api.waystar.com/v1",
+    "healthEndpoint": "/claims",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "claims", "endpoint": "/claims", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "amount", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "weibo",
+    "displayName": "Weibo",
+    "authType": "bearer",
+    "baseUrl": "https://api.weibo.com/2",
+    "healthEndpoint": "/account/profile/basic",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "statuses", "endpoint": "/statuses/user_timeline", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "text", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "whimsical",
+    "displayName": "Whimsical",
+    "authType": "bearer",
+    "baseUrl": "https://api.whimsical.com/v1",
+    "healthEndpoint": "/files",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "files", "endpoint": "/files", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wistia",
+    "displayName": "Wistia",
+    "authType": "bearer",
+    "baseUrl": "https://api.wistia.com/v1",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "medias", "endpoint": "/medias", "idField": "hashed_id",
+        "columns": [
+          { "name": "hashed_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wordpress-com",
+    "displayName": "WordPress.com",
+    "authType": "bearer",
+    "baseUrl": "https://public-api.wordpress.com/rest/v1.1",
+    "healthEndpoint": "/me",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "posts", "endpoint": "/sites/{siteId}/posts", "idField": "ID",
+        "columns": [
+          { "name": "ID", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "date", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "workday-gov",
+    "displayName": "Workday Gov",
+    "authType": "bearer",
+    "baseUrl": "https://your-workday.com/ccx/api/v1",
+    "healthEndpoint": "/workers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "workers", "endpoint": "/workers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "preferredName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "workday-student",
+    "displayName": "Workday Student",
+    "authType": "bearer",
+    "baseUrl": "https://your-workday.com/ccx/api/v1",
+    "healthEndpoint": "/students",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "students", "endpoint": "/students", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "preferredName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wrike-v2",
+    "displayName": "Wrike v2",
+    "authType": "bearer",
+    "baseUrl": "https://www.wrike.com/api/v4",
+    "healthEndpoint": "/contacts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tasks", "endpoint": "/tasks", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdDate", "type": "datetime", "nullable": true },
+          { "name": "updatedDate", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updatedDate"
+      }
+    ]
+  },
+  {
+    "engine": "yampi",
+    "displayName": "Yampi",
+    "authType": "bearer",
+    "baseUrl": "https://api.yampi.io/v1",
+    "healthEndpoint": "/orders",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "total", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "yotpo",
+    "displayName": "Yotpo",
+    "authType": "bearer",
+    "baseUrl": "https://api.yotpo.com/v1",
+    "healthEndpoint": "/reviews",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "reviews", "endpoint": "/reviews", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true },
+          { "name": "score", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zalo",
+    "displayName": "Zalo",
+    "authType": "bearer",
+    "baseUrl": "https://openapi.zalo.me/v2",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "followers", "endpoint": "/me/follower/get_list", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zedocs",
+    "displayName": "ZeDocs",
+    "authType": "bearer",
+    "baseUrl": "https://api.zedocs.com/v1",
+    "healthEndpoint": "/documents",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "documents", "endpoint": "/documents", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zendesk-chat",
+    "displayName": "Zendesk Chat",
+    "authType": "bearer",
+    "baseUrl": "https://www.zopim.com/api/v2",
+    "healthEndpoint": "/chats",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "chats", "endpoint": "/chats", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "visitor", "type": "object", "nullable": true },
+          { "name": "started_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zeromq",
+    "displayName": "ZeroMQ",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:5555",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "topics", "endpoint": "/topics", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zinc",
+    "displayName": "Zinc",
+    "authType": "bearer",
+    "baseUrl": "https://api.zinc.io/v1",
+    "healthEndpoint": "/orders",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "request_id",
+        "columns": [
+          { "name": "request_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zoho-desk",
+    "displayName": "Zoho Desk",
+    "authType": "bearer",
+    "baseUrl": "https://desk.zoho.com/api/v1",
+    "healthEndpoint": "/tickets",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tickets", "endpoint": "/tickets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zoho-workspace",
+    "displayName": "Zoho Workspace",
+    "authType": "bearer",
+    "baseUrl": "https://mail.zoho.com/api",
+    "healthEndpoint": "/accounts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/accounts/{accountId}/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "receivedTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zoominfo",
+    "displayName": "ZoomInfo",
+    "authType": "bearer",
+    "baseUrl": "https://api.zoominfo.com/v1",
+    "healthEndpoint": "/search",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "contacts", "endpoint": "/search/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zoom-v3",
+    "displayName": "Zoom v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.zoom.us/v2",
+    "healthEndpoint": "/users/me",
+    "paginationType": "nextPageToken",
+    "resources": [
+      { "name": "webinars", "endpoint": "/users/me/webinars", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "topic", "type": "string", "nullable": false },
+          { "name": "start_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zywave",
+    "displayName": "Zywave",
+    "authType": "bearer",
+    "baseUrl": "https://api.zywave.com/v1",
+    "healthEndpoint": "/clients",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clients", "endpoint": "/clients", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
   }
 ]
