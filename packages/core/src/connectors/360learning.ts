@@ -4,7 +4,7 @@ import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 import { UnifiedChangeEvent } from '../events';
 
 @registerSource('360learning')
-export class 360learningConnector extends BaseConnector {
+export class ThreeSixtyLearningConnector extends BaseConnector {
   private baseUrl: string;
   private apiKey: string;
 

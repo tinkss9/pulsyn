@@ -1,33 +1,33 @@
 // @ts-nocheck
-// LinkedIn Connector — Auto-generated from config
+// Facebook Messenger Connector — Auto-generated from config
 import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
 import type { DatabaseConfig } from '../types';
 
 const RESOURCES: SaaSResource[] = [
   {
-    name: 'posts',
-    endpoint: '/shares',
+    name: 'conversations',
+    endpoint: '/me/conversations',
     schema: {
-      name: 'posts',
-      table: 'posts',
+      name: 'conversations',
+      table: 'conversations',
       columns: [
       { name: 'id', type: 'string', nullable: false, primaryKey: true },
-      { name: 'text', type: 'string', nullable: true },
-      { name: 'created', type: 'datetime', nullable: true },
+      { name: 'snippet', type: 'string', nullable: true },
+      { name: 'updated_time', type: 'datetime', nullable: true },
       ],
       primaryKey: ['id'],
     },
     idField: 'id',
-    
+    modifiedField: 'updated_time',
   },
 ];
 
-@registerSource('linkedin')
-export class LinkedInConnector extends SaaSConnector {
+@registerSource('messenger')
+export class FacebookMessengerConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'linkedin', 'linkedin', config, {
-      baseUrl: config.host || 'https://api.linkedin.com/v2',
+    super(id, 'messenger', 'messenger', config, {
+      baseUrl: config.host || 'https://graph.facebook.com/v18.0',
       authType: 'bearer',
       resources: RESOURCES,
       paginationType: 'cursor',

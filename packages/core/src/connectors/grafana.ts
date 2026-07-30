@@ -1,35 +1,40 @@
+// @ts-nocheck
+// Grafana Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'dashboards',
+    endpoint: '/search',
+    schema: {
+      name: 'dashboards',
+      table: 'dashboards',
+      columns: [
+      { name: 'uid', type: 'string', nullable: false, primaryKey: true },
+      { name: 'title', type: 'string', nullable: false },
+      { name: 'type', type: 'string', nullable: true },
+      { name: 'created', type: 'datetime', nullable: true },
+      { name: 'updated', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['uid'],
+    },
+    idField: 'uid',
+    modifiedField: 'updated',
+  },
+];
 
 @registerSource('grafana')
-export class GrafanaConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class GrafanaConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'grafana', 'grafana', config);
-    this.baseUrl = config.host || '';
+    super(id, 'grafana', 'grafana', config, {
+      baseUrl: config.host || 'https://your-grafana.com/api',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/health',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

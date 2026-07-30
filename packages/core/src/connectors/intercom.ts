@@ -23,22 +23,6 @@ const RESOURCES: SaaSResource[] = [
     idField: 'id',
     modifiedField: 'updated_at',
   },
-  {
-    name: 'companies',
-    endpoint: '/companies',
-    schema: {
-      name: 'companies',
-      table: 'companies',
-      columns: [
-      { name: 'id', type: 'string', nullable: false, primaryKey: true },
-      { name: 'name', type: 'string', nullable: false },
-      { name: 'created_at', type: 'datetime', nullable: true },
-      ],
-      primaryKey: ['id'],
-    },
-    idField: 'id',
-    modifiedField: 'updated_at',
-  },
 ];
 
 @registerSource('intercom')

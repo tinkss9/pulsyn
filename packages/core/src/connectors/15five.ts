@@ -4,7 +4,7 @@ import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 import { UnifiedChangeEvent } from '../events';
 
 @registerSource('15five')
-export class 15fiveConnector extends BaseConnector {
+export class FifteenFiveConnector extends BaseConnector {
   private baseUrl: string;
   private apiKey: string;
 

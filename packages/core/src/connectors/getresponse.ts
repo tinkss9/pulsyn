@@ -1,35 +1,39 @@
+// @ts-nocheck
+// GetResponse Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'contacts',
+    endpoint: '/contacts',
+    schema: {
+      name: 'contacts',
+      table: 'contacts',
+      columns: [
+      { name: 'contactId', type: 'string', nullable: false, primaryKey: true },
+      { name: 'email', type: 'string', nullable: true },
+      { name: 'name', type: 'string', nullable: true },
+      { name: 'createdOn', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['contactId'],
+    },
+    idField: 'contactId',
+    
+  },
+];
 
 @registerSource('getresponse')
-export class GetresponseConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class GetResponseConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'getresponse', 'getresponse', config);
-    this.baseUrl = config.host || '';
+    super(id, 'getresponse', 'getresponse', config, {
+      baseUrl: config.host || 'https://api.getresponse.com/v3',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/campaigns',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

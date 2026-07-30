@@ -1,35 +1,38 @@
+// @ts-nocheck
+// TikTok Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'videos',
+    endpoint: '/video/list/',
+    schema: {
+      name: 'videos',
+      table: 'videos',
+      columns: [
+      { name: 'video_id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'title', type: 'string', nullable: true },
+      { name: 'create_time', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['video_id'],
+    },
+    idField: 'video_id',
+    
+  },
+];
 
 @registerSource('tiktok')
-export class TiktokConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class TikTokConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'tiktok', 'tiktok', config);
-    this.baseUrl = config.host || '';
+    super(id, 'tiktok', 'tiktok', config, {
+      baseUrl: config.host || 'https://business-api.tiktok.com/open_api/v1.3',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/user/info/',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

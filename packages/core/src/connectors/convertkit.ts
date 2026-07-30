@@ -1,35 +1,39 @@
+// @ts-nocheck
+// ConvertKit Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'subscribers',
+    endpoint: '/subscribers',
+    schema: {
+      name: 'subscribers',
+      table: 'subscribers',
+      columns: [
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
+      { name: 'email_address', type: 'string', nullable: true },
+      { name: 'first_name', type: 'string', nullable: true },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('convertkit')
-export class ConvertkitConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class ConvertKitConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'convertkit', 'convertkit', config);
-    this.baseUrl = config.host || '';
+    super(id, 'convertkit', 'convertkit', config, {
+      baseUrl: config.host || 'https://api.convertkit.com/v4',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/account',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

@@ -1,20 +1,20 @@
 // @ts-nocheck
-// Spotify Connector — Auto-generated from config
+// Hotjar Connector — Auto-generated from config
 import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
 import type { DatabaseConfig } from '../types';
 
 const RESOURCES: SaaSResource[] = [
   {
-    name: 'playlists',
-    endpoint: '/me/playlists',
+    name: 'surveys',
+    endpoint: '/sites/{siteId}/surveys',
     schema: {
-      name: 'playlists',
-      table: 'playlists',
+      name: 'surveys',
+      table: 'surveys',
       columns: [
-      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
       { name: 'name', type: 'string', nullable: false },
-      { name: 'tracks.total', type: 'number', nullable: true },
+      { name: 'status', type: 'string', nullable: true },
       { name: 'created_at', type: 'datetime', nullable: true },
       ],
       primaryKey: ['id'],
@@ -24,15 +24,15 @@ const RESOURCES: SaaSResource[] = [
   },
 ];
 
-@registerSource('spotify')
-export class SpotifyConnector extends SaaSConnector {
+@registerSource('hotjar')
+export class HotjarConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'spotify', 'spotify', config, {
-      baseUrl: config.host || 'https://api.spotify.com/v1',
+    super(id, 'hotjar', 'hotjar', config, {
+      baseUrl: config.host || 'https://insights.hotjar.com/api',
       authType: 'bearer',
       resources: RESOURCES,
-      paginationType: 'cursor',
-      healthEndpoint: '/me',
+      paginationType: 'offset',
+      healthEndpoint: '/sites',
       
     });
   }

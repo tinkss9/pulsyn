@@ -1,35 +1,41 @@
+// @ts-nocheck
+// Marketo Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'leads',
+    endpoint: '/v1/leads.json',
+    schema: {
+      name: 'leads',
+      table: 'leads',
+      columns: [
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
+      { name: 'email', type: 'string', nullable: true },
+      { name: 'firstName', type: 'string', nullable: true },
+      { name: 'lastName', type: 'string', nullable: true },
+      { name: 'createdAt', type: 'datetime', nullable: true },
+      { name: 'updatedAt', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'updatedAt',
+  },
+];
 
 @registerSource('marketo')
-export class MarketoConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class MarketoConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'marketo', 'marketo', config);
-    this.baseUrl = config.host || '';
+    super(id, 'marketo', 'marketo', config, {
+      baseUrl: config.host || 'https://your-instance.mktorest.com/rest',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/v1/leads/describe.json',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }
