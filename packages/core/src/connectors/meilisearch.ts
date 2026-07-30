@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Meilisearch Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'indexes',
+    endpoint: '/indexes',
+    schema: {
+      name: 'indexes',
+      table: 'indexes',
+      columns: [
+      { name: 'uid', type: 'string', nullable: false, primaryKey: true },
+      { name: 'primaryKey', type: 'string', nullable: true },
+      { name: 'createdAt', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['uid'],
+    },
+    idField: 'uid',
+    
+  },
+];
 
 @registerSource('meilisearch')
-export class MeilisearchConnector extends BaseConnector {
+export class MeilisearchConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'meilisearch', 'meilisearch', config);
+    super(id, 'meilisearch', 'meilisearch', config, {
+      baseUrl: config.host || 'http://localhost:7700',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/health',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: meilisearch via rest
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

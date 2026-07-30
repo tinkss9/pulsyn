@@ -10874,5 +10874,2342 @@
         ]
       }
     ]
+  },
+  {
+    "engine": "agriwebb",
+    "displayName": "AgriWebb",
+    "authType": "bearer",
+    "baseUrl": "https://api.agriwebb.com/v1",
+    "healthEndpoint": "/farms",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "farms", "endpoint": "/farms", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "airtable-v2",
+    "displayName": "Airtable v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.airtable.com/v0",
+    "healthEndpoint": "/meta/bases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/meta/bases/{baseId}/tables", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "createdTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bling",
+    "displayName": "Bling",
+    "authType": "bearer",
+    "baseUrl": "https://www.bling.com.br/Api/v3",
+    "healthEndpoint": "/contatos",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contatos", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "nome", "type": "string", "nullable": false },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bloomerang",
+    "displayName": "Bloomerang",
+    "authType": "bearer",
+    "baseUrl": "https://api.bloomerang.co/v2",
+    "healthEndpoint": "/constituents",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "constituents", "endpoint": "/constituents", "idField": "Id",
+        "columns": [
+          { "name": "Id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "FirstName", "type": "string", "nullable": true },
+          { "name": "LastName", "type": "string", "nullable": true },
+          { "name": "Email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bluecart",
+    "displayName": "BlueCart",
+    "authType": "bearer",
+    "baseUrl": "https://api.bluecart.com/v1",
+    "healthEndpoint": "/orders",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bt",
+    "displayName": "BT Business",
+    "authType": "bearer",
+    "baseUrl": "https://api.bt.com/v1",
+    "healthEndpoint": "/accounts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cayenne",
+    "displayName": "Cayenne",
+    "authType": "bearer",
+    "baseUrl": "https://api.cayenne.com/v1",
+    "healthEndpoint": "/devices",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "figjam",
+    "displayName": "FigJam",
+    "authType": "bearer",
+    "baseUrl": "https://api.figma.com/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "files", "endpoint": "/files/{fileKey}", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "fishbowl",
+    "displayName": "Fishbowl",
+    "authType": "bearer",
+    "baseUrl": "https://api.fishbowl.com/v1",
+    "healthEndpoint": "/inventory",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "inventory", "endpoint": "/inventory", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "quantity", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "leanplum",
+    "displayName": "Leanplum",
+    "authType": "bearer",
+    "baseUrl": "https://api.leanplum.com/api",
+    "healthEndpoint": "/getApp",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "users", "endpoint": "/getUsers", "idField": "userId",
+        "columns": [
+          { "name": "userId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "attributes", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "lexoffice",
+    "displayName": "Lexoffice",
+    "authType": "bearer",
+    "baseUrl": "https://api.lexoffice.io/v1",
+    "healthEndpoint": "/contacts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "invoices", "endpoint": "/invoices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "invoiceNumber", "type": "string", "nullable": true },
+          { "name": "totalAmount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "linear-v2",
+    "displayName": "Linear v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.linear.app/graphql",
+    "healthEndpoint": "/graphql",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "issues", "endpoint": "/graphql", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true },
+          { "name": "updatedAt", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updatedAt"
+      }
+    ]
+  },
+  {
+    "engine": "little-green-light",
+    "displayName": "Little Green Light",
+    "authType": "bearer",
+    "baseUrl": "https://api.littlegreenlight.com/v1",
+    "healthEndpoint": "/constituents",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "constituents", "endpoint": "/constituents", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "loggly-v2",
+    "displayName": "Loggly v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-tenant.loggly.com/apiv2",
+    "healthEndpoint": "/inputs",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "timestamp", "type": "datetime", "nullable": true },
+          { "name": "event", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "logz-io",
+    "displayName": "Logz.io",
+    "authType": "bearer",
+    "baseUrl": "https://api.logz.io/v1",
+    "healthEndpoint": "/search",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "alerts", "endpoint": "/v2/alerts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "severity", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "loom-v2",
+    "displayName": "Loom v2",
+    "authType": "bearer",
+    "baseUrl": "https://www.loom.com/v1",
+    "healthEndpoint": "/videos",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "videos", "endpoint": "/videos", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mailgun-v2",
+    "displayName": "Mailgun v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.mailgun.net/v3",
+    "healthEndpoint": "/domains",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "event", "type": "string", "nullable": true },
+          { "name": "timestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mamut",
+    "displayName": "Mamut",
+    "authType": "bearer",
+    "baseUrl": "https://api.mamut.com/v1",
+    "healthEndpoint": "/customers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "customers", "endpoint": "/customers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mandrill-v2",
+    "displayName": "Mandrill v2",
+    "authType": "bearer",
+    "baseUrl": "https://mandrillapp.com/api/1.0",
+    "healthEndpoint": "/users/info.json",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages/search.json", "idField": "_id",
+        "columns": [
+          { "name": "_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "sender", "type": "string", "nullable": true },
+          { "name": "ts", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "marketman",
+    "displayName": "MarketMan",
+    "authType": "bearer",
+    "baseUrl": "https://api.marketman.com/v3",
+    "healthEndpoint": "/inventory",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "inventory", "endpoint": "/inventory", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "quantity", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "marvel",
+    "displayName": "Marvel",
+    "authType": "bearer",
+    "baseUrl": "https://api.marvelapp.com/v1",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "projects", "endpoint": "/projects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "meditech",
+    "displayName": "Meditech",
+    "authType": "bearer",
+    "baseUrl": "https://api.meditech.com/v1",
+    "healthEndpoint": "/patients",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "patients", "endpoint": "/patients", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "medium",
+    "displayName": "Medium",
+    "authType": "bearer",
+    "baseUrl": "https://api.medium.com/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "publications", "endpoint": "/users/{userId}/publications", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "description", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "meilisearch",
+    "displayName": "Meilisearch",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:7700",
+    "healthEndpoint": "/health",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "indexes", "endpoint": "/indexes", "idField": "uid",
+        "columns": [
+          { "name": "uid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "primaryKey", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "messagebird",
+    "displayName": "MessageBird",
+    "authType": "bearer",
+    "baseUrl": "https://rest.messagebird.com",
+    "healthEndpoint": "/balance",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "direction", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdDatetime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "messagebird-cc",
+    "displayName": "MessageBird CC",
+    "authType": "bearer",
+    "baseUrl": "https://voice.messagebird.com",
+    "healthEndpoint": "/calls",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "calls", "endpoint": "/calls", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "messagebird-v2",
+    "displayName": "MessageBird v2",
+    "authType": "bearer",
+    "baseUrl": "https://rest.messagebird.com",
+    "healthEndpoint": "/balance",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "conversations", "endpoint": "/conversations", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdDatetime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "microsoft-365",
+    "displayName": "Microsoft 365",
+    "authType": "bearer",
+    "baseUrl": "https://graph.microsoft.com/v1.0",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "events", "endpoint": "/me/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": true },
+          { "name": "start", "type": "object", "nullable": true },
+          { "name": "createdDateTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "microsoft-todo",
+    "displayName": "Microsoft To Do",
+    "authType": "bearer",
+    "baseUrl": "https://graph.microsoft.com/v1.0",
+    "healthEndpoint": "/me/todo/lists",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "lists", "endpoint": "/me/todo/lists", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "displayName", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mobilize",
+    "displayName": "Mobilize",
+    "authType": "bearer",
+    "baseUrl": "https://api.mobilize.us/v1",
+    "healthEndpoint": "/events",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "created_date", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mollie",
+    "displayName": "Mollie",
+    "authType": "bearer",
+    "baseUrl": "https://api.mollie.com/v2",
+    "healthEndpoint": "/organizations/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "object", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "monday-crm",
+    "displayName": "Monday CRM",
+    "authType": "bearer",
+    "baseUrl": "https://api.monday.com/v2",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "boards", "endpoint": "/boards", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "monday-v3",
+    "displayName": "Monday v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.monday.com/v2",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "items", "endpoint": "/boards/{boardId}/items", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "moodle",
+    "displayName": "Moodle",
+    "authType": "bearer",
+    "baseUrl": "https://your-moodle.com/webservice/restful/server.php",
+    "healthEndpoint": "/core_webservice_get_site_info",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "courses", "endpoint": "/core_course_get_courses", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "fullname", "type": "string", "nullable": false },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "motherduck",
+    "displayName": "MotherDuck",
+    "authType": "bearer",
+    "baseUrl": "https://api.motherduck.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "motherduck-v2",
+    "displayName": "MotherDuck v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.motherduck.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tables", "endpoint": "/databases/{db}/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nationbuilder",
+    "displayName": "NationBuilder",
+    "authType": "bearer",
+    "baseUrl": "https://{slug}.nationbuilder.com/api/v1",
+    "healthEndpoint": "/people",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "people", "endpoint": "/people", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "naver-works",
+    "displayName": "Naver Works",
+    "authType": "bearer",
+    "baseUrl": "https://www.worksapis.com/v1.0",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "users", "endpoint": "/users", "idField": "userId",
+        "columns": [
+          { "name": "userId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "neoncrm",
+    "displayName": "NeonCRM",
+    "authType": "bearer",
+    "baseUrl": "https://api.neoncrm.com/v2",
+    "healthEndpoint": "/accounts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "accounts", "endpoint": "/accounts/search", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "netezza-v2",
+    "displayName": "Netezza v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.netezza.com/v2",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "netsmart",
+    "displayName": "Netsmart",
+    "authType": "bearer",
+    "baseUrl": "https://api.netsmart.com/v1",
+    "healthEndpoint": "/patients",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "patients", "endpoint": "/patients", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nfe",
+    "displayName": "NFe",
+    "authType": "bearer",
+    "baseUrl": "https://api.nfe.fazenda.gov.br/v1",
+    "healthEndpoint": "/nfe",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/nfe", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ngpvan",
+    "displayName": "NGP VAN",
+    "authType": "bearer",
+    "baseUrl": "https://api.securevan.com/v4",
+    "healthEndpoint": "/people",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "people", "endpoint": "/people", "idField": "vanId",
+        "columns": [
+          { "name": "vanId", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "niledb",
+    "displayName": "NileDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.niledb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "notion-tasks",
+    "displayName": "Notion Tasks",
+    "authType": "bearer",
+    "baseUrl": "https://api.notion.com/v1",
+    "healthEndpoint": "/search",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tasks", "endpoint": "/databases/{databaseId}/query", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "notion-v3",
+    "displayName": "Notion v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.notion.com/v1",
+    "healthEndpoint": "/search",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "databases", "endpoint": "/search", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nz-ea",
+    "displayName": "NZ EA",
+    "authType": "bearer",
+    "baseUrl": "https://api.ea.govt.nz/v1",
+    "healthEndpoint": "/prices",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "prices", "endpoint": "/prices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "region", "type": "string", "nullable": true },
+          { "name": "price", "type": "number", "nullable": true },
+          { "name": "timestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "oceanbase-mysql",
+    "displayName": "OceanBase MySQL",
+    "authType": "bearer",
+    "baseUrl": "https://api.oceanbase.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "omie",
+    "displayName": "Omie",
+    "authType": "bearer",
+    "baseUrl": "https://app.omie.com.br/api/v1",
+    "healthEndpoint": "/geral/conta/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/financas/nfconsultar/", "idField": "codigo",
+        "columns": [
+          { "name": "codigo", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "numero", "type": "string", "nullable": true },
+          { "name": "valor_total", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "omnifocus",
+    "displayName": "OmniFocus",
+    "authType": "bearer",
+    "baseUrl": "https://api.omnigroup.com/v1",
+    "healthEndpoint": "/tasks",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tasks", "endpoint": "/tasks", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "completed", "type": "boolean", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "onedrive-v2",
+    "displayName": "OneDrive v2",
+    "authType": "bearer",
+    "baseUrl": "https://graph.microsoft.com/v1.0",
+    "healthEndpoint": "/me/drive",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "files", "endpoint": "/me/drive/root/children", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "size", "type": "number", "nullable": true },
+          { "name": "createdDateTime", "type": "datetime", "nullable": true },
+          { "name": "lastModifiedDateTime", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "lastModifiedDateTime"
+      }
+    ]
+  },
+  {
+    "engine": "opengov",
+    "displayName": "OpenGov",
+    "authType": "bearer",
+    "baseUrl": "https://api.opengov.com/v1",
+    "healthEndpoint": "/budgets",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "budgets", "endpoint": "/budgets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "oracle-gov",
+    "displayName": "Oracle Government",
+    "authType": "bearer",
+    "baseUrl": "https://api.oracle.com/gov/v1",
+    "healthEndpoint": "/services",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "services", "endpoint": "/services", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "outbrain",
+    "displayName": "Outbrain",
+    "authType": "bearer",
+    "baseUrl": "https://api.outbrain.com/v1.0",
+    "healthEndpoint": "/marketers",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/marketers/{marketerId}/campaigns", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdOn", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "outreach-v2",
+    "displayName": "Outreach v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.outreach.io/api/v2",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "prospects", "endpoint": "/prospects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "firstName", "type": "string", "nullable": true },
+          { "name": "lastName", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "createdAt", "type": "datetime", "nullable": true },
+          { "name": "updatedAt", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updatedAt"
+      }
+    ]
+  },
+  {
+    "engine": "paddle",
+    "displayName": "Paddle",
+    "authType": "bearer",
+    "baseUrl": "https://api.paddle.com",
+    "healthEndpoint": "/products",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "transactions", "endpoint": "/transactions", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "papertrail",
+    "displayName": "Papertrail",
+    "authType": "bearer",
+    "baseUrl": "https://papertrailapp.com/api/v1",
+    "healthEndpoint": "/systems",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/events/search", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "message", "type": "string", "nullable": true },
+          { "name": "received_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "patreon",
+    "displayName": "Patreon",
+    "authType": "bearer",
+    "baseUrl": "https://www.patreon.com/api/oauth2/v2",
+    "healthEndpoint": "/identity",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "members", "endpoint": "/members", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "full_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "peoplesoft",
+    "displayName": "PeopleSoft",
+    "authType": "bearer",
+    "baseUrl": "https://api.peoplesoft.com/v1",
+    "healthEndpoint": "/employees",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "employees", "endpoint": "/employees", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "percona",
+    "displayName": "Percona",
+    "authType": "bearer",
+    "baseUrl": "https://api.percona.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plane-v2",
+    "displayName": "Plane v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.plane.so/v1",
+    "healthEndpoint": "/workspaces",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "issues", "endpoint": "/workspaces/{workspaceId}/projects/{projectId}/issues", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plivo",
+    "displayName": "Plivo",
+    "authType": "bearer",
+    "baseUrl": "https://api.plivo.com/v1",
+    "healthEndpoint": "/Account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/Account/{authId}/Message", "idField": "message_uuid",
+        "columns": [
+          { "name": "message_uuid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "from_number", "type": "string", "nullable": true },
+          { "name": "to_number", "type": "string", "nullable": true },
+          { "name": "message_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plivo-cc",
+    "displayName": "Plivo CC",
+    "authType": "bearer",
+    "baseUrl": "https://api.plivo.com/v1",
+    "healthEndpoint": "/Account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "calls", "endpoint": "/Account/{authId}/Call", "idField": "call_uuid",
+        "columns": [
+          { "name": "call_uuid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "from_number", "type": "string", "nullable": true },
+          { "name": "to_number", "type": "string", "nullable": true },
+          { "name": "call_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plivo-v2",
+    "displayName": "Plivo v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.plivo.com/v1",
+    "healthEndpoint": "/Account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "phlo", "endpoint": "/Account/{authId}/Phlo", "idField": "phlo_id",
+        "columns": [
+          { "name": "phlo_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "postmark-v2",
+    "displayName": "Postmark v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.postmarkapp.com",
+    "healthEndpoint": "/server",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages/outbound", "idField": "MessageID",
+        "columns": [
+          { "name": "MessageID", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Subject", "type": "string", "nullable": true },
+          { "name": "ReceivedAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "powerschool",
+    "displayName": "PowerSchool",
+    "authType": "bearer",
+    "baseUrl": "https://your-district.powerschool.com/ws/v1",
+    "healthEndpoint": "/school",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "students", "endpoint": "/students", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "proctorio",
+    "displayName": "Proctorio",
+    "authType": "bearer",
+    "baseUrl": "https://api.proctorio.com/v1",
+    "healthEndpoint": "/exams",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "exams", "endpoint": "/exams", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "proto-io",
+    "displayName": "Proto.io",
+    "authType": "bearer",
+    "baseUrl": "https://api.proto.io/v1",
+    "healthEndpoint": "/projects",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "projects", "endpoint": "/projects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "questdb-v3",
+    "displayName": "QuestDB v3",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9000",
+    "healthEndpoint": "/exec",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/exec?query=SHOW+TABLES", "idField": "table",
+        "columns": [
+          { "name": "table", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ralph",
+    "displayName": "Ralph",
+    "authType": "bearer",
+    "baseUrl": "https://api.ralph.com/v1",
+    "healthEndpoint": "/assets",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "assets", "endpoint": "/assets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "recharge",
+    "displayName": "Recharge",
+    "authType": "bearer",
+    "baseUrl": "https://api.rechargepayments.com/v2",
+    "healthEndpoint": "/subscriptions",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscriptions", "endpoint": "/subscriptions", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "recruit",
+    "displayName": "Recruit",
+    "authType": "bearer",
+    "baseUrl": "https://api.recruit.com/v1",
+    "healthEndpoint": "/candidates",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "candidates", "endpoint": "/candidates", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "remember-the-milk",
+    "displayName": "Remember The Milk",
+    "authType": "bearer",
+    "baseUrl": "https://api.rememberthemilk.com/rest",
+    "healthEndpoint": "/?method=rtm.auth.getToken",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tasks", "endpoint": "/?method=rtm.tasks.getList", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "completed", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "respondus",
+    "displayName": "Respondus",
+    "authType": "bearer",
+    "baseUrl": "https://api.respondus.com/v1",
+    "healthEndpoint": "/exams",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "exams", "endpoint": "/exams", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "restaurant365",
+    "displayName": "Restaurant365",
+    "authType": "bearer",
+    "baseUrl": "https://api.restaurant365.com/v1",
+    "healthEndpoint": "/invoices",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/invoices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "rethinkdb",
+    "displayName": "RethinkDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8080",
+    "healthEndpoint": "/ajax/dashboard",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tables", "endpoint": "/ajax/tables", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "revel",
+    "displayName": "Revel",
+    "authType": "bearer",
+    "baseUrl": "https://api.revelsystems.com/v1",
+    "healthEndpoint": "/orders",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "orders", "endpoint": "/orders", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "revel-pay",
+    "displayName": "Revel Pay",
+    "authType": "bearer",
+    "baseUrl": "https://api.revelsystems.com/v1",
+    "healthEndpoint": "/payments",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "revenue-io",
+    "displayName": "Revenue.io",
+    "authType": "bearer",
+    "baseUrl": "https://api.revenue.io/v1",
+    "healthEndpoint": "/calls",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "calls", "endpoint": "/calls", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "duration", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "revue",
+    "displayName": "Revue",
+    "authType": "bearer",
+    "baseUrl": "https://www.getrevue.co/api/v2",
+    "healthEndpoint": "/account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscribers", "endpoint": "/subscribers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ringcentral-v2",
+    "displayName": "RingCentral v2",
+    "authType": "bearer",
+    "baseUrl": "https://platform.ringcentral.com/restapi/v1.0",
+    "healthEndpoint": "/account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "calls", "endpoint": "/account/~/call-log", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "direction", "type": "string", "nullable": true },
+          { "name": "duration", "type": "number", "nullable": true },
+          { "name": "startTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "route-mobile",
+    "displayName": "Route Mobile",
+    "authType": "bearer",
+    "baseUrl": "https://api.routemobile.com/v1",
+    "healthEndpoint": "/messages",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "from", "type": "string", "nullable": true },
+          { "name": "to", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "rumble",
+    "displayName": "Rumble",
+    "authType": "bearer",
+    "baseUrl": "https://console.rumble.run/api/v1.0",
+    "healthEndpoint": "/assets",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "assets", "endpoint": "/assets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "addresses", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sabre",
+    "displayName": "Sabre",
+    "authType": "bearer",
+    "baseUrl": "https://api.sabre.com/v3.6.0",
+    "healthEndpoint": "/shop/flights",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "flights", "endpoint": "/shop/flights", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "price", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sage-crm",
+    "displayName": "Sage CRM",
+    "authType": "bearer",
+    "baseUrl": "https://api.sage.com/crm/v1",
+    "healthEndpoint": "/contacts",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sage-intacct",
+    "displayName": "Sage Intacct",
+    "authType": "bearer",
+    "baseUrl": "https://api.intacct.com/ia/xml/xmlgw.phtml",
+    "healthEndpoint": "/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/?q=readByQuery&object=ARINVOICE", "idField": "RECORDNO",
+        "columns": [
+          { "name": "RECORDNO", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "RECORDID", "type": "string", "nullable": true },
+          { "name": "TOTALDUE", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "salesforce-gov",
+    "displayName": "Salesforce Gov",
+    "authType": "bearer",
+    "baseUrl": "https://your-instance.salesforce.com/services/data/v59.0",
+    "healthEndpoint": "/limits",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "accounts", "endpoint": "/query?q=SELECT+Id,Name+FROM+Account", "idField": "Id",
+        "columns": [
+          { "name": "Id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "Name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "salesforce-pardot",
+    "displayName": "Salesforce Pardot",
+    "authType": "bearer",
+    "baseUrl": "https://pi.pardot.com/api",
+    "healthEndpoint": "/v4/prospect/version",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "prospects", "endpoint": "/v4/prospects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "salesloft-v2",
+    "displayName": "Salesloft v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.salesloft.com/v2",
+    "healthEndpoint": "/me.json",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "people", "endpoint": "/people.json", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "email_address", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated_at"
+      }
+    ]
+  },
+  {
+    "engine": "sap-business-one",
+    "displayName": "SAP Business One",
+    "authType": "bearer",
+    "baseUrl": "https://your-server:50000/b1s/v2",
+    "healthEndpoint": "/BusinessPartners",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "businessPartners", "endpoint": "/BusinessPartners", "idField": "CardCode",
+        "columns": [
+          { "name": "CardCode", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "CardName", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sap-gov",
+    "displayName": "SAP Gov",
+    "authType": "bearer",
+    "baseUrl": "https://api.sap.com/gov/v1",
+    "healthEndpoint": "/services",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "services", "endpoint": "/services", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sap-isu",
+    "displayName": "SAP ISU",
+    "authType": "bearer",
+    "baseUrl": "https://api.sap.com/isu/v1",
+    "healthEndpoint": "/customers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "customers", "endpoint": "/customers", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "schoology",
+    "displayName": "Schoology",
+    "authType": "bearer",
+    "baseUrl": "https://api.schoology.com/v1",
+    "healthEndpoint": "/courses",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "courses", "endpoint": "/courses", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "course_title", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sendgrid-v4",
+    "displayName": "SendGrid v4",
+    "authType": "bearer",
+    "baseUrl": "https://api.sendgrid.com/v3",
+    "healthEndpoint": "/user/profile",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "contacts", "endpoint": "/marketing/contacts", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "email", "type": "string", "nullable": false },
+          { "name": "first_name", "type": "string", "nullable": true },
+          { "name": "last_name", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ses",
+    "displayName": "Amazon SES",
+    "authType": "bearer",
+    "baseUrl": "https://email.us-east-1.amazonaws.com",
+    "healthEndpoint": "/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "templates", "endpoint": "/v2/email/templates", "idField": "TemplateName",
+        "columns": [
+          { "name": "TemplateName", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "CreatedTimestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ses-v2",
+    "displayName": "Amazon SES v2",
+    "authType": "bearer",
+    "baseUrl": "https://email.us-east-1.amazonaws.com/v2",
+    "healthEndpoint": "/email",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "contacts", "endpoint": "/v2/email/contacts", "idField": "ContactIdentity",
+        "columns": [
+          { "name": "ContactIdentity", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "EmailAddress", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sevdesk",
+    "displayName": "SevDesk",
+    "authType": "bearer",
+    "baseUrl": "https://my.sevdesk.de/api/v1",
+    "healthEndpoint": "/Contact",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/Invoice", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "invoiceNumber", "type": "string", "nullable": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sharepoint",
+    "displayName": "SharePoint",
+    "authType": "bearer",
+    "baseUrl": "https://your-tenant.sharepoint.com/_api/v2.0",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "lists", "endpoint": "/sites/{siteId}/lists", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "createdDateTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "shortcut-v2",
+    "displayName": "Shortcut v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.app.shortcut.com/api/v3",
+    "healthEndpoint": "/member",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "stories", "endpoint": "/stories", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated_at"
+      }
+    ]
+  },
+  {
+    "engine": "sinch",
+    "displayName": "Sinch",
+    "authType": "bearer",
+    "baseUrl": "https://sms.api.sinch.com/xms/v1",
+    "healthEndpoint": "/batches",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/batches", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "to", "type": "string", "nullable": true },
+          { "name": "body", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "skyscanner",
+    "displayName": "Skyscanner",
+    "authType": "bearer",
+    "baseUrl": "https://partners.api.skyscanner.net/apiservices/v3",
+    "healthEndpoint": "/flights/live/search/create",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "flights", "endpoint": "/flights/live/search/create", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "price", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "skyward",
+    "displayName": "Skyward",
+    "authType": "bearer",
+    "baseUrl": "https://api.skyward.com/v1",
+    "healthEndpoint": "/students",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "students", "endpoint": "/students", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "slack-v3",
+    "displayName": "Slack v3",
+    "authType": "bearer",
+    "baseUrl": "https://slack.com/api",
+    "healthEndpoint": "/auth.test",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/conversations.history", "idField": "ts",
+        "columns": [
+          { "name": "ts", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "text", "type": "string", "nullable": true },
+          { "name": "user", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "slate",
+    "displayName": "Slate",
+    "authType": "bearer",
+    "baseUrl": "https://api.slate.com/v1",
+    "healthEndpoint": "/applications",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "applications", "endpoint": "/applications", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "smartsheet-v2",
+    "displayName": "Smartsheet v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.smartsheet.com/2.0",
+    "healthEndpoint": "/users/me",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "sheets", "endpoint": "/sheets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "modified_at", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "modified_at"
+      }
+    ]
+  },
+  {
+    "engine": "spanner-v2",
+    "displayName": "Cloud Spanner v2",
+    "authType": "bearer",
+    "baseUrl": "https://spanner.googleapis.com/v1",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "instances", "endpoint": "/projects/{project}/instances", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "displayName", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sprout-social",
+    "displayName": "Sprout Social",
+    "authType": "bearer",
+    "baseUrl": "https://api.sproutsocial.com/v1",
+    "healthEndpoint": "/profiles",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "text", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "square",
+    "displayName": "Square",
+    "authType": "bearer",
+    "baseUrl": "https://connect.squareup.com/v2",
+    "healthEndpoint": "/locations",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "payments", "endpoint": "/payments", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "object", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sumo-logic-v2",
+    "displayName": "Sumo Logic v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.sumologic.com/api/v1",
+    "healthEndpoint": "/collectors",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "collectors", "endpoint": "/collectors", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "synapse",
+    "displayName": "Azure Synapse",
+    "authType": "bearer",
+    "baseUrl": "https://your-workspace.dev.azuresynapse.net",
+    "healthEndpoint": "/pipelines",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "pipelines", "endpoint": "/pipelines", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "taboola",
+    "displayName": "Taboola",
+    "authType": "bearer",
+    "baseUrl": "https://api.taboola.com/1.2",
+    "healthEndpoint": "/users/current",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/advertisers/{advertiserId}/campaigns", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "branding_text", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tata-communications",
+    "displayName": "Tata Communications",
+    "authType": "bearer",
+    "baseUrl": "https://api.tatacommunications.com/v1",
+    "healthEndpoint": "/messages",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "from", "type": "string", "nullable": true },
+          { "name": "to", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "teams-v3",
+    "displayName": "Microsoft Teams v3",
+    "authType": "bearer",
+    "baseUrl": "https://graph.microsoft.com/v1.0",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/teams/{teamId}/channels/{channelId}/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "body", "type": "object", "nullable": true },
+          { "name": "createdDateTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "teamup",
+    "displayName": "Teamup",
+    "authType": "bearer",
+    "baseUrl": "https://api.teamup.com",
+    "healthEndpoint": "/calendars",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/calendars/{calendarKey}/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "start_dt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "telnyx",
+    "displayName": "Telnyx",
+    "authType": "bearer",
+    "baseUrl": "https://api.telnyx.com/v2",
+    "healthEndpoint": "/messaging_profiles",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/messages", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "from", "type": "string", "nullable": true },
+          { "name": "to", "type": "string", "nullable": true },
+          { "name": "sent_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tempo-v2",
+    "displayName": "Tempo v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.tempo.io/4",
+    "healthEndpoint": "/worklogs",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "worklogs", "endpoint": "/worklogs", "idField": "tempoAccountId",
+        "columns": [
+          { "name": "tempoAccountId", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "description", "type": "string", "nullable": true },
+          { "name": "startDate", "type": "date", "nullable": true },
+          { "name": "timeSeconds", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "teradata-v2",
+    "displayName": "Teradata v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.teradata.com/v2",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "things",
+    "displayName": "Things",
+    "authType": "bearer",
+    "baseUrl": "https://api.culturedcode.com/v1",
+    "healthEndpoint": "/tasks",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tasks", "endpoint": "/tasks", "idField": "id",
+        "to-do-list-name": "string",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "thruway",
+    "displayName": "Thruway",
+    "authType": "bearer",
+    "baseUrl": "https://api.thruway.com/v1",
+    "healthEndpoint": "/shipments",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "shipments", "endpoint": "/shipdays", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ticktick-v2",
+    "displayName": "TickTick v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.ticktick.com/open/v1",
+    "healthEndpoint": "/project",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tasks", "endpoint": "/task", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tidio",
+    "displayName": "Tidio",
+    "authType": "bearer",
+    "baseUrl": "https://api.tidio.com/v1",
+    "healthEndpoint": "/conversations",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "conversations", "endpoint": "/conversations", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tiny-erp",
+    "displayName": "Tiny ERP",
+    "authType": "bearer",
+    "baseUrl": "https://api.tiny.com.br/api2",
+    "healthEndpoint": "/notas.fiscais.pesquisa.php",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/notas.fiscais.pesquisa.php", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "numero", "type": "string", "nullable": true },
+          { "name": "valor", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tmobile",
+    "displayName": "T-Mobile",
+    "authType": "bearer",
+    "baseUrl": "https://api.t-mobile.com/v1",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "todoist-v2",
+    "displayName": "Todoist v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.todoist.com/rest/v2",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tasks", "endpoint": "/tasks", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "content", "type": "string", "nullable": false },
+          { "name": "is_completed", "type": "boolean", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "travelport",
+    "displayName": "Travelport",
+    "authType": "bearer",
+    "baseUrl": "https://api.travelport.com/v1",
+    "healthEndpoint": "/flights",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "flights", "endpoint": "/flights", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "price", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "trello-v2",
+    "displayName": "Trello v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.trello.com/1",
+    "healthEndpoint": "/members/me",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "cards", "endpoint": "/boards/{boardId}/cards", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "due", "type": "datetime", "nullable": true },
+          { "name": "dateLastActivity", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "dateLastActivity"
+      }
+    ]
+  },
+  {
+    "engine": "tripadvisor",
+    "displayName": "TripAdvisor",
+    "authType": "bearer",
+    "baseUrl": "https://api.tripadvisor.com/api/partner/v2",
+    "healthEndpoint": "/locations",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "reviews", "endpoint": "/location/{locationId}/reviews", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true },
+          { "name": "text", "type": "string", "nullable": true },
+          { "name": "published_date", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tripletex",
+    "displayName": "Tripletex",
+    "authType": "bearer",
+    "baseUrl": "https://api.tripletex.no/v2",
+    "healthEndpoint": "/token/session",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/invoice", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "invoiceNumber", "type": "string", "nullable": true },
+          { "name": "amount", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "turnitin",
+    "displayName": "Turnitin",
+    "authType": "bearer",
+    "baseUrl": "https://api.turnitin.com/api/v1",
+    "healthEndpoint": "/submissions",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "submissions", "endpoint": "/submissions", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "twilio-flex",
+    "displayName": "Twilio Flex",
+    "authType": "bearer",
+    "baseUrl": "https://flex-api.twilio.com/v1",
+    "healthEndpoint": "/Channels",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "channels", "endpoint": "/Channels", "idField": "sid",
+        "columns": [
+          { "name": "sid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "friendly_name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "twilio-v3",
+    "displayName": "Twilio v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.twilio.com",
+    "healthEndpoint": "/2010-04-01/Accounts.json",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "messages", "endpoint": "/2010-04-01/Accounts/{AccountSid}/Messages.json", "idField": "sid",
+        "columns": [
+          { "name": "sid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "to", "type": "string", "nullable": true },
+          { "name": "from", "type": "string", "nullable": true },
+          { "name": "date_sent", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "twillio-verify",
+    "displayName": "Twilio Verify",
+    "authType": "bearer",
+    "baseUrl": "https://verify.twilio.com/v2",
+    "healthEndpoint": "/Services",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "verifications", "endpoint": "/Services/{ServiceSid}/Verifications", "idField": "sid",
+        "columns": [
+          { "name": "sid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "date_created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "twinfield",
+    "displayName": "Twinfield",
+    "authType": "bearer",
+    "baseUrl": "https://api.twinfield.com/v1",
+    "healthEndpoint": "/invoices",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "invoices", "endpoint": "/invoices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "amount", "type": "number", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tyler-tech",
+    "displayName": "Tyler Technologies",
+    "authType": "bearer",
+    "baseUrl": "https://api.tylertech.com/v1",
+    "healthEndpoint": "/records",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "records", "endpoint": "/records", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "typesense",
+    "displayName": "Typesense",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8108",
+    "healthEndpoint": "/health",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "collections", "endpoint": "/collections", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "num_documents", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "verizon",
+    "displayName": "Verizon",
+    "authType": "bearer",
+    "baseUrl": "https://api.verizon.com/v1",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vertica-v2",
+    "displayName": "Vertica v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.vertica.com/v2",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "victoriametrics-v2",
+    "displayName": "VictoriaMetrics v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.victoriametrics.com/v1",
+    "healthEndpoint": "/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "labels", "endpoint": "/api/v1/label/__name__/values", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
   }
 ]

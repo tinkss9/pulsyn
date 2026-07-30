@@ -1,35 +1,39 @@
+// @ts-nocheck
+// Plivo Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'messages',
+    endpoint: '/Account/{authId}/Message',
+    schema: {
+      name: 'messages',
+      table: 'messages',
+      columns: [
+      { name: 'message_uuid', type: 'string', nullable: false, primaryKey: true },
+      { name: 'from_number', type: 'string', nullable: true },
+      { name: 'to_number', type: 'string', nullable: true },
+      { name: 'message_time', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['message_uuid'],
+    },
+    idField: 'message_uuid',
+    
+  },
+];
 
 @registerSource('plivo')
-export class PlivoConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class PlivoConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'plivo', 'plivo', config);
-    this.baseUrl = config.host || '';
+    super(id, 'plivo', 'plivo', config, {
+      baseUrl: config.host || 'https://api.plivo.com/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/Account',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }
