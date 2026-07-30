@@ -171,14 +171,19 @@ billingRoutes.post('/checkout', async (req: Request, res: Response) => {
   const { planId, email, organizationId } = req.body;
   const plan = getPlan(planId);
   if (!plan) return res.status(400).json({ error: `Invalid plan: ${planId}` });
-  if (!plan.stripePriceId) return res.status(400).json({ error: `Plan "${planId}" does not have a Stripe price ID configured` });
+  if (plan.price === 0) return res.status(400).json({ error: `Plan "${planId}" is free — no checkout needed` });
 
   try {
+    const origin = `${req.headers.origin || 'http://localhost:3000'}`;
     const session = await createCheckoutSession({
       customerEmail: email,
-      priceId: plan.stripePriceId,
-      successUrl: `${req.headers.origin || 'http://localhost:3000'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${req.headers.origin || 'http://localhost:3000'}/billing/canceled`,
+      // Use pre-configured price ID if available, otherwise inline price data
+      ...(plan.stripePriceId
+        ? { priceId: plan.stripePriceId }
+        : { priceData: { amount: plan.price, currency: plan.currency, productName: `Pulsyn ${plan.name}`, interval: 'month' } }
+      ),
+      successUrl: `${origin}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${origin}/billing/canceled`,
       metadata: { organizationId: organizationId || '', planId },
     });
     res.json({ data: { sessionId: session.id, url: session.url } });

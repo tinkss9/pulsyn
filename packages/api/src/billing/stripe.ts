@@ -52,7 +52,8 @@ export async function getCustomer(customerId: string) {
 export async function createCheckoutSession(params: {
   customerId?: string;
   customerEmail?: string;
-  priceId: string;
+  priceId?: string;
+  priceData?: { amount: number; currency: string; productName: string; interval?: 'month' | 'year' };
   successUrl: string;
   cancelUrl: string;
   metadata?: Record<string, string>;
@@ -61,10 +62,30 @@ export async function createCheckoutSession(params: {
   const s = getStripe();
   if (!s) throw new Error('Stripe not configured');
 
+  let lineItem: any;
+
+  if (params.priceId) {
+    // Use pre-configured price ID
+    lineItem = { price: params.priceId, quantity: 1 };
+  } else if (params.priceData) {
+    // Create inline price data (no pre-configured price needed)
+    lineItem = {
+      price_data: {
+        currency: params.priceData.currency,
+        unit_amount: params.priceData.amount,
+        product_data: { name: params.priceData.productName },
+        ...(params.priceData.interval ? { recurring: { interval: params.priceData.interval } } : {}),
+      },
+      quantity: 1,
+    };
+  } else {
+    throw new Error('Either priceId or priceData is required');
+  }
+
   return s.checkout.sessions.create({
     customer: params.customerId,
     customer_email: params.customerId ? undefined : params.customerEmail,
-    line_items: [{ price: params.priceId, quantity: 1 }],
+    line_items: [lineItem],
     mode: params.mode || 'subscription',
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
