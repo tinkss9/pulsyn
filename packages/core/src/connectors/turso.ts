@@ -1,35 +1,37 @@
+// @ts-nocheck
+// Turso Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'databases',
+    endpoint: '/organizations/{orgName}/databases',
+    schema: {
+      name: 'databases',
+      table: 'databases',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('turso')
-export class TursoConnector extends BaseConnector {
+export class TursoConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'turso', 'turso', config);
+    super(id, 'turso', 'turso', config, {
+      baseUrl: config.host || 'https://api.turso.tech/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/organizations',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: turso via native
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

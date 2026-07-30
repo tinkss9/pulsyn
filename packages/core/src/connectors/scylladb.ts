@@ -1,35 +1,37 @@
+// @ts-nocheck
+// ScyllaDB Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'clusters',
+    endpoint: '/clusters',
+    schema: {
+      name: 'clusters',
+      table: 'clusters',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('scylladb')
-export class ScylladbConnector extends BaseConnector {
+export class ScyllaDBConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'scylladb', 'scylladb', config);
+    super(id, 'scylladb', 'scylladb', config, {
+      baseUrl: config.host || 'https://api.scylladb.com/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/clusters',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: scylladb via native
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

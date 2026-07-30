@@ -1,35 +1,38 @@
+// @ts-nocheck
+// AWS Kinesis Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'streams',
+    endpoint: '/',
+    schema: {
+      name: 'streams',
+      table: 'streams',
+      columns: [
+      { name: 'StreamName', type: 'string', nullable: false, primaryKey: true },
+      { name: 'StreamStatus', type: 'string', nullable: true },
+      { name: 'ShardCount', type: 'number', nullable: true },
+      ],
+      primaryKey: ['StreamName'],
+    },
+    idField: 'StreamName',
+    
+  },
+];
 
 @registerSource('kinesis')
-export class KinesisConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class AWSKinesisConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'kinesis', 'kinesis', config);
-    this.baseUrl = config.host || '';
+    super(id, 'kinesis', 'kinesis', config, {
+      baseUrl: config.host || 'https://kinesis.us-east-1.amazonaws.com',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

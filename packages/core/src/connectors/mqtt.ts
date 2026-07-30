@@ -1,27 +1,37 @@
-﻿// @ts-nocheck
-// mqtt Connector — streaming source
-import { BaseConnector } from './base';
+// @ts-nocheck
+// MQTT Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'topics',
+    endpoint: '/topics',
+    schema: {
+      name: 'topics',
+      table: 'topics',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      { name: 'messages', type: 'number', nullable: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('mqtt')
-export class mqttConnector extends BaseConnector {
-  private client: any = null;
-
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.connected = true;
+export class MQTTConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'mqtt', 'mqtt', config, {
+      baseUrl: config.host || 'http://localhost:1883',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/status',
+      
+    });
   }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return true; }
-  async getTables(): Promise<string[]> { return ['topics', 'queues']; }
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [{ name: 'id', type: 'string', nullable: false, defaultValue: null }], primaryKey: ['id'], primaryKeys: ['id'] };
-  }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
-  async startCDC(): Promise<void> { throw new Error('CDC not implemented'); }
-  async stopCDC(): Promise<void> {}
 }

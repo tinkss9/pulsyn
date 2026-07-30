@@ -1,29 +1,38 @@
-﻿// @ts-nocheck
-// linode-object Connector — cloud storage source
-import { BaseConnector } from './base';
+// @ts-nocheck
+// Linode Object Storage Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'buckets',
+    endpoint: '/object-storage/buckets',
+    schema: {
+      name: 'buckets',
+      table: 'buckets',
+      columns: [
+      { name: 'label', type: 'string', nullable: false, primaryKey: true },
+      { name: 'cluster', type: 'string', nullable: true },
+      { name: 'created', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['label'],
+    },
+    idField: 'label',
+    
+  },
+];
 
 @registerSource('linode-object')
-export class linodeobjectConnector extends BaseConnector {
-  private client: any = null;
-  private bucket: string = '';
-
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.bucket = config.database || '';
-    this.connected = true;
+export class LinodeObjectStorageConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'linode-object', 'linode-object', config, {
+      baseUrl: config.host || 'https://api.linode.com/v4',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/object-storage/buckets',
+      
+    });
   }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return true; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [{ name: 'key', type: 'string', nullable: false, defaultValue: null }], primaryKey: ['key'], primaryKeys: ['key'] };
-  }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
-  async startCDC(): Promise<void> { throw new Error('CDC not supported'); }
-  async stopCDC(): Promise<void> {}
 }

@@ -1,35 +1,37 @@
+// @ts-nocheck
+// openGauss Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'databases',
+    endpoint: '/databases',
+    schema: {
+      name: 'databases',
+      table: 'databases',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('opengauss')
-export class OpengaussConnector extends BaseConnector {
+export class openGaussConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'opengauss', 'opengauss', config);
+    super(id, 'opengauss', 'opengauss', config, {
+      baseUrl: config.host || 'https://api.opengauss.com/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/databases',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: opengauss via native
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

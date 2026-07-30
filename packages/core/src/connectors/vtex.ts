@@ -1,35 +1,38 @@
+// @ts-nocheck
+// VTEX Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'products',
+    endpoint: '/catalog_system/pub/products/search',
+    schema: {
+      name: 'products',
+      table: 'products',
+      columns: [
+      { name: 'productId', type: 'string', nullable: false, primaryKey: true },
+      { name: 'productName', type: 'string', nullable: false },
+      { name: 'price', type: 'number', nullable: true },
+      ],
+      primaryKey: ['productId'],
+    },
+    idField: 'productId',
+    
+  },
+];
 
 @registerSource('vtex')
-export class VtexConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class VTEXConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'vtex', 'vtex', config);
-    this.baseUrl = config.host || '';
+    super(id, 'vtex', 'vtex', config, {
+      baseUrl: config.host || 'https://your-store.vtexcommercestable.com.br/api',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/catalog_system/pub/products/search',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

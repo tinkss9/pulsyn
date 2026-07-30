@@ -5414,5 +5414,3236 @@
         ]
       }
     ]
+  },
+  {
+    "engine": "firebird",
+    "displayName": "Firebird",
+    "authType": "bearer",
+    "baseUrl": "https://api.firebirdsql.org/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/databases/{dbId}/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "arangodb",
+    "displayName": "ArangoDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8529/_api",
+    "healthEndpoint": "/version",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "collections", "endpoint": "/collection", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "type", "type": "number", "nullable": true },
+          { "name": "status", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "dgraph",
+    "displayName": "Dgraph",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8080",
+    "healthEndpoint": "/health",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "predicates", "endpoint": "/admin/schema", "idField": "predicate",
+        "columns": [
+          { "name": "predicate", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nebulagraph",
+    "displayName": "NebulaGraph",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:19559",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "spaces", "endpoint": "/spaces", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "memgraph",
+    "displayName": "Memgraph",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:7687",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "nodes", "endpoint": "/nodes", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "labels", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "faunadb",
+    "displayName": "FaunaDB",
+    "authType": "bearer",
+    "baseUrl": "https://db.fauna.com/db",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "collections", "endpoint": "/collections", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "coll", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "surrealdb",
+    "displayName": "SurrealDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8000",
+    "healthEndpoint": "/health",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tables", "endpoint": "/table", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pocketbase",
+    "displayName": "PocketBase",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8090/api",
+    "healthEndpoint": "/health",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "collections", "endpoint": "/collections", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "singlestore",
+    "displayName": "SingleStore",
+    "authType": "bearer",
+    "baseUrl": "https://api.singlestore.com/v1",
+    "healthEndpoint": "/workspaces",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "databaseID",
+        "columns": [
+          { "name": "databaseID", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tidb",
+    "displayName": "TiDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.tidbcloud.com/v1beta",
+    "healthEndpoint": "/clusters",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "clusterId",
+        "columns": [
+          { "name": "clusterId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "clickhouse-v2",
+    "displayName": "ClickHouse v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.clickhouse.cloud/v1",
+    "healthEndpoint": "/queries",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "databricks-v3",
+    "displayName": "Databricks v3",
+    "authType": "bearer",
+    "baseUrl": "https://your-workspace.cloud.databricks.com/api/2.0",
+    "healthEndpoint": "/clusters/list",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters/list", "idField": "cluster_id",
+        "columns": [
+          { "name": "cluster_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "cluster_name", "type": "string", "nullable": true },
+          { "name": "state", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cosmosdb-v2",
+    "displayName": "CosmosDB v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-account.documents.azure.com",
+    "healthEndpoint": "/dbs",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "databases", "endpoint": "/dbs", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "_rid", "type": "string", "nullable": true },
+          { "name": "_ts", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "neo4j",
+    "displayName": "Neo4j",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:7474/db/neo4j",
+    "healthEndpoint": "/tx",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "nodes", "endpoint": "/tx/commit", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "labels", "type": "object", "nullable": true },
+          { "name": "properties", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "influxdb",
+    "displayName": "InfluxDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8086/api/v2",
+    "healthEndpoint": "/buckets",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/buckets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "retentionRules", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "timescaledb",
+    "displayName": "TimescaleDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.timescale.com/v1",
+    "healthEndpoint": "/services",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "services", "endpoint": "/services", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "state", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cockroachdb",
+    "displayName": "CockroachDB",
+    "authType": "bearer",
+    "baseUrl": "https://cockroachlabs.cloud/api/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "state", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mariadb",
+    "displayName": "MariaDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.mariadb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sqlite",
+    "displayName": "SQLite",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8080",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/databases/{dbId}/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "oracle",
+    "displayName": "Oracle",
+    "authType": "bearer",
+    "baseUrl": "https://api.oracle.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sap",
+    "displayName": "SAP",
+    "authType": "bearer",
+    "baseUrl": "https://api.sap.com/v1",
+    "healthEndpoint": "/systems",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "systems", "endpoint": "/systems", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "redis",
+    "displayName": "Redis",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:6379",
+    "healthEndpoint": "/ping",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "keys", "endpoint": "/keys", "idField": "key",
+        "columns": [
+          { "name": "key", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true },
+          { "name": "ttl", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "kafka",
+    "displayName": "Kafka",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8082",
+    "healthEndpoint": "/v3/clusters",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "topics", "endpoint": "/v3/clusters/{clusterId}/topics", "idField": "topic_name",
+        "columns": [
+          { "name": "topic_name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "partitions_count", "type": "number", "nullable": true },
+          { "name": "replication_factor", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "activemq",
+    "displayName": "ActiveMQ",
+    "authType": "basic",
+    "baseUrl": "http://localhost:8161/api/jolokia",
+    "healthEndpoint": "/version",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "queues", "endpoint": "/read/org.apache.activemq:type=Broker,brokerName=localhost,destinationType=Queue,destinationName=*", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "QueueSize", "type": "number", "nullable": true },
+          { "name": "EnqueueCount", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mqtt",
+    "displayName": "MQTT",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:1883",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "topics", "endpoint": "/topics", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "messages", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nats",
+    "displayName": "NATS",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8222",
+    "healthEndpoint": "/varz",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "streams", "endpoint": "/jsz", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "messages", "type": "number", "nullable": true },
+          { "name": "bytes", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pulsar",
+    "displayName": "Apache Pulsar",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8080/admin/v2",
+    "healthEndpoint": "/brokers/healthcheck",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tenants", "endpoint": "/tenants", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      },
+      { "name": "namespaces", "endpoint": "/namespaces", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "rabbitmq",
+    "displayName": "RabbitMQ",
+    "authType": "basic",
+    "baseUrl": "http://localhost:15672/api",
+    "healthEndpoint": "/overview",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "queues", "endpoint": "/queues", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "messages", "type": "number", "nullable": true },
+          { "name": "consumers", "type": "number", "nullable": true },
+          { "name": "state", "type": "string", "nullable": true }
+        ]
+      },
+      { "name": "exchanges", "endpoint": "/exchanges", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "eventhubs",
+    "displayName": "Azure Event Hubs",
+    "authType": "bearer",
+    "baseUrl": "https://your-namespace.servicebus.windows.net",
+    "healthEndpoint": "/$management",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "hubs", "endpoint": "/$management", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "kinesis",
+    "displayName": "AWS Kinesis",
+    "authType": "bearer",
+    "baseUrl": "https://kinesis.us-east-1.amazonaws.com",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "streams", "endpoint": "/", "idField": "StreamName",
+        "columns": [
+          { "name": "StreamName", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "StreamStatus", "type": "string", "nullable": true },
+          { "name": "ShardCount", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pubsub",
+    "displayName": "Google Pub/Sub",
+    "authType": "bearer",
+    "baseUrl": "https://pubsub.googleapis.com/v1",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "subscriptions", "endpoint": "/projects/{projectId}/subscriptions", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "topic", "type": "string", "nullable": true },
+          { "name": "ackDeadlineSeconds", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "redpanda",
+    "displayName": "Redpanda",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9644/v1",
+    "healthEndpoint": "/brokers",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "topics", "endpoint": "/topics", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "partition_count", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mixpanel-v3",
+    "displayName": "Mixpanel v3",
+    "authType": "bearer",
+    "baseUrl": "https://mixpanel.com/api/2.0",
+    "healthEndpoint": "/events",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "event",
+        "columns": [
+          { "name": "event", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "count", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "amplitude-v3",
+    "displayName": "Amplitude v3",
+    "authType": "bearer",
+    "baseUrl": "https://amplitude.com/api/2",
+    "healthEndpoint": "/usersearch",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/events/segmentation", "idField": "event",
+        "columns": [
+          { "name": "event", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "count", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "segment-v2",
+    "displayName": "Segment v2",
+    "authType": "bearer",
+    "baseUrl": "https://platform.segmentapis.com/v1",
+    "healthEndpoint": "/whoami",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "sources", "endpoint": "/sources", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "enabled", "type": "boolean", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "posthog-v2",
+    "displayName": "PostHog v2",
+    "authType": "bearer",
+    "baseUrl": "https://app.posthog.com/api",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "event", "type": "string", "nullable": false },
+          { "name": "timestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "datadog-v3",
+    "displayName": "Datadog v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.datadoghq.com/api/v2",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "metrics", "endpoint": "/metrics", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true },
+          { "name": "attributes", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "newrelic-v3",
+    "displayName": "New Relic v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.newrelic.com/v2",
+    "healthEndpoint": "/users.json",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "applications", "endpoint": "/applications.json", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "language", "type": "string", "nullable": true },
+          { "name": "last_reported_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sentry",
+    "displayName": "Sentry",
+    "authType": "bearer",
+    "baseUrl": "https://sentry.io/api/0",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "issues", "endpoint": "/issues/", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "level", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "count", "type": "number", "nullable": true },
+          { "name": "firstSeen", "type": "datetime", "nullable": true },
+          { "name": "lastSeen", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "lastSeen"
+      }
+    ]
+  },
+  {
+    "engine": "grafana-v2",
+    "displayName": "Grafana v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-grafana.com/api",
+    "healthEndpoint": "/health",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "dashboards", "endpoint": "/search", "idField": "uid",
+        "columns": [
+          { "name": "uid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "type", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true },
+          { "name": "updated", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated"
+      }
+    ]
+  },
+  {
+    "engine": "prometheus",
+    "displayName": "Prometheus",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9090/api/v1",
+    "healthEndpoint": "/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "targets", "endpoint": "/targets", "idField": "scrapeUrl",
+        "columns": [
+          { "name": "scrapeUrl", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "health", "type": "string", "nullable": true },
+          { "name": "lastScrape", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "loki",
+    "displayName": "Loki",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:3100/loki/api/v1",
+    "healthEndpoint": "/labels",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "streams", "endpoint": "/query_range", "idField": "stream",
+        "columns": [
+          { "name": "stream", "type": "object", "nullable": false, "primaryKey": true },
+          { "name": "values", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "splunk",
+    "displayName": "Splunk",
+    "authType": "bearer",
+    "baseUrl": "https://your-splunk.com:8089/services",
+    "healthEndpoint": "/server/info",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "saved_searches", "endpoint": "/saved/searches", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "search", "type": "string", "nullable": true },
+          { "name": "updated", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "kibana",
+    "displayName": "Kibana",
+    "authType": "bearer",
+    "baseUrl": "https://your-kibana.com/api",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "saved_objects", "endpoint": "/saved_objects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true },
+          { "name": "attributes", "type": "object", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "elasticsearch",
+    "displayName": "Elasticsearch",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9200",
+    "healthEndpoint": "/_cluster/health",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "indices", "endpoint": "/_cat/indices", "idField": "index",
+        "columns": [
+          { "name": "index", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "health", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "docs.count", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bigquery-v3",
+    "displayName": "BigQuery v3",
+    "authType": "bearer",
+    "baseUrl": "https://bigquery.googleapis.com/bigquery/v2",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "datasets", "endpoint": "/projects/{projectId}/datasets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "friendlyName", "type": "string", "nullable": true },
+          { "name": "creationTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "snowflake-v3",
+    "displayName": "Snowflake v3",
+    "authType": "bearer",
+    "baseUrl": "https://your-account.snowflakecomputing.com/api/v2",
+    "healthEndpoint": "/queries",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "warehouses", "endpoint": "/warehouses", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "size", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "redshift-v3",
+    "displayName": "Redshift v3",
+    "authType": "bearer",
+    "baseUrl": "https://redshift.us-east-1.amazonaws.com",
+    "healthEndpoint": "/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "ClusterIdentifier",
+        "columns": [
+          { "name": "ClusterIdentifier", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "ClusterStatus", "type": "string", "nullable": true },
+          { "name": "NodeType", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "dynamodb-v2",
+    "displayName": "DynamoDB v2",
+    "authType": "bearer",
+    "baseUrl": "https://dynamodb.us-east-1.amazonaws.com",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tables", "endpoint": "/", "idField": "TableName",
+        "columns": [
+          { "name": "TableName", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "TableStatus", "type": "string", "nullable": true },
+          { "name": "ItemCount", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "s3",
+    "displayName": "Amazon S3",
+    "authType": "bearer",
+    "baseUrl": "https://s3.us-east-1.amazonaws.com",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/", "idField": "Name",
+        "columns": [
+          { "name": "Name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "CreationDate", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "gcs",
+    "displayName": "Google Cloud Storage",
+    "authType": "bearer",
+    "baseUrl": "https://storage.googleapis.com/storage/v1",
+    "healthEndpoint": "/b",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/b", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "timeCreated", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "azure-blob",
+    "displayName": "Azure Blob Storage",
+    "authType": "bearer",
+    "baseUrl": "https://your-account.blob.core.windows.net",
+    "healthEndpoint": "/?comp=list",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "containers", "endpoint": "/?comp=list", "idField": "Name",
+        "columns": [
+          { "name": "Name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "LastModified", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "r2",
+    "displayName": "Cloudflare R2",
+    "authType": "bearer",
+    "baseUrl": "https://your-account.r2.cloudflarestorage.com",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/", "idField": "Name",
+        "columns": [
+          { "name": "Name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "CreationDate", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wasabi",
+    "displayName": "Wasabi",
+    "authType": "bearer",
+    "baseUrl": "https://s3.wasabisys.com",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/", "idField": "Name",
+        "columns": [
+          { "name": "Name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "CreationDate", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "backblaze-b2",
+    "displayName": "Backblaze B2",
+    "authType": "bearer",
+    "baseUrl": "https://api.backblazeb2.com/b2api/v2",
+    "healthEndpoint": "/b2_authorize_account",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/b2_list_buckets", "idField": "bucketId",
+        "columns": [
+          { "name": "bucketId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "bucketName", "type": "string", "nullable": false },
+          { "name": "bucketType", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "linode-object",
+    "displayName": "Linode Object Storage",
+    "authType": "bearer",
+    "baseUrl": "https://api.linode.com/v4",
+    "healthEndpoint": "/object-storage/buckets",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "buckets", "endpoint": "/object-storage/buckets", "idField": "label",
+        "columns": [
+          { "name": "label", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "cluster", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "metabase",
+    "displayName": "Metabase",
+    "authType": "bearer",
+    "baseUrl": "https://your-metabase.com/api",
+    "healthEndpoint": "/database",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/database", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "engine", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "superset",
+    "displayName": "Apache Superset",
+    "authType": "bearer",
+    "baseUrl": "https://your-superset.com/api/v1",
+    "healthEndpoint": "/database",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/database", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "database_name", "type": "string", "nullable": false },
+          { "name": "backend", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "redash",
+    "displayName": "Redash",
+    "authType": "bearer",
+    "baseUrl": "https://your-redash.com/api",
+    "healthEndpoint": "/data_sources",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "data_sources", "endpoint": "/data_sources", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mode",
+    "displayName": "Mode Analytics",
+    "authType": "bearer",
+    "baseUrl": "https://app.mode.com/api",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "reports", "endpoint": "/{workspace}/reports", "idField": "token",
+        "columns": [
+          { "name": "token", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "grafana-mimir",
+    "displayName": "Grafana Mimir",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9009/prometheus",
+    "healthEndpoint": "/api/v1/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "metrics", "endpoint": "/api/v1/label/__name__/values", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "thanos",
+    "displayName": "Thanos",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:10902/api/v1",
+    "healthEndpoint": "/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "targets", "endpoint": "/targets", "idField": "scrapeUrl",
+        "columns": [
+          { "name": "scrapeUrl", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "health", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "m3db",
+    "displayName": "M3DB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:7201/api/v1",
+    "healthEndpoint": "/services/m3db/placement",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "namespaces", "endpoint": "/services/m3db/namespace", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "options", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "victoriametrics",
+    "displayName": "VictoriaMetrics",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8428/api/v1",
+    "healthEndpoint": "/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "labels", "endpoint": "/labels", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "snowplow",
+    "displayName": "Snowplow",
+    "authType": "bearer",
+    "baseUrl": "https://your-snowplow.com/api",
+    "healthEndpoint": "/micro/health",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "event_id",
+        "columns": [
+          { "name": "event_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "event_name", "type": "string", "nullable": true },
+          { "name": "derived_tstamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "rudderstack",
+    "displayName": "RudderStack",
+    "authType": "bearer",
+    "baseUrl": "https://api.rudderstack.com/v2",
+    "healthEndpoint": "/sources",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "sources", "endpoint": "/sources", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "enabled", "type": "boolean", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "heap-v2",
+    "displayName": "Heap v2",
+    "authType": "bearer",
+    "baseUrl": "https://heapanalytics.com/api",
+    "healthEndpoint": "/version",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "event_id",
+        "columns": [
+          { "name": "event_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "event_type", "type": "string", "nullable": true },
+          { "name": "time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "hotjar-v2",
+    "displayName": "Hotjar v2",
+    "authType": "bearer",
+    "baseUrl": "https://insights.hotjar.com/api",
+    "healthEndpoint": "/sites",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "surveys", "endpoint": "/sites/{siteId}/surveys", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "fullstory-v2",
+    "displayName": "FullStory v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.fullstory.com/v2",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "users", "endpoint": "/users", "idField": "uid",
+        "columns": [
+          { "name": "uid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "display_name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mouseflow-v2",
+    "displayName": "Mouseflow v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.mouseflow.com/v1",
+    "healthEndpoint": "/websites",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "recordings", "endpoint": "/websites/{websiteId}/recordings", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "duration", "type": "number", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "plausible-v2",
+    "displayName": "Plausible v2",
+    "authType": "bearer",
+    "baseUrl": "https://plausible.io/api/v2",
+    "healthEndpoint": "/realtime/visitors",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "stats", "endpoint": "/stats/breakdown", "idField": "source",
+        "columns": [
+          { "name": "source", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "visitors", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pendo-v2",
+    "displayName": "Pendo v2",
+    "authType": "bearer",
+    "baseUrl": "https://app.pendo.io/api/v1",
+    "healthEndpoint": "/page",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "pages", "endpoint": "/page", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "createdAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "fathom-v2",
+    "displayName": "Fathom v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.usefathom.com/v1",
+    "healthEndpoint": "/sites",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "sites", "endpoint": "/sites", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "matomo-v2",
+    "displayName": "Matomo v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-matomo.com/index.php",
+    "healthEndpoint": "?module=API&method=SitesManager.getAllSites&format=JSON",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "sites", "endpoint": "?module=API&method=SitesManager.getAllSites&format=JSON", "idField": "idsite",
+        "columns": [
+          { "name": "idsite", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "main_url", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "crazyegg-v2",
+    "displayName": "Crazy Egg v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.crazyegg.com/v1",
+    "healthEndpoint": "/snapshots",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "snapshots", "endpoint": "/snapshots", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sessioncam-v2",
+    "displayName": "SessionCam v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.sessioncam.com/v1",
+    "healthEndpoint": "/recordings",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "recordings", "endpoint": "/recordings", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "duration", "type": "number", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "countly",
+    "displayName": "Countly",
+    "authType": "bearer",
+    "baseUrl": "https://your-countly.com/o",
+    "healthEndpoint": "/apps/all",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "apps", "endpoint": "/apps/all", "idField": "_id",
+        "columns": [
+          { "name": "_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "domo-v2",
+    "displayName": "Domo v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.domo.com/v1",
+    "healthEndpoint": "/datasets",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "datasets", "endpoint": "/datasets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "rows", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sisense-v2",
+    "displayName": "Sisense v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-sisense.com/api/v1",
+    "healthEndpoint": "/dashboards",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "dashboards", "endpoint": "/dashboards", "idField": "oid",
+        "columns": [
+          { "name": "oid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "created", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "looker-v2",
+    "displayName": "Looker v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-looker.com/api/4.0",
+    "healthEndpoint": "/user",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "looks", "endpoint": "/looks", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tableau-v3",
+    "displayName": "Tableau v3",
+    "authType": "bearer",
+    "baseUrl": "https://your-tableau.com/api/3.19",
+    "healthEndpoint": "/sites",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "workbooks", "endpoint": "/sites/{siteId}/workbooks", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated_at"
+      }
+    ]
+  },
+  {
+    "engine": "power-bi-v2",
+    "displayName": "Power BI v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.powerbi.com/v1.0",
+    "healthEndpoint": "/myorg/groups",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "reports", "endpoint": "/myorg/reports", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "createdDateTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "metabase-v2",
+    "displayName": "Metabase v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-metabase.com/api",
+    "healthEndpoint": "/database",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/database", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "engine", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mode-v2",
+    "displayName": "Mode v2",
+    "authType": "bearer",
+    "baseUrl": "https://app.mode.com/api",
+    "healthEndpoint": "/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "reports", "endpoint": "/{workspace}/reports", "idField": "token",
+        "columns": [
+          { "name": "token", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "grafana-mimir-v2",
+    "displayName": "Grafana Mimir v2",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9009/prometheus",
+    "healthEndpoint": "/api/v1/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "metrics", "endpoint": "/api/v1/label/__name__/values", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "google-analytics-v3",
+    "displayName": "Google Analytics v3",
+    "authType": "bearer",
+    "baseUrl": "https://analyticsdata.googleapis.com/v1beta",
+    "healthEndpoint": "/properties",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "properties", "endpoint": "/properties", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "displayName", "type": "string", "nullable": true },
+          { "name": "createTime", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "splunk-v2",
+    "displayName": "Splunk v2",
+    "authType": "bearer",
+    "baseUrl": "https://your-splunk.com:8089/services",
+    "healthEndpoint": "/server/info",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "saved_searches", "endpoint": "/saved/searches", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "search", "type": "string", "nullable": true },
+          { "name": "updated", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "splunk-iot",
+    "displayName": "Splunk IoT",
+    "authType": "bearer",
+    "baseUrl": "https://your-splunk.com:8089/services",
+    "healthEndpoint": "/server/info",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "source", "type": "string", "nullable": true },
+          { "name": "sourcetype", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "datadog-iot",
+    "displayName": "Datadog IoT",
+    "authType": "bearer",
+    "baseUrl": "https://api.datadoghq.com/api/v2",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/iot/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "blynk",
+    "displayName": "Blynk",
+    "authType": "bearer",
+    "baseUrl": "https://blynk.cloud/external/api",
+    "healthEndpoint": "/isHardwareConnected",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "online", "type": "boolean", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "losant",
+    "displayName": "Losant",
+    "authType": "bearer",
+    "baseUrl": "https://api.losant.com",
+    "healthEndpoint": "/applications",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/applications/{appId}/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "description", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "particle",
+    "displayName": "Particle",
+    "authType": "bearer",
+    "baseUrl": "https://api.particle.io/v1",
+    "healthEndpoint": "/devices",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "last_heard", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "thingsboard",
+    "displayName": "ThingsBoard",
+    "authType": "bearer",
+    "baseUrl": "https://your-thingsboard.com/api",
+    "healthEndpoint": "/tenant/devices",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/tenant/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "object", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ubidots",
+    "displayName": "Ubidots",
+    "authType": "bearer",
+    "baseUrl": "https://industrial.api.ubidots.com/api/v1.6",
+    "healthEndpoint": "/datasources",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/datasources", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "label", "type": "string", "nullable": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "canvass",
+    "displayName": "Canvass",
+    "authType": "bearer",
+    "baseUrl": "https://api.canvass.io/v1",
+    "healthEndpoint": "/assets",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "assets", "endpoint": "/assets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "echo",
+    "displayName": "Echo",
+    "authType": "bearer",
+    "baseUrl": "https://api.echo.com/v1",
+    "healthEndpoint": "/devices",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "aws-iot",
+    "displayName": "AWS IoT",
+    "authType": "bearer",
+    "baseUrl": "https://iot.us-east-1.amazonaws.com",
+    "healthEndpoint": "/things",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "things", "endpoint": "/things", "idField": "thingName",
+        "columns": [
+          { "name": "thingName", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "thingTypeName", "type": "string", "nullable": true },
+          { "name": "version", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "azure-iot",
+    "displayName": "Azure IoT",
+    "authType": "bearer",
+    "baseUrl": "https://your-hub.azure-devices.net",
+    "healthEndpoint": "/devices",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "devices", "endpoint": "/devices", "idField": "deviceId",
+        "columns": [
+          { "name": "deviceId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "connectionState", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "gcp-iot",
+    "displayName": "Google Cloud IoT",
+    "authType": "bearer",
+    "baseUrl": "https://cloudiot.googleapis.com/v1",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "registries", "endpoint": "/projects/{projectId}/locations/{location}/registries", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "abante-cart",
+    "displayName": "AbanteCart",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cs-cart",
+    "displayName": "CS-Cart",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/4.0",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "product_id",
+        "columns": [
+          { "name": "product_id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "product", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cubecart",
+    "displayName": "CubeCart",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "product_id",
+        "columns": [
+          { "name": "product_id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "ecwid",
+    "displayName": "Ecwid",
+    "authType": "bearer",
+    "baseUrl": "https://app.ecwid.com/api/v3",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "opencart",
+    "displayName": "OpenCart",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/index.php?route=api",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "product_id",
+        "columns": [
+          { "name": "product_id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "oscommerce",
+    "displayName": "osCommerce",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "shift4shop",
+    "displayName": "Shift4Shop",
+    "authType": "bearer",
+    "baseUrl": "https://api.3dcart.com/v1",
+    "healthEndpoint": "/Products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/Products", "idField": "CatalogID",
+        "columns": [
+          { "name": "CatalogID", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "Name", "type": "string", "nullable": false },
+          { "name": "Price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "volusion",
+    "displayName": "Volusion",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/v1",
+    "healthEndpoint": "/Products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/Products", "idField": "ProductID",
+        "columns": [
+          { "name": "ProductID", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "ProductName", "type": "string", "nullable": false },
+          { "name": "Price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vtex",
+    "displayName": "VTEX",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.vtexcommercestable.com.br/api",
+    "healthEndpoint": "/catalog_system/pub/products/search",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "products", "endpoint": "/catalog_system/pub/products/search", "idField": "productId",
+        "columns": [
+          { "name": "productId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "productName", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "x-cart",
+    "displayName": "X-Cart",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "zen-cart",
+    "displayName": "Zen Cart",
+    "authType": "bearer",
+    "baseUrl": "https://your-store.com/api/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wix-ecom",
+    "displayName": "Wix eCommerce",
+    "authType": "bearer",
+    "baseUrl": "https://www.wixapis.com/stores/v2",
+    "healthEndpoint": "/products",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "global-shop",
+    "displayName": "GlobalShop",
+    "authType": "bearer",
+    "baseUrl": "https://api.globalshop.com/v1",
+    "healthEndpoint": "/products",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "lazada",
+    "displayName": "Lazada",
+    "authType": "bearer",
+    "baseUrl": "https://api.lazada.com/rest",
+    "healthEndpoint": "/products/get",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "products", "endpoint": "/products/get", "idField": "item_id",
+        "columns": [
+          { "name": "item_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bukalapak",
+    "displayName": "Bukalapak",
+    "authType": "bearer",
+    "baseUrl": "https://api.bukalapak.com/v2",
+    "healthEndpoint": "/products",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "products", "endpoint": "/products", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "price", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pinterest-ads",
+    "displayName": "Pinterest Ads",
+    "authType": "bearer",
+    "baseUrl": "https://api.pinterest.com/v5",
+    "healthEndpoint": "/ad_accounts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/ad_accounts/{adAccountId}/campaigns", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "snapchat-ads",
+    "displayName": "Snapchat Ads",
+    "authType": "bearer",
+    "baseUrl": "https://adsapi.snapchat.com/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/adaccounts/{adAccountId}/campaigns", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tiktok-ads",
+    "displayName": "TikTok Ads",
+    "authType": "bearer",
+    "baseUrl": "https://business-api.tiktok.com/open_api/v1.3",
+    "healthEndpoint": "/user/info/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/campaign/get/", "idField": "campaign_id",
+        "columns": [
+          { "name": "campaign_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "campaign_name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "create_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "twitter-ads",
+    "displayName": "Twitter Ads",
+    "authType": "bearer",
+    "baseUrl": "https://ads-api.twitter.com/11",
+    "healthEndpoint": "/accounts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/accounts/{accountId}/campaigns", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "reddit-ads",
+    "displayName": "Reddit Ads",
+    "authType": "bearer",
+    "baseUrl": "https://ads-api.reddit.com/v3",
+    "healthEndpoint": "/accounts",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "campaigns", "endpoint": "/accounts/{accountId}/campaigns", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "linkedin-sales",
+    "displayName": "LinkedIn Sales",
+    "authType": "bearer",
+    "baseUrl": "https://api.linkedin.com/v2",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "leads", "endpoint": "/leadFormResponses", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "submittedAt", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bluesky",
+    "displayName": "Bluesky",
+    "authType": "bearer",
+    "baseUrl": "https://public.api.bsky.app/xrpc",
+    "healthEndpoint": "/app.bsky.actor.getProfile",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "posts", "endpoint": "/app.bsky.feed.getAuthorFeed", "idField": "uri",
+        "columns": [
+          { "name": "uri", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "text", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "mastodon",
+    "displayName": "Mastodon",
+    "authType": "bearer",
+    "baseUrl": "https://mastodon.social/api/v1",
+    "healthEndpoint": "/instance",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "statuses", "endpoint": "/statuses", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "content", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nostr",
+    "displayName": "Nostr",
+    "authType": "bearer",
+    "baseUrl": "https://relay.example.com",
+    "healthEndpoint": "/",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "events", "endpoint": "/events", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "kind", "type": "number", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "threads",
+    "displayName": "Threads",
+    "authType": "bearer",
+    "baseUrl": "https://graph.threads.net/v1.0",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "posts", "endpoint": "/me/threads", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "text", "type": "string", "nullable": true },
+          { "name": "timestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "soundcloud",
+    "displayName": "SoundCloud",
+    "authType": "bearer",
+    "baseUrl": "https://api.soundcloud.com",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "tracks", "endpoint": "/me/tracks", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vimeo",
+    "displayName": "Vimeo",
+    "authType": "bearer",
+    "baseUrl": "https://api.vimeo.com",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "videos", "endpoint": "/me/videos", "idField": "uri",
+        "columns": [
+          { "name": "uri", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "dailymotion",
+    "displayName": "Dailymotion",
+    "authType": "bearer",
+    "baseUrl": "https://api.dailymotion.com",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "videos", "endpoint": "/me/videos", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "youtube-music",
+    "displayName": "YouTube Music",
+    "authType": "bearer",
+    "baseUrl": "https://music.youtube.com/youtubei/v1",
+    "healthEndpoint": "/browse",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "playlists", "endpoint": "/browse", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "bitchute",
+    "displayName": "BitChute",
+    "authType": "bearer",
+    "baseUrl": "https://api.bitchute.com/v1",
+    "healthEndpoint": "/videos",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "videos", "endpoint": "/videos", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "odysee",
+    "displayName": "Odysee",
+    "authType": "bearer",
+    "baseUrl": "https://api.odysee.com",
+    "healthEndpoint": "/proxy",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "claims", "endpoint": "/proxy", "idField": "claim_id",
+        "columns": [
+          { "name": "claim_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "gab",
+    "displayName": "Gab",
+    "authType": "bearer",
+    "baseUrl": "https://api.gab.com/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "posts", "endpoint": "/timelines/home", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "content", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "minds",
+    "displayName": "Minds",
+    "authType": "bearer",
+    "baseUrl": "https://www.minds.com/api/v1",
+    "healthEndpoint": "/channel",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "posts", "endpoint": "/newsfeed", "idField": "guid",
+        "columns": [
+          { "name": "guid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "message", "type": "string", "nullable": true },
+          { "name": "created_timestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "parler",
+    "displayName": "Parler",
+    "authType": "bearer",
+    "baseUrl": "https://api.parler.com/v1",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "posts", "endpoint": "/feed", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "body", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "truth-social",
+    "displayName": "Truth Social",
+    "authType": "bearer",
+    "baseUrl": "https://truthsocial.com/api/v1",
+    "healthEndpoint": "/accounts/verify_credentials",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "statuses", "endpoint": "/statuses", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "content", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "line-works",
+    "displayName": "LINE WORKS",
+    "authType": "bearer",
+    "baseUrl": "https://www.worksapis.com/v1.0",
+    "healthEndpoint": "/users",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "users", "endpoint": "/users", "idField": "userId",
+        "columns": [
+          { "name": "userId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "displayName", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "wechat-work",
+    "displayName": "WeCom",
+    "authType": "bearer",
+    "baseUrl": "https://qyapi.weixin.qq.com/cgi-bin",
+    "healthEndpoint": "/gettoken",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "members", "endpoint": "/user/list", "idField": "userid",
+        "columns": [
+          { "name": "userid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "email", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "intercom-support",
+    "displayName": "Intercom Support",
+    "authType": "bearer",
+    "baseUrl": "https://api.intercom.io",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "conversations", "endpoint": "/conversations", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "updated_at"
+      }
+    ]
+  },
+  {
+    "engine": "jira-service",
+    "displayName": "Jira Service Management",
+    "authType": "bearer",
+    "baseUrl": "https://your-domain.atlassian.net/rest/servicedeskapi",
+    "healthEndpoint": "/servicedesk",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "requests", "endpoint": "/request", "idField": "issueId",
+        "columns": [
+          { "name": "issueId", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "summary", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "createdDate", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "servicedesk",
+    "displayName": "ServiceDesk Plus",
+    "authType": "bearer",
+    "baseUrl": "https://your-servicedesk.com/api/v3",
+    "healthEndpoint": "/requests",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "requests", "endpoint": "/requests", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "subject", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sysaid",
+    "displayName": "SysAid",
+    "authType": "bearer",
+    "baseUrl": "https://your-sysaid.com/api/v1",
+    "healthEndpoint": "/tickets",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tickets", "endpoint": "/tickets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "create_date", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "spiceworks",
+    "displayName": "Spiceworks",
+    "authType": "bearer",
+    "baseUrl": "https://api.spiceworks.com/v1",
+    "healthEndpoint": "/tickets",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tickets", "endpoint": "/tickets", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "summary", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "codacy",
+    "displayName": "Codacy",
+    "authType": "bearer",
+    "baseUrl": "https://api.codacy.com/v2",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "repositories", "endpoint": "/user/repos", "idField": "uuid",
+        "columns": [
+          { "name": "uuid", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "language", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "codeclimate",
+    "displayName": "Code Climate",
+    "authType": "bearer",
+    "baseUrl": "https://api.codeclimate.com/v1",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "repos", "endpoint": "/repos", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "score", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "codecov",
+    "displayName": "Codecov",
+    "authType": "bearer",
+    "baseUrl": "https://api.codecov.io/api/v2",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "repos", "endpoint": "/github/{owner}/repos", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "coverage", "type": "number", "nullable": true },
+          { "name": "updatestamp", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "coveralls",
+    "displayName": "Coveralls",
+    "authType": "bearer",
+    "baseUrl": "https://coveralls.io/api/v1",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "repos", "endpoint": "/github/{owner}/repos", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "coverage", "type": "number", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "deepsource",
+    "displayName": "DeepSource",
+    "authType": "bearer",
+    "baseUrl": "https://api.deepsource.com/v1",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "repos", "endpoint": "/repos", "idField": "key",
+        "columns": [
+          { "name": "key", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "is_active", "type": "boolean", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "gitguardian",
+    "displayName": "GitGuardian",
+    "authType": "bearer",
+    "baseUrl": "https://api.gitguardian.com/v1",
+    "healthEndpoint": "/health",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "incidents", "endpoint": "/incidents", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "severity", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "semgrep",
+    "displayName": "Semgrep",
+    "authType": "bearer",
+    "baseUrl": "https://semgrep.dev/api/v1",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "findings", "endpoint": "/deployments/{deploymentId}/findings", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "severity", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sonarqube",
+    "displayName": "SonarQube",
+    "authType": "bearer",
+    "baseUrl": "https://your-sonarqube.com/api",
+    "healthEndpoint": "/system/status",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "projects", "endpoint": "/projects/search", "idField": "key",
+        "columns": [
+          { "name": "key", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "lastAnalysis", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "dependabot",
+    "displayName": "Dependabot",
+    "authType": "bearer",
+    "baseUrl": "https://api.github.com",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "alerts", "endpoint": "/repos/{owner}/{repo}/dependabot/alerts", "idField": "number",
+        "columns": [
+          { "name": "number", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "dependency", "type": "object", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "renovate",
+    "displayName": "Renovate",
+    "authType": "bearer",
+    "baseUrl": "https://api.github.com",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "pull_requests", "endpoint": "/repos/{owner}/{repo}/pulls", "idField": "number",
+        "columns": [
+          { "name": "number", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "title", "type": "string", "nullable": false },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "terraform-cloud",
+    "displayName": "Terraform Cloud",
+    "authType": "bearer",
+    "baseUrl": "https://app.terraform.io/api/v2",
+    "healthEndpoint": "/organizations",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "workspaces", "endpoint": "/workspaces", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "environment", "type": "string", "nullable": true },
+          { "name": "created-at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "fly-io",
+    "displayName": "Fly.io",
+    "authType": "bearer",
+    "baseUrl": "https://api.fly.io/graphql",
+    "healthEndpoint": "/graphql",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "apps", "endpoint": "/graphql", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "status", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "github-actions",
+    "displayName": "GitHub Actions",
+    "authType": "bearer",
+    "baseUrl": "https://api.github.com",
+    "healthEndpoint": "/user",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "workflows", "endpoint": "/repos/{owner}/{repo}/actions/workflows", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "state", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "databricks-v3",
+    "displayName": "Databricks v3",
+    "authType": "bearer",
+    "baseUrl": "https://your-workspace.cloud.databricks.com/api/2.1",
+    "healthEndpoint": "/clusters/list",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "jobs", "endpoint": "/jobs/list", "idField": "job_id",
+        "columns": [
+          { "name": "job_id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_time", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "prometheus-v2",
+    "displayName": "Prometheus v2",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9090/api/v1",
+    "healthEndpoint": "/status/config",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "targets", "endpoint": "/targets", "idField": "scrapeUrl",
+        "columns": [
+          { "name": "scrapeUrl", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "health", "type": "string", "nullable": true },
+          { "name": "lastScrape", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "loki-v2",
+    "displayName": "Loki v2",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:3100/loki/api/v1",
+    "healthEndpoint": "/labels",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "streams", "endpoint": "/query_range", "idField": "stream",
+        "columns": [
+          { "name": "stream", "type": "object", "nullable": false, "primaryKey": true },
+          { "name": "values", "type": "object", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "datadog-v3",
+    "displayName": "Datadog v3",
+    "authType": "bearer",
+    "baseUrl": "https://api.datadoghq.com/api/v2",
+    "healthEndpoint": "/me",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "monitors", "endpoint": "/monitor", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "type", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created", "type": "datetime", "nullable": true },
+          { "name": "modified", "type": "datetime", "nullable": true }
+        ],
+        "modifiedField": "modified"
+      }
+    ]
+  },
+  {
+    "engine": "countly",
+    "displayName": "Countly",
+    "authType": "bearer",
+    "baseUrl": "https://your-countly.com/o",
+    "healthEndpoint": "/apps/all",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "apps", "endpoint": "/apps/all", "idField": "_id",
+        "columns": [
+          { "name": "_id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "crazyegg-v2",
+    "displayName": "Crazy Egg v2",
+    "authType": "bearer",
+    "baseUrl": "https://api.crazyegg.com/v1",
+    "healthEndpoint": "/snapshots",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "snapshots", "endpoint": "/snapshots", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "number", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": true },
+          { "name": "status", "type": "string", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "neon",
+    "displayName": "Neon",
+    "authType": "bearer",
+    "baseUrl": "https://console.neon.tech/api/v2",
+    "healthEndpoint": "/projects",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "projects", "endpoint": "/projects", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "planetscale",
+    "displayName": "PlanetScale",
+    "authType": "bearer",
+    "baseUrl": "https://api.planetscale.com/v1",
+    "healthEndpoint": "/organizations",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "databases", "endpoint": "/organizations/{orgId}/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "turso",
+    "displayName": "Turso",
+    "authType": "bearer",
+    "baseUrl": "https://api.turso.tech/v1",
+    "healthEndpoint": "/organizations",
+    "paginationType": "cursor",
+    "resources": [
+      { "name": "databases", "endpoint": "/organizations/{orgName}/databases", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "created_at", "type": "datetime", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "yugabytedb",
+    "displayName": "YugabyteDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.yugabyte.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "scylladb",
+    "displayName": "ScyllaDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.scylladb.com/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "questdb",
+    "displayName": "QuestDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9000",
+    "healthEndpoint": "/exec",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/exec?query=SHOW+TABLES", "idField": "table",
+        "columns": [
+          { "name": "table", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "materialize",
+    "displayName": "Materialize",
+    "authType": "bearer",
+    "baseUrl": "https://api.materialize.com/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "risingwave",
+    "displayName": "RisingWave",
+    "authType": "bearer",
+    "baseUrl": "https://api.risingwave.com/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "starrocks",
+    "displayName": "StarRocks",
+    "authType": "bearer",
+    "baseUrl": "https://api.starrocks.com/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "doris",
+    "displayName": "Apache Doris",
+    "authType": "bearer",
+    "baseUrl": "https://api.doris.apache.org/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "pinot",
+    "displayName": "Apache Pinot",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9000",
+    "healthEndpoint": "/tables",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "type", "type": "string", "nullable": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "druid",
+    "displayName": "Apache Druid",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8888/druid/v2",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "datasources", "endpoint": "/datasources", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vitess",
+    "displayName": "Vitess",
+    "authType": "bearer",
+    "baseUrl": "https://api.vitess.io/v1",
+    "healthEndpoint": "/clusters",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "clusters", "endpoint": "/clusters", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "firebolt",
+    "displayName": "Firebolt",
+    "authType": "bearer",
+    "baseUrl": "https://api.firebolt.io",
+    "healthEndpoint": "/core/v1/account",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/core/v1/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "duckdb",
+    "displayName": "DuckDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8080",
+    "healthEndpoint": "/status",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "cratedb",
+    "displayName": "CrateDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:4200",
+    "healthEndpoint": "/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/_sql", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "h2",
+    "displayName": "H2 Database",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:8082",
+    "healthEndpoint": "/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "hsqldb",
+    "displayName": "HSQLDB",
+    "authType": "bearer",
+    "baseUrl": "http://localhost:9090",
+    "healthEndpoint": "/",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "tables", "endpoint": "/tables", "idField": "name",
+        "columns": [
+          { "name": "name", "type": "string", "nullable": false, "primaryKey": true }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "nuodb",
+    "displayName": "NuoDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.nuodb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "sequoiadb",
+    "displayName": "SequoiaDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.sequoiadb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "deepdb",
+    "displayName": "DeepDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.deepdb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "gaussdb",
+    "displayName": "GaussDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.gaussdb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "opengauss",
+    "displayName": "openGauss",
+    "authType": "bearer",
+    "baseUrl": "https://api.opengauss.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "greatdb",
+    "displayName": "GreatDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.greatdb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "polardb",
+    "displayName": "PolarDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.polardb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "oceanbase",
+    "displayName": "OceanBase",
+    "authType": "bearer",
+    "baseUrl": "https://api.oceanbase.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "dmdb",
+    "displayName": "DMDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.dmdb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "tendb",
+    "displayName": "TendDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.tendb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "netezza",
+    "displayName": "Netezza",
+    "authType": "bearer",
+    "baseUrl": "https://api.netezza.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "teradata",
+    "displayName": "Teradata",
+    "authType": "bearer",
+    "baseUrl": "https://api.teradata.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "vertica",
+    "displayName": "Vertica",
+    "authType": "bearer",
+    "baseUrl": "https://api.vertica.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
+  },
+  {
+    "engine": "voltdb",
+    "displayName": "VoltDB",
+    "authType": "bearer",
+    "baseUrl": "https://api.voltdb.com/v1",
+    "healthEndpoint": "/databases",
+    "paginationType": "offset",
+    "resources": [
+      { "name": "databases", "endpoint": "/databases", "idField": "id",
+        "columns": [
+          { "name": "id", "type": "string", "nullable": false, "primaryKey": true },
+          { "name": "name", "type": "string", "nullable": false }
+        ]
+      }
+    ]
   }
 ]

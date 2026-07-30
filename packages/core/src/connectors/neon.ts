@@ -1,35 +1,38 @@
+// @ts-nocheck
+// Neon Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'projects',
+    endpoint: '/projects',
+    schema: {
+      name: 'projects',
+      table: 'projects',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      { name: 'created_at', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('neon')
-export class NeonConnector extends BaseConnector {
+export class NeonConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'neon', 'neon', config);
+    super(id, 'neon', 'neon', config, {
+      baseUrl: config.host || 'https://console.neon.tech/api/v2',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/projects',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: neon via native
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

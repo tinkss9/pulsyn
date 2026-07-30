@@ -1,35 +1,37 @@
+// @ts-nocheck
+// Dgraph Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'predicates',
+    endpoint: '/admin/schema',
+    schema: {
+      name: 'predicates',
+      table: 'predicates',
+      columns: [
+      { name: 'predicate', type: 'string', nullable: false, primaryKey: true },
+      { name: 'type', type: 'string', nullable: true },
+      ],
+      primaryKey: ['predicate'],
+    },
+    idField: 'predicate',
+    
+  },
+];
 
 @registerSource('dgraph')
-export class DgraphConnector extends BaseConnector {
+export class DgraphConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'dgraph', 'dgraph', config);
+    super(id, 'dgraph', 'dgraph', config, {
+      baseUrl: config.host || 'http://localhost:8080',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/health',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: dgraph via graphql
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

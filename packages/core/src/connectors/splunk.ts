@@ -1,19 +1,20 @@
 // @ts-nocheck
-// M3DB Connector — Auto-generated from config
+// Splunk Connector — Auto-generated from config
 import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
 import type { DatabaseConfig } from '../types';
 
 const RESOURCES: SaaSResource[] = [
   {
-    name: 'namespaces',
-    endpoint: '/services/m3db/namespace',
+    name: 'saved_searches',
+    endpoint: '/saved/searches',
     schema: {
-      name: 'namespaces',
-      table: 'namespaces',
+      name: 'saved_searches',
+      table: 'saved_searches',
       columns: [
       { name: 'name', type: 'string', nullable: false, primaryKey: true },
-      { name: 'options', type: 'object', nullable: true },
+      { name: 'search', type: 'string', nullable: true },
+      { name: 'updated', type: 'datetime', nullable: true },
       ],
       primaryKey: ['name'],
     },
@@ -22,15 +23,15 @@ const RESOURCES: SaaSResource[] = [
   },
 ];
 
-@registerSource('m3db')
-export class M3DBConnector extends SaaSConnector {
+@registerSource('splunk')
+export class SplunkConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'm3db', 'm3db', config, {
-      baseUrl: config.host || 'http://localhost:7201/api/v1',
+    super(id, 'splunk', 'splunk', config, {
+      baseUrl: config.host || 'https://your-splunk.com:8089/services',
       authType: 'bearer',
       resources: RESOURCES,
       paginationType: 'offset',
-      healthEndpoint: '/services/m3db/placement',
+      healthEndpoint: '/server/info',
       
     });
   }

@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Wasabi Connector — Auto-generated from config
+// Cloudflare R2 Connector — Auto-generated from config
 import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
 import type { DatabaseConfig } from '../types';
@@ -22,11 +22,11 @@ const RESOURCES: SaaSResource[] = [
   },
 ];
 
-@registerSource('wasabi')
-export class WasabiConnector extends SaaSConnector {
+@registerSource('r2')
+export class CloudflareR2Connector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'wasabi', 'wasabi', config, {
-      baseUrl: config.host || 'https://s3.wasabisys.com',
+    super(id, 'r2', 'r2', config, {
+      baseUrl: config.host || 'https://your-account.r2.cloudflarestorage.com',
       authType: 'bearer',
       resources: RESOURCES,
       paginationType: 'cursor',

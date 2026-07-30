@@ -1,28 +1,38 @@
-﻿// @ts-nocheck
-// redash Connector — analytics source
-import { BaseConnector } from './base';
+// @ts-nocheck
+// Redash Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'data_sources',
+    endpoint: '/data_sources',
+    schema: {
+      name: 'data_sources',
+      table: 'data_sources',
+      columns: [
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      { name: 'type', type: 'string', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('redash')
-export class redashConnector extends BaseConnector {
-  private apiKey: string = '';
-
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.apiKey = config.password || '';
-    this.connected = true;
+export class RedashConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'redash', 'redash', config, {
+      baseUrl: config.host || 'https://your-redash.com/api',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/data_sources',
+      
+    });
   }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return !!this.apiKey; }
-  async getTables(): Promise<string[]> { return ['dashboards', 'queries', 'users']; }
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [{ name: 'id', type: 'string', nullable: false, defaultValue: null }], primaryKey: ['id'], primaryKeys: ['id'] };
-  }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
-  async startCDC(): Promise<void> { throw new Error('CDC not supported'); }
-  async stopCDC(): Promise<void> {}
 }

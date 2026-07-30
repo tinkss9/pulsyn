@@ -1,35 +1,36 @@
+// @ts-nocheck
+// H2 Database Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'tables',
+    endpoint: '/tables',
+    schema: {
+      name: 'tables',
+      table: 'tables',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('h2')
-export class H2Connector extends BaseConnector {
+export class H2DatabaseConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'h2', 'h2', config);
+    super(id, 'h2', 'h2', config, {
+      baseUrl: config.host || 'http://localhost:8082',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: h2 via jdbc
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

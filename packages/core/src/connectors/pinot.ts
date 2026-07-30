@@ -1,35 +1,37 @@
+// @ts-nocheck
+// Apache Pinot Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'tables',
+    endpoint: '/tables',
+    schema: {
+      name: 'tables',
+      table: 'tables',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      { name: 'type', type: 'string', nullable: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('pinot')
-export class PinotConnector extends BaseConnector {
+export class ApachePinotConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'pinot', 'pinot', config);
+    super(id, 'pinot', 'pinot', config, {
+      baseUrl: config.host || 'http://localhost:9000',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/tables',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    // Connection: pinot via rest
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return this.connected;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { columns: [], primaryKey: [] };
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

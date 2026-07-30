@@ -1,43 +1,37 @@
 // @ts-nocheck
-// singlestore Connector � database source
-import { BaseConnector } from './base';
+// SingleStore Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'databases',
+    endpoint: '/databases',
+    schema: {
+      name: 'databases',
+      table: 'databases',
+      columns: [
+      { name: 'databaseID', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      ],
+      primaryKey: ['databaseID'],
+    },
+    idField: 'databaseID',
+    
+  },
+];
 
 @registerSource('singlestore')
-export class singlestoreConnector extends BaseConnector {
-  private pool: any = null;
-
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.connected = true;
+export class SingleStoreConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'singlestore', 'singlestore', config, {
+      baseUrl: config.host || 'https://api.singlestore.com/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/workspaces',
+      
+    });
   }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    return true;
-  }
-
-  async getTables(): Promise<string[]> {
-    return [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [], primaryKeys: [], primaryKey: [] };
-  }
-
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

@@ -1,35 +1,38 @@
+// @ts-nocheck
+// ActiveMQ Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'queues',
+    endpoint: '/read/org.apache.activemq:type=Broker,brokerName=localhost,destinationType=Queue,destinationName=*',
+    schema: {
+      name: 'queues',
+      table: 'queues',
+      columns: [
+      { name: 'name', type: 'string', nullable: false, primaryKey: true },
+      { name: 'QueueSize', type: 'number', nullable: true },
+      { name: 'EnqueueCount', type: 'number', nullable: true },
+      ],
+      primaryKey: ['name'],
+    },
+    idField: 'name',
+    
+  },
+];
 
 @registerSource('activemq')
-export class ActivemqConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class ActiveMQConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'activemq', 'activemq', config);
-    this.baseUrl = config.host || '';
+    super(id, 'activemq', 'activemq', config, {
+      baseUrl: config.host || 'http://localhost:8161/api/jolokia',
+      authType: 'basic',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/version',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

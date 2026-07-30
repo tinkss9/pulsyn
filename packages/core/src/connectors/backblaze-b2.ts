@@ -1,29 +1,38 @@
-﻿// @ts-nocheck
-// backblaze-b2 Connector — cloud storage source
-import { BaseConnector } from './base';
+// @ts-nocheck
+// Backblaze B2 Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'buckets',
+    endpoint: '/b2_list_buckets',
+    schema: {
+      name: 'buckets',
+      table: 'buckets',
+      columns: [
+      { name: 'bucketId', type: 'string', nullable: false, primaryKey: true },
+      { name: 'bucketName', type: 'string', nullable: false },
+      { name: 'bucketType', type: 'string', nullable: true },
+      ],
+      primaryKey: ['bucketId'],
+    },
+    idField: 'bucketId',
+    
+  },
+];
 
 @registerSource('backblaze-b2')
-export class backblazeb2Connector extends BaseConnector {
-  private client: any = null;
-  private bucket: string = '';
-
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.bucket = config.database || '';
-    this.connected = true;
+export class BackblazeB2Connector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'backblaze-b2', 'backblaze-b2', config, {
+      baseUrl: config.host || 'https://api.backblazeb2.com/b2api/v2',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/b2_authorize_account',
+      
+    });
   }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return true; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [{ name: 'key', type: 'string', nullable: false, defaultValue: null }], primaryKey: ['key'], primaryKeys: ['key'] };
-  }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
-  async startCDC(): Promise<void> { throw new Error('CDC not supported'); }
-  async stopCDC(): Promise<void> {}
 }
