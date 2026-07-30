@@ -1,92 +1,30 @@
+// @ts-nocheck
+// Contentful Connector — Real implementation
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  { name: 'entries', endpoint: '/spaces/{spaceId}/environments/master/entries', schema: { name: 'entries', table: 'entries', columns: [
+    { name: 'sys.id', type: 'string', nullable: false, primaryKey: true }, { name: 'sys.type', type: 'string', nullable: true },
+    { name: 'fields', type: 'object', nullable: true }, { name: 'sys.createdAt', type: 'datetime', nullable: true },
+    { name: 'sys.updatedAt', type: 'datetime', nullable: true },
+  ], primaryKey: ['sys.id'] }, idField: 'sys.id', modifiedField: 'sys.updatedAt' },
+  { name: 'content_types', endpoint: '/spaces/{spaceId}/environments/master/content_types', schema: { name: 'content_types', table: 'content_types', columns: [
+    { name: 'sys.id', type: 'string', nullable: false, primaryKey: true }, { name: 'name', type: 'string', nullable: false },
+    { name: 'fields', type: 'object', nullable: true },
+  ], primaryKey: ['sys.id'] }, idField: 'sys.id' },
+];
 
 @registerSource('contentful')
-export class ContentfulConnector extends BaseConnector {
-  private baseUrl: string;
-  private apiKey: string;
-
+export class ContentfulConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'contentful', 'contentful', config);
-    this.baseUrl = config.host || '';
-    this.apiKey = config.password || '';
-  }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    this.baseUrl = cfg.host || this.baseUrl;
-    this.apiKey = cfg.password || this.apiKey;
-    const resp = await fetch(this.baseUrl + '/health', {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    super(id, 'contentful', 'contentful', config, {
+      baseUrl: config.host || 'https://cdn.contentful.com',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/spaces/{spaceId}',
     });
-    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
-    this.connected = true;
   }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    try {
-      const resp = await fetch(this.baseUrl + '/health', {
-        headers: { 'Authorization': 'Bearer ' + this.apiKey }
-      });
-      return resp.ok;
-    } catch { return false; }
-  }
-
-  async getTables(): Promise<string[]> {
-    const resp = await fetch(this.baseUrl + '/resources', {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
-    });
-    const data = await resp.json();
-    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
-    });
-    return await resp.json();
-  }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    const params = new URLSearchParams();
-    if (opts?.limit) params.set('limit', String(opts.limit));
-    if (opts?.offset) params.set('offset', String(opts.offset));
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
-    });
-    const data = await resp.json();
-    const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: Record<string, unknown>) => ({
-      op: 'S' as const, table, after: item, before: null,
-      ts: new Date(), watermark: null, sourceMetadata: { connector: 'contentful' }
-    }));
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    const params = new URLSearchParams();
-    if (opts?.watermarkColumn && opts?.watermarkValue) {
-      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
-    }
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
-    });
-    const data = await resp.json();
-    const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: Record<string, unknown>) => ({
-      op: 'I' as const, table, after: item, before: null,
-      ts: new Date(), watermark: null, sourceMetadata: { connector: 'contentful' }
-    }));
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
-    // REST API polling CDC: poll every 5s
-  }
-
-  async stopCDC(): Promise<void> {}
 }

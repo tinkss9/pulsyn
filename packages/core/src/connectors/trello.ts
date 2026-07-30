@@ -1,35 +1,30 @@
+// @ts-nocheck
+// Trello Connector — Real implementation
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  { name: 'boards', endpoint: '/1/members/me/boards', schema: { name: 'boards', table: 'boards', columns: [
+    { name: 'id', type: 'string', nullable: false, primaryKey: true }, { name: 'name', type: 'string', nullable: false },
+    { name: 'desc', type: 'string', nullable: true }, { name: 'dateLastActivity', type: 'datetime', nullable: true },
+  ], primaryKey: ['id'] }, idField: 'id', modifiedField: 'dateLastActivity' },
+  { name: 'cards', endpoint: '/1/boards/{boardId}/cards', schema: { name: 'cards', table: 'cards', columns: [
+    { name: 'id', type: 'string', nullable: false, primaryKey: true }, { name: 'name', type: 'string', nullable: false },
+    { name: 'desc', type: 'string', nullable: true }, { name: 'due', type: 'datetime', nullable: true },
+    { name: 'dateLastActivity', type: 'datetime', nullable: true },
+  ], primaryKey: ['id'] }, idField: 'id', modifiedField: 'dateLastActivity' },
+];
 
 @registerSource('trello')
-export class TrelloConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class TrelloConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'trello', 'trello', config);
-    this.baseUrl = config.host || '';
+    super(id, 'trello', 'trello', config, {
+      baseUrl: config.host || 'https://api.trello.com',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/1/members/me',
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

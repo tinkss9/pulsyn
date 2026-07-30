@@ -1,35 +1,30 @@
+// @ts-nocheck
+// SendGrid Connector — Real implementation
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  { name: 'contacts', endpoint: '/v3/marketing/contacts', schema: { name: 'contacts', table: 'contacts', columns: [
+    { name: 'id', type: 'string', nullable: false, primaryKey: true }, { name: 'email', type: 'string', nullable: false },
+    { name: 'first_name', type: 'string', nullable: true }, { name: 'last_name', type: 'string', nullable: true },
+    { name: 'created_at', type: 'datetime', nullable: true },
+  ], primaryKey: ['id'] }, idField: 'id', modifiedField: 'updated_at' },
+  { name: 'templates', endpoint: '/v3/templates', schema: { name: 'templates', table: 'templates', columns: [
+    { name: 'id', type: 'string', nullable: false, primaryKey: true }, { name: 'name', type: 'string', nullable: false },
+    { name: 'created_at', type: 'datetime', nullable: true },
+  ], primaryKey: ['id'] }, idField: 'id' },
+];
 
 @registerSource('sendgrid')
-export class SendgridConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class SendGridConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'sendgrid', 'sendgrid', config);
-    this.baseUrl = config.host || '';
+    super(id, 'sendgrid', 'sendgrid', config, {
+      baseUrl: config.host || 'https://api.sendgrid.com',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/v3/user/profile',
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

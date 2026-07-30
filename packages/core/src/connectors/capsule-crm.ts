@@ -1,35 +1,58 @@
+// @ts-nocheck
+// Capsule CRM Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'parties',
+    endpoint: '/parties',
+    schema: {
+      name: 'parties',
+      table: 'parties',
+      columns: [
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
+      { name: 'type', type: 'string', nullable: false },
+      { name: 'firstName', type: 'string', nullable: true },
+      { name: 'lastName', type: 'string', nullable: true },
+      { name: 'createdAt', type: 'datetime', nullable: true },
+      { name: 'updatedAt', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'updatedAt',
+  },
+  {
+    name: 'opportunities',
+    endpoint: '/opportunities',
+    schema: {
+      name: 'opportunities',
+      table: 'opportunities',
+      columns: [
+      { name: 'id', type: 'number', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      { name: 'value', type: 'number', nullable: true },
+      { name: 'createdAt', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'updatedAt',
+  },
+];
 
 @registerSource('capsule-crm')
-export class CapsuleCrmConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class CapsuleCRMConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'capsule-crm', 'capsule-crm', config);
-    this.baseUrl = config.host || '';
+    super(id, 'capsule-crm', 'capsule-crm', config, {
+      baseUrl: config.host || 'https://api.capsulecrm.com/api/v2',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/users',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

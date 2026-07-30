@@ -1,27 +1,40 @@
 // @ts-nocheck
-// OneDrive Connector
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
+// OneDrive Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'files',
+    endpoint: '/me/drive/root/children',
+    schema: {
+      name: 'files',
+      table: 'files',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      { name: 'size', type: 'number', nullable: true },
+      { name: 'createdDateTime', type: 'datetime', nullable: true },
+      { name: 'lastModifiedDateTime', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'lastModifiedDateTime',
+  },
+];
 
 @registerSource('onedrive')
-export class OneDriveConnector extends BaseConnector {
-  private token: string = '';
-  constructor(id: string, name: string, config: DatabaseConfig) { super(id, name, 'onedrive', config); }
-  async connect(config: DatabaseConfig): Promise<void> { this.token = config.password; this.connected = true; }
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { try { const r = await fetch('https://graph.microsoft.com/v1.0/me/drive', { headers: { Authorization: `Bearer ${this.token}` } }); return r.ok; } catch { return false; } }
-  async getTables(): Promise<string[]> { return ['files', 'folders']; }
-  async getTableSchema(): Promise<TableSchema> { return { name: 'files', columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'name', type: 'string', nullable: true }, { name: 'size', type: 'number', nullable: true }], primaryKey: ['id'] }; }
-  async extractFull(): Promise<UnifiedChangeEvent[]> {
-    const r = await fetch('https://graph.microsoft.com/v1.0/me/drive/root/children', { headers: { Authorization: `Bearer ${this.token}` } });
-    const d = await r.json() as any;
-    return (d.value || []).map((i: any) => createEvent({ op: 'S', table: 'files', after: i, watermark: i.id }));
+export class OneDriveConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'onedrive', 'onedrive', config, {
+      baseUrl: config.host || 'https://graph.microsoft.com/v1.0',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/me/drive',
+      
+    });
   }
-  async startCDC(): Promise<void> { throw new Error('OneDrive CDC requires webhooks'); }
-  async stopCDC(): Promise<void> {}
 }
-
-
-

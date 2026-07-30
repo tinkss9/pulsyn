@@ -1,27 +1,54 @@
 // @ts-nocheck
-// Microsoft Teams Connector
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema } from '../types';
-import { UnifiedChangeEvent, createEvent } from '../events';
+// Microsoft Teams Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'teams',
+    endpoint: '/me/joinedTeams',
+    schema: {
+      name: 'teams',
+      table: 'teams',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'displayName', type: 'string', nullable: false },
+      { name: 'description', type: 'string', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+  {
+    name: 'channels',
+    endpoint: '/teams/{teamId}/channels',
+    schema: {
+      name: 'channels',
+      table: 'channels',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'displayName', type: 'string', nullable: false },
+      { name: 'description', type: 'string', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('microsoft-teams')
-export class MicrosoftTeamsConnector extends BaseConnector {
-  private token: string = '';
-  constructor(id: string, name: string, config: DatabaseConfig) { super(id, name, 'microsoft-teams', config); }
-  async connect(config: DatabaseConfig): Promise<void> { this.token = config.password; this.connected = true; }
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { try { const r = await fetch('https://graph.microsoft.com/v1.0/me', { headers: { Authorization: `Bearer ${this.token}` } }); return r.ok; } catch { return false; } }
-  async getTables(): Promise<string[]> { return ['teams', 'channels', 'messages']; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { name: table, columns: [{ name: 'id', type: 'string', nullable: false }, { name: 'displayName', type: 'string', nullable: true }], primaryKey: ['id'] }; }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
-    const r = await fetch(`https://graph.microsoft.com/v1.0/${table}`, { headers: { Authorization: `Bearer ${this.token}` } });
-    const d = await r.json() as any;
-    return (d.value || []).map((i: any) => createEvent({ op: 'S', table, after: i, watermark: i.id }));
+export class MicrosoftTeamsConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'microsoft-teams', 'microsoft-teams', config, {
+      baseUrl: config.host || 'https://graph.microsoft.com/v1.0',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/me',
+      
+    });
   }
-  async startCDC(): Promise<void> { throw new Error('Teams CDC requires webhooks'); }
-  async stopCDC(): Promise<void> {}
 }
-
-
-

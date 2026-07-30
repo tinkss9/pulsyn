@@ -1,92 +1,38 @@
+// @ts-nocheck
+// Workday Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'workers',
+    endpoint: '/workers',
+    schema: {
+      name: 'workers',
+      table: 'workers',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'preferredName', type: 'string', nullable: true },
+      { name: 'email', type: 'string', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    
+  },
+];
 
 @registerSource('workday')
-export class WorkdayConnector extends BaseConnector {
-  private baseUrl: string;
-  private apiKey: string;
-
+export class WorkdayConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'workday', 'workday', config);
-    this.baseUrl = config.host || '';
-    this.apiKey = config.password || '';
-  }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    this.baseUrl = cfg.host || this.baseUrl;
-    this.apiKey = cfg.password || this.apiKey;
-    const resp = await fetch(this.baseUrl + '/health', {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    super(id, 'workday', 'workday', config, {
+      baseUrl: config.host || 'https://your-workday.com/ccx/api/v1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/workers',
+      
     });
-    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
-    this.connected = true;
   }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    try {
-      const resp = await fetch(this.baseUrl + '/health', {
-        headers: { 'Authorization': 'Basic ' + this.apiKey }
-      });
-      return resp.ok;
-    } catch { return false; }
-  }
-
-  async getTables(): Promise<string[]> {
-    const resp = await fetch(this.baseUrl + '/resources', {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    const data = await resp.json();
-    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    return await resp.json();
-  }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    const params = new URLSearchParams();
-    if (opts?.limit) params.set('limit', String(opts.limit));
-    if (opts?.offset) params.set('offset', String(opts.offset));
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    const data = await resp.json();
-    const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: Record<string, unknown>) => ({
-      op: 'S' as const, table, after: item, before: null,
-      ts: new Date(), watermark: null, sourceMetadata: { connector: 'workday' }
-    }));
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    const params = new URLSearchParams();
-    if (opts?.watermarkColumn && opts?.watermarkValue) {
-      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
-    }
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    const data = await resp.json();
-    const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: Record<string, unknown>) => ({
-      op: 'I' as const, table, after: item, before: null,
-      ts: new Date(), watermark: null, sourceMetadata: { connector: 'workday' }
-    }));
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
-    // REST API polling CDC: poll every 5s
-  }
-
-  async stopCDC(): Promise<void> {}
 }

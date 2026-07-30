@@ -1,35 +1,40 @@
+// @ts-nocheck
+// Wrike Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'tasks',
+    endpoint: '/tasks',
+    schema: {
+      name: 'tasks',
+      table: 'tasks',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'title', type: 'string', nullable: false },
+      { name: 'status', type: 'string', nullable: true },
+      { name: 'createdDate', type: 'datetime', nullable: true },
+      { name: 'updatedDate', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'updatedDate',
+  },
+];
 
 @registerSource('wrike')
-export class WrikeConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class WrikeConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'wrike', 'wrike', config);
-    this.baseUrl = config.host || '';
+    super(id, 'wrike', 'wrike', config, {
+      baseUrl: config.host || 'https://www.wrike.com/api/v4',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/contacts',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

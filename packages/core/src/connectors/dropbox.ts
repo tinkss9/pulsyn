@@ -1,29 +1,39 @@
 // @ts-nocheck
-// dropbox Connector — SaaS source
-import { BaseConnector } from './base';
+// Dropbox Connector â€” Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { UnifiedChangeEvent, createEvent } from '../events';
-import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'files',
+    endpoint: '/files/list_folder',
+    schema: {
+      name: 'files',
+      table: 'files',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      { name: 'path_display', type: 'string', nullable: true },
+      { name: 'server_modified', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'server_modified',
+  },
+];
 
 @registerSource('dropbox')
-export class dropboxConnector extends BaseConnector {
-  private apiKey: string = '';
-
-  async connect(config: DatabaseConfig): Promise<void> {
-    this.config = config;
-    this.apiKey = config.password || '';
-    this.connected = true;
+export class DropboxConnector extends SaaSConnector {
+  constructor(id: string, config: DatabaseConfig) {
+    super(id, 'dropbox', 'dropbox', config, {
+      baseUrl: config.host || 'https://api.dropboxapi.com/2',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'cursor',
+      healthEndpoint: '/users/get_current_account',
+      
+    });
   }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return !!this.apiKey; }
-  async getTables(): Promise<string[]> { return ['files', 'folders', 'users']; }
-  async getTableSchema(table: string): Promise<TableSchema> {
-    return { name: table, table, columns: [{ name: 'id', type: 'string', nullable: false, defaultValue: null }], primaryKey: ['id'], primaryKeys: ['id'] };
-  }
-  async extractFull(table: string): Promise<UnifiedChangeEvent[]> { return []; }
-  async extractIncremental(table: string, opts?: any): Promise<UnifiedChangeEvent[]> { return []; }
-
-  async startCDC(callback: (event: any) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

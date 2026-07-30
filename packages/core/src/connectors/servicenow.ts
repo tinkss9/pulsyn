@@ -1,92 +1,41 @@
+// @ts-nocheck
+// ServiceNow Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'incidents',
+    endpoint: '/table/incident',
+    schema: {
+      name: 'incidents',
+      table: 'incidents',
+      columns: [
+      { name: 'sys_id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'number', type: 'string', nullable: false },
+      { name: 'short_description', type: 'string', nullable: true },
+      { name: 'state', type: 'string', nullable: true },
+      { name: 'sys_created_on', type: 'datetime', nullable: true },
+      { name: 'sys_updated_on', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['sys_id'],
+    },
+    idField: 'sys_id',
+    modifiedField: 'sys_updated_on',
+  },
+];
 
 @registerSource('servicenow')
-export class ServicenowConnector extends BaseConnector {
-  private baseUrl: string;
-  private apiKey: string;
-
+export class ServiceNowConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'servicenow', 'servicenow', config);
-    this.baseUrl = config.host || '';
-    this.apiKey = config.password || '';
-  }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    const cfg = config || this.config;
-    this.baseUrl = cfg.host || this.baseUrl;
-    this.apiKey = cfg.password || this.apiKey;
-    const resp = await fetch(this.baseUrl + '/health', {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
+    super(id, 'servicenow', 'servicenow', config, {
+      baseUrl: config.host || 'https://your-instance.service-now.com/api/now',
+      authType: 'basic',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/table/sys_user?sysparm_limit=1',
+      
     });
-    if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
-    this.connected = true;
   }
-
-  async disconnect(): Promise<void> {
-    this.connected = false;
-  }
-
-  async testConnection(): Promise<boolean> {
-    try {
-      const resp = await fetch(this.baseUrl + '/health', {
-        headers: { 'Authorization': 'Basic ' + this.apiKey }
-      });
-      return resp.ok;
-    } catch { return false; }
-  }
-
-  async getTables(): Promise<string[]> {
-    const resp = await fetch(this.baseUrl + '/resources', {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    const data = await resp.json();
-    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
-  }
-
-  async getTableSchema(table: string): Promise<TableSchema> {
-    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    return await resp.json();
-  }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    const params = new URLSearchParams();
-    if (opts?.limit) params.set('limit', String(opts.limit));
-    if (opts?.offset) params.set('offset', String(opts.offset));
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    const data = await resp.json();
-    const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: Record<string, unknown>) => ({
-      op: 'S' as const, table, after: item, before: null,
-      ts: new Date(), watermark: null, sourceMetadata: { connector: 'servicenow' }
-    }));
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    const params = new URLSearchParams();
-    if (opts?.watermarkColumn && opts?.watermarkValue) {
-      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
-    }
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Basic ' + this.apiKey }
-    });
-    const data = await resp.json();
-    const items = Array.isArray(data) ? data : data.data || data.items || [];
-    return items.map((item: Record<string, unknown>) => ({
-      op: 'I' as const, table, after: item, before: null,
-      ts: new Date(), watermark: null, sourceMetadata: { connector: 'servicenow' }
-    }));
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
-    // REST API polling CDC: poll every 5s
-  }
-
-  async stopCDC(): Promise<void> {}
 }

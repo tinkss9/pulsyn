@@ -1,35 +1,55 @@
+// @ts-nocheck
+// Insightly Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'contacts',
+    endpoint: '/Contacts',
+    schema: {
+      name: 'contacts',
+      table: 'contacts',
+      columns: [
+      { name: 'CONTACT_ID', type: 'number', nullable: false, primaryKey: true },
+      { name: 'FIRST_NAME', type: 'string', nullable: true },
+      { name: 'LAST_NAME', type: 'string', nullable: false },
+      { name: 'EMAIL_ADDRESS', type: 'string', nullable: true },
+      ],
+      primaryKey: ['CONTACT_ID'],
+    },
+    idField: 'CONTACT_ID',
+    
+  },
+  {
+    name: 'opportunities',
+    endpoint: '/Opportunities',
+    schema: {
+      name: 'opportunities',
+      table: 'opportunities',
+      columns: [
+      { name: 'OPPORTUNITY_ID', type: 'number', nullable: false, primaryKey: true },
+      { name: 'OPPORTUNITY_NAME', type: 'string', nullable: false },
+      { name: 'AMOUNT', type: 'number', nullable: true },
+      ],
+      primaryKey: ['OPPORTUNITY_ID'],
+    },
+    idField: 'OPPORTUNITY_ID',
+    
+  },
+];
 
 @registerSource('insightly')
-export class InsightlyConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class InsightlyConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'insightly', 'insightly', config);
-    this.baseUrl = config.host || '';
+    super(id, 'insightly', 'insightly', config, {
+      baseUrl: config.host || 'https://api.insightly.com/v3.1',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/Users',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }

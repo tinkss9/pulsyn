@@ -1,35 +1,56 @@
+// @ts-nocheck
+// SugarCRM Connector — Auto-generated from config
+import { SaaSConnector, SaaSResource } from './saas-base';
 import { registerSource } from './registry';
-import { BaseConnector } from './base';
-import { DatabaseConfig, TableSchema, CDCEvent } from '../types';
-import { UnifiedChangeEvent } from '../events';
+import type { DatabaseConfig } from '../types';
+
+const RESOURCES: SaaSResource[] = [
+  {
+    name: 'accounts',
+    endpoint: '/Accounts',
+    schema: {
+      name: 'accounts',
+      table: 'accounts',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'name', type: 'string', nullable: false },
+      { name: 'industry', type: 'string', nullable: true },
+      { name: 'date_modified', type: 'datetime', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'date_modified',
+  },
+  {
+    name: 'contacts',
+    endpoint: '/Contacts',
+    schema: {
+      name: 'contacts',
+      table: 'contacts',
+      columns: [
+      { name: 'id', type: 'string', nullable: false, primaryKey: true },
+      { name: 'first_name', type: 'string', nullable: true },
+      { name: 'last_name', type: 'string', nullable: false },
+      { name: 'email', type: 'string', nullable: true },
+      ],
+      primaryKey: ['id'],
+    },
+    idField: 'id',
+    modifiedField: 'date_modified',
+  },
+];
 
 @registerSource('sugarcrm')
-export class SugarcrmConnector extends BaseConnector {
-  private baseUrl: string;
-
+export class SugarCRMConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
-    super(id, 'sugarcrm', 'sugarcrm', config);
-    this.baseUrl = config.host || '';
+    super(id, 'sugarcrm', 'sugarcrm', config, {
+      baseUrl: config.host || 'https://your-site.sugarcrm.com/rest/v11',
+      authType: 'bearer',
+      resources: RESOURCES,
+      paginationType: 'offset',
+      healthEndpoint: '/me',
+      
+    });
   }
-
-  async connect(config?: DatabaseConfig): Promise<void> {
-    this.baseUrl = (config || this.config).host || this.baseUrl;
-    this.connected = true;
-  }
-
-  async disconnect(): Promise<void> { this.connected = false; }
-  async testConnection(): Promise<boolean> { return this.connected; }
-  async getTables(): Promise<string[]> { return []; }
-  async getTableSchema(table: string): Promise<TableSchema> { return { columns: [], primaryKey: [] }; }
-
-  async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
-    return [];
-  }
-
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
-  async stopCDC(): Promise<void> {}
 }
