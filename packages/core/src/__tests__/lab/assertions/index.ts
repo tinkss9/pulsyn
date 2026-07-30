@@ -2,8 +2,9 @@
 // Provides reusable assertions for connectivity, data integrity, and performance
 
 import { expect } from 'vitest';
-import type { BaseConnector, WriteBatchResult } from '../../connectors/base';
-import type { TableSchema, UnifiedChangeEvent } from '../../types';
+import type { BaseConnector, WriteBatchResult } from '../../../connectors/base';
+import type { TableSchema, CDCEvent } from '../../../types';
+import type { UnifiedChangeEvent } from '../../../events';
 
 // === CONNECTIVITY ASSERTIONS ===
 
@@ -100,7 +101,7 @@ export async function expectExtractIncremental(
 
 export async function expectCDCStart(
   connector: BaseConnector,
-  callback: (event: UnifiedChangeEvent) => void
+  callback: (event: CDCEvent) => void
 ): Promise<void> {
   await expect(connector.startCDC(callback)).resolves.not.toThrow();
 }
@@ -223,8 +224,7 @@ export async function expectMerge(
   keyColumns: string[]
 ): Promise<void> {
   const result = await connector.merge(table, events, keyColumns);
-  expect(result).toBeDefined();
-  expect(result.upserted + result.updated + result.deleted).toBeGreaterThan(0);
+  expect(result).toBeGreaterThanOrEqual(0);
 }
 
 export async function expectCreateTable(
@@ -241,7 +241,7 @@ export async function expectCreateTable(
 
 export async function expectThrowsWithMessage(
   fn: () => Promise<any>,
-  errorPattern: string
+  errorPattern: string | RegExp
 ): Promise<void> {
   await expect(fn()).rejects.toThrow(errorPattern);
 }

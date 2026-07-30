@@ -3,7 +3,8 @@
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import type { BaseConnector } from '../../../connectors/base';
-import type { DatabaseConfig, TableSchema, UnifiedChangeEvent } from '../../../types';
+import type { DatabaseConfig, TableSchema, CDCEvent } from '../../../types';
+import type { UnifiedChangeEvent } from '../../../events';
 import { ConnectorRegistry } from '../../../connectors/registry';
 import {
   expectConnect, expectDisconnect, expectTestConnection,
@@ -157,8 +158,8 @@ export class ConnectorTestRunner {
           // Find a table that has a primary key
           for (const table of tables) {
             const schema = await this.connector.getTableSchema(table);
-            if (schema.primaryKeys.length > 0) {
-              expect(schema.primaryKeys.length).toBeGreaterThan(0);
+            if (schema.primaryKey && schema.primaryKey.length > 0) {
+              expect(schema.primaryKey.length).toBeGreaterThan(0);
               return;
             }
           }
@@ -270,7 +271,7 @@ export class ConnectorTestRunner {
           it('should start and stop CDC', async () => {
             this.connector = this.createConnector();
             await expectConnect(this.connector, config);
-            const receivedEvents: UnifiedChangeEvent[] = [];
+            const receivedEvents: CDCEvent[] = [];
             await expectCDCStart(this.connector, (e) => receivedEvents.push(e));
             await new Promise(r => setTimeout(r, 1000));
             await expectCDCStop(this.connector);
@@ -331,7 +332,7 @@ export class ConnectorTestRunner {
           if (this.config.engine === 'redis' || this.config.engine === 'cassandra') {
             try {
               await this.connector.getTables();
-              fail('Should have thrown');
+              expect.fail('Should have thrown');
             } catch (err) {
               expect(err).toBeDefined();
             }
