@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const id = `connector-${Date.now()}`;
 
   const result = await query(
-    `INSERT INTO connectors (id, name, engine, config) VALUES ($1, $2, $3, $4) RETURNING *`,
+    `INSERT INTO connectors (id, name, engine, config) VALUES ($1, $2, $3, $4::jsonb) RETURNING *`,
     [id, name, engine, JSON.stringify(config)]
   );
 
