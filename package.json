@@ -33,7 +33,10 @@
     "blitz": "npx tsx scripts/overnight-blitz/orchestrator.ts",
     "blitz:start": "bash scripts/overnight-blitz/start.sh",
     "blitz:log": "tail -f overnight-blitz.log",
-    "blitz:status": "cat docs/lab/results/OVERNIGHT_BLITZ_FINAL.json | jq '.'"
+    "blitz:status": "cat docs/lab/results/OVERNIGHT_BLITZ_FINAL.json | jq '.'",
+    "keys:setup": "npx tsx scripts/setup-test-keys.ts",
+    "keys:check": "npx tsx scripts/setup-test-keys.ts --env-only",
+    "keys:validate": "npx tsx scripts/setup-test-keys.ts --validate"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.1096.0",
