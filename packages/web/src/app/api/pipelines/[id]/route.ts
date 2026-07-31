@@ -15,9 +15,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { name, source, target, tables, config } = await req.json();
 
   const result = await query(
-    `UPDATE pipelines SET name = COALESCE($2, name), source = COALESCE($3, source),
-     target = COALESCE($4, target), tables = COALESCE($5, tables),
-     config = COALESCE($6, config), updated_at = NOW() WHERE id = $1 RETURNING *`,
+    `UPDATE pipelines SET name = COALESCE($2, name), source = COALESCE($3::jsonb, source),
+     target = COALESCE($4::jsonb, target), tables = COALESCE($5::jsonb, tables),
+     config = COALESCE($6::jsonb, config), updated_at = NOW() WHERE id = $1 RETURNING *`,
     [id, name, source ? JSON.stringify(source) : null, target ? JSON.stringify(target) : null,
      tables ? JSON.stringify(tables) : null, config ? JSON.stringify(config) : null]
   );

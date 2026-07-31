@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const result = await query(
     `INSERT INTO pipelines (id, name, source, target, tables, config)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+     VALUES ($1, $2, $3::jsonb, $4::jsonb, $5::jsonb, $6::jsonb) RETURNING *`,
     [id, name, JSON.stringify(source), JSON.stringify(target), JSON.stringify(tables || []), JSON.stringify(config || {})]
   );
 
