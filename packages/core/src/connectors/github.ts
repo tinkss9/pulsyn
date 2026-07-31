@@ -20,8 +20,11 @@ const RESOURCES: SaaSResource[] = [
 
 @registerSource('github')
 export class GithubConnector extends SaaSConnector {
-  constructor(id: string, config: DatabaseConfig) {
-    super(id, 'github', 'github', config, {
+  constructor(id: string, nameOrConfig?: string | DatabaseConfig, engine?: string, config?: DatabaseConfig) {
+    // Registry calls with 4 args: (id, name, name, config)
+    // Direct calls may use 2 args: (id, config)
+    const actualConfig = (typeof nameOrConfig === 'object' ? nameOrConfig : config) as DatabaseConfig;
+    super(id, 'github', 'github', actualConfig, {
       baseUrl: config.host || 'https://api.github.com',
       authType: 'bearer',
       resources: RESOURCES,

@@ -1,11 +1,10 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  // Load .env from project root (two levels up from packages/core)
-  envDir: '../..',
   test: {
     globals: true,
     environment: 'node',
+    setupFiles: ['./src/__tests__/setup.ts'],
     exclude: [
       '**/node_modules/**',
       '**/dist/**',

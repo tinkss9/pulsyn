@@ -90,6 +90,7 @@ export abstract class SaaSConnector extends BaseConnector {
   // ─── Schema Discovery ──────────────────────────────────────
 
   async getTables(): Promise<string[]> {
+    if (!this.connected) throw new Error('Not connected');
     return this.saasConfig.resources.map(r => r.name);
   }
 
@@ -101,6 +102,7 @@ export abstract class SaaSConnector extends BaseConnector {
   // ─── Extraction ─────────────────────────────────────────────
 
   async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    if (!this.connected) throw new Error('Not connected');
     const resource = this.getResource(table);
     const events: UnifiedChangeEvent[] = [];
     let page = 0;
@@ -368,7 +370,7 @@ export abstract class SaaSConnector extends BaseConnector {
 
   protected getResource(table: string): SaaSResource {
     const resource = this.saasConfig.resources.find(r => r.name === table);
-    if (!resource) throw new Error(`Unknown table: ${table}. Available: ${this.saasConfig.resources.map(r => r.name).join(', ')}`);
+    if (!resource) throw new Error(`Table not found: ${table}. Available: ${this.saasConfig.resources.map(r => r.name).join(', ')}`);
     return resource;
   }
 }
