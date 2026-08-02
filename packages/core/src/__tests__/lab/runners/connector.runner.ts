@@ -36,6 +36,7 @@ const STUB_ENGINES = [
 const COMMUNITY_ENGINES = [
   'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi', 'restcountries',
   'httpbin', 'reqres', 'thedogapi',
+  'randomuser', 'ipapi', 'exchangerate', 'catfacts', 'openmeteo',
 ];
 
 // Engines that don't throw on invalid host/credentials
