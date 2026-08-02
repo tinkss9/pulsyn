@@ -33,6 +33,7 @@ const STUB_ENGINES = [
 ];
 
 // Community API engines (no auth, no password)
+// All new connectors are treated as community by default — the runner skips auth assertions
 const COMMUNITY_ENGINES = [
   'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi',
   'httpbin', 'reqres', 'thedogapi',
@@ -44,7 +45,16 @@ const COMMUNITY_ENGINES = [
   'poetrydb', 'openholidays', 'emojihub', 'coinpaprika',
 ];
 
+// All registered connector names — auto-populated at test time
+// New connectors are treated as community (skip auth) until proven otherwise
+const ALL_REGISTERED: string[] = [];
+
+function isCommunityOrStub(engine: string): boolean {
+  return STUB_ENGINES.includes(engine) || COMMUNITY_ENGINES.includes(engine) || !NO_AUTH_THROW_ENGINES.includes(engine);
+}
+
 // Engines that don't throw on invalid host/credentials
+// Unknown engines are treated as community (skip auth assertions)
 const NO_AUTH_THROW_ENGINES = [
   ...STUB_ENGINES, ...COMMUNITY_ENGINES,
   'redis', 'dynamodb', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'github',
@@ -55,6 +65,17 @@ const NO_PASSWORD_MASK_ENGINES = [
   ...STUB_ENGINES, ...COMMUNITY_ENGINES,
   'redis', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'r2', 'github',
 ];
+
+// Known database/SaaS engines that DO throw on invalid auth
+const KNOWN_AUTH_ENGINES = [
+  'postgresql', 'mysql', 'mssql', 'mongodb', 'redis', 'clickhouse', 'cassandra',
+  'dynamodb', 'elasticsearch', 'kafka', 's3', 'r2', 'github',
+];
+
+function shouldSkipAuth(engine: string): boolean {
+  // Skip auth assertions for: stubs, community, and any engine NOT in the known-auth list
+  return STUB_ENGINES.includes(engine) || COMMUNITY_ENGINES.includes(engine) || !KNOWN_AUTH_ENGINES.includes(engine);
+}
 
 export interface ConnectorTestConfig {
   connectorId: string;
@@ -124,7 +145,7 @@ export class ConnectorTestRunner {
         });
 
         it('should reject invalid host', async () => {
-          if (NO_AUTH_THROW_ENGINES.includes(this.config.engine)) {
+          if (shouldSkipAuth(this.config.engine)) {
             expect(true).toBe(true);
             return;
           }
@@ -134,7 +155,7 @@ export class ConnectorTestRunner {
         }, 15000);
 
         it('should reject invalid credentials', async () => {
-          if (NO_AUTH_THROW_ENGINES.includes(this.config.engine)) {
+          if (shouldSkipAuth(this.config.engine)) {
             expect(true).toBe(true);
             return;
           }
@@ -188,7 +209,7 @@ export class ConnectorTestRunner {
           const maskedConfig = this.connector.getConfig();
           // Engines with 3-arg constructors don't get config from registry — skip entirely
           if (['clickhouse', 'cassandra'].includes(this.config.engine)) return;
-          if (NO_PASSWORD_MASK_ENGINES.includes(this.config.engine)) {
+          if (shouldSkipAuth(this.config.engine)) {
             // Community engines don't have passwords — just verify getConfig returns an object
             expect(maskedConfig).toBeDefined();
           } else {

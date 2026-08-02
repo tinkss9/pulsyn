@@ -1,0 +1,18 @@
+// turbo-smtp Connector — Lab Test Suite
+import { createConnectorTests, ConnectorTestConfig } from '../runners/connector.runner';
+import '../../../connectors/turbo-smtp';
+
+const config: ConnectorTestConfig = {
+  connectorId: 'test-turbo-smtp',
+  connectorType: 'source',
+  engine: 'turbo-smtp',
+  config: { /* TODO: Add API credentials */ },
+  testTables: [],
+  skipCDC: true,
+  skipBenchmark: true,
+};
+
+const runner = createConnectorTests(config);
+runner.runUnitTests();
+runner.runIntegrationTests();
+runner.runE2ETests();

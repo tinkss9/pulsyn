@@ -1,0 +1,18 @@
+// mailerlite Connector — Lab Test Suite
+import { createConnectorTests, ConnectorTestConfig } from '../runners/connector.runner';
+import '../../../connectors/mailerlite';
+
+const config: ConnectorTestConfig = {
+  connectorId: 'test-mailerlite',
+  connectorType: 'source',
+  engine: 'mailerlite',
+  config: { /* TODO: Add API credentials */ },
+  testTables: [],
+  skipCDC: true,
+  skipBenchmark: true,
+};
+
+const runner = createConnectorTests(config);
+runner.runUnitTests();
+runner.runIntegrationTests();
+runner.runE2ETests();

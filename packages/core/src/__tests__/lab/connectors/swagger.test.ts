@@ -1,0 +1,18 @@
+// swagger Connector — Lab Test Suite
+import { createConnectorTests, ConnectorTestConfig } from '../runners/connector.runner';
+import '../../../connectors/swagger';
+
+const config: ConnectorTestConfig = {
+  connectorId: 'test-swagger',
+  connectorType: 'source',
+  engine: 'swagger',
+  config: {},
+  testTables: [],
+  skipCDC: true,
+  skipBenchmark: false,
+};
+
+const runner = createConnectorTests(config);
+runner.runUnitTests();
+runner.runIntegrationTests();
+runner.runE2ETests();
