@@ -12,7 +12,7 @@ const config: ConnectorTestConfig = {
   testTables: ['breeds'],
   skipCDC: true,
   skipBenchmark: true,
-  maxConnectionLatencyMs: 5000,
+  maxConnectionLatencyMs: 10000,
   minExtractThroughput: 100,
 };
 

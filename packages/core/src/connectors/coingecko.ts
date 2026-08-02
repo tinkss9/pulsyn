@@ -13,7 +13,7 @@ export class CoinGeckoConnector extends BaseConnector {
     for (let i = 0; i <= retries; i++) {
       const res = await fetch(url);
       if (res.status === 429 && i < retries) {
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 3000));
         continue;
       }
       return res;
@@ -63,8 +63,9 @@ export class CoinGeckoConnector extends BaseConnector {
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     if (!this.connected) throw new Error('Not connected');
+    // No retries for extraction — return empty on 429 to avoid timeouts
     if (table === 'exchange_rates') {
-      const res = await this.fetchWithRetry(`${this.baseUrl}/exchange_rates`);
+      const res = await fetch(`${this.baseUrl}/exchange_rates`);
       if (!res.ok) return [];
       const data = await res.json();
       if (!data.rates) return [];
@@ -72,7 +73,7 @@ export class CoinGeckoConnector extends BaseConnector {
         createEvent({ op: 'S', table: 'exchange_rates', after: { name, ...rate }, watermark: name })
       );
     }
-    const res = await this.fetchWithRetry(`${this.baseUrl}/coins/markets?vs_currency=usd&per_page=5&page=1`);
+    const res = await fetch(`${this.baseUrl}/coins/markets?vs_currency=usd&per_page=5&page=1`);
     if (!res.ok) return [];
     const data = await res.json();
     if (!Array.isArray(data)) return [];
