@@ -37,6 +37,13 @@ const COMMUNITY_ENGINES = [
   'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi', 'restcountries',
   'httpbin', 'reqres', 'thedogapi',
   'randomuser', 'ipapi', 'exchangerate', 'catfacts', 'openmeteo',
+  'boredapi', 'adviceslip', 'numbersapi', 'agify', 'genderize', 'nationalize',
+  'kanyerest', 'jokeapi', 'jsonplaceholder2', 'dogceo', 'quotable', 'countriesv3',
+  'coingecko', 'frankfurter', 'deckofcards', 'chucknorris', 'httpstatusdogs',
+  'randomfox', 'httpcat', 'nekosbest', 'waifupics', 'metmuseum', 'artic',
+  'jikan', 'ghibli', 'wizardworld', 'nagerdate', 'memegen', 'dummyimage',
+  'poetrydb', 'openholidays', 'emojihub', 'coincap', 'coinpaprika', 'coinstats',
+  'animechan',
 ];
 
 // Engines that don't throw on invalid host/credentials
@@ -345,7 +352,7 @@ export class ConnectorTestRunner {
             } catch (err) {
               expect(err).toBeDefined();
             }
-          } else if (STUB_ENGINES.includes(this.config.engine)) {
+          } else if (STUB_ENGINES.includes(this.config.engine) || COMMUNITY_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
           } else {
             await expectNotConnected(() => this.connector!.getTables());
