@@ -1,4 +1,4 @@
-﻿// Public Holidays API — global holidays (no auth)
+// Public Holidays API — global holidays (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -49,7 +49,7 @@ export class OpenHolidaysConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/Countries?languageIsoCode=EN`);
       const data = await res.json();
       return data.slice(0, 10).map((c: any) =>
-        createEvent({ op: 'S', table: 'countries', after: { isoCode: c.isoCode, watermark: name: c.name?.[0]?.text }, c.isoCode })
+        createEvent({ op: 'S', table: 'countries', after: { isoCode: c.isoCode, name: c.name?.[0]?.text }, watermark: c.isoCode })
       );
     }
     const res = await fetch(`${this.baseUrl}/PublicHolidays?countryIsoCode=DE&languageIsoCode=DE&validFrom=2024-01-01&validTo=2024-12-31`);

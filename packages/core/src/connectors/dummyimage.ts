@@ -1,4 +1,4 @@
-﻿// Vatican Museums API — Collection data (no auth, via Smithsonian open access)
+// Vatican Museums API — Collection data (no auth, via Smithsonian open access)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -49,9 +49,9 @@ export class DummyImageConnector extends BaseConnector {
     return sizes.map((size, i) => {
       const [w, h] = size.split('x');
       return createEvent({ op: 'S', table: 'images', after: {
-        width: parseInt(w), watermark: height: parseInt(h }), format: 'png',
+        width: parseInt(w), height: parseInt(h), format: 'png',
         url: `${this.baseUrl}/${size}`,
-      }, String(i));
+      }, watermark: String(i) });
     });
   }
 

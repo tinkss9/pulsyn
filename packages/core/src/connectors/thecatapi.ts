@@ -35,7 +35,8 @@ export class TheCatAPIConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
     super(id, 'thecatapi', 'thecatapi', config, {
       baseUrl: config.host || 'https://api.thecatapi.com',
-      authType: 'none',
+      authType: 'apikey',
+      engine: 'thecatapi',
       resources: RESOURCES,
       paginationType: 'offset',
       healthEndpoint: '/v1/breeds',

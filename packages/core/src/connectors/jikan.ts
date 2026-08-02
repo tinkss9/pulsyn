@@ -1,4 +1,4 @@
-﻿// Jikan API — MyAnimeList unofficial (no auth)
+// Jikan API � MyAnimeList unofficial (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -50,13 +50,13 @@ export class JikanConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/genres/anime`);
       const data = await res.json();
       return data.data.slice(0, 10).map((g: any) =>
-        createEvent({ op: 'S', table: 'genres', after: g, watermark: String(g.mal_id )))
+        createEvent({ op: 'S', table: 'genres', after: g, watermark: String(g.mal_id) })
       );
     }
     const endpoint = table === 'manga' ? 'manga' : 'anime';
     const res = await fetch(`${this.baseUrl}/${endpoint}?limit=5&order_by=score&sort=desc`);
     const data = await res.json();
-    return data.data.map((a: any) => createEvent({ op: 'S', table: table, after: a, watermark: String(a.mal_id ))));
+    return data.data.map((a: any) => createEvent({ op: 'S', table: table, after: a, watermark: String(a.mal_id) }));
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

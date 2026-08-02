@@ -1,4 +1,4 @@
-﻿// RestCountries V3 API (alt — more tables)
+// RestCountries V3 API (alt — more tables)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -81,8 +81,8 @@ export class CountriesV3Connector extends BaseConnector {
     const data = await res.json();
     return data.slice(0, 20).map((c: any) =>
       createEvent({ op: 'S', table: 'countries', after: {
-        cca2: c.cca2, watermark: name: c.name?.common, capital: c.capital?.[0], region: c.region, population: c.population,
-      }, c.cca2 })
+        cca2: c.cca2, name: c.name?.common, capital: c.capital?.[0], region: c.region, population: c.population,
+      }, watermark: c.cca2 })
     );
   }
 

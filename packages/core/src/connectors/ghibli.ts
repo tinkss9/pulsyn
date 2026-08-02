@@ -1,4 +1,4 @@
-﻿// Studio Ghibli API (no auth)
+// Studio Ghibli API (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';

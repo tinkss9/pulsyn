@@ -32,7 +32,8 @@ export class TheDogAPIConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
     super(id, 'thedogapi', 'thedogapi', config, {
       baseUrl: config.host || 'https://api.thedogapi.com',
-      authType: 'none',
+      authType: 'apikey',
+      engine: 'thedogapi',
       resources: RESOURCES,
       paginationType: 'offset',
       healthEndpoint: '/v1/breeds',

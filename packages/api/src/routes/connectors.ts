@@ -3,10 +3,38 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../db';
 import { Pool } from 'pg';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export const connectorRoutes = Router();
 
-// List all connectors
+// List all supported connectors from the connector files
+connectorRoutes.get('/supported', async (req: Request, res: Response) => {
+  try {
+    const connectorsDir = path.join(__dirname, '../../../../packages/core/src/connectors');
+    const files = fs.readdirSync(connectorsDir)
+      .filter(f => f.endsWith('.ts') && !['index.ts', 'registry.ts', 'base.ts', 'saas-base.ts', 'saas-types.ts', 'rest-api.ts'].includes(f));
+    
+    const connectors = files.map(f => {
+      const content = fs.readFileSync(path.join(connectorsDir, f), 'utf-8');
+      const name = f.replace('.ts', '');
+      const isSource = content.includes('@registerSource');
+      const isTarget = content.includes('@registerTarget');
+      return { name, type: isTarget ? 'target' : 'source' };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+
+    res.json({ 
+      data: connectors, 
+      total: connectors.length,
+      sources: connectors.filter(c => c.type === 'source').length,
+      targets: connectors.filter(c => c.type === 'target').length 
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to load connector list', details: error.message });
+  }
+});
+
+// List all user-created connectors
 connectorRoutes.get('/', async (req: Request, res: Response) => {
   const result = await query(
     'SELECT id, name, engine, status, created_at, updated_at FROM connectors ORDER BY created_at DESC'

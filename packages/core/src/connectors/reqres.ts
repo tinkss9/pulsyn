@@ -45,7 +45,8 @@ export class ReqResConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
     super(id, 'reqres', 'reqres', config, {
       baseUrl: config.host || 'https://reqres.in',
-      authType: 'none',
+      authType: 'apikey',
+      engine: 'reqres',
       resources: RESOURCES,
       paginationType: 'offset',
       healthEndpoint: '/api/users/1',

@@ -1,4 +1,4 @@
-﻿// Dog CEO API — Random dog images by breed (no auth)
+// Dog CEO API — Random dog images by breed (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -46,13 +46,13 @@ export class DogCEOConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/breeds/list/all`);
       const data = await res.json();
       return Object.entries(data.message).map(([breed, subs]) =>
-        createEvent({ op: 'S', table: 'breeds', after: { breed, watermark: subBreeds: subs }, breed })
+        createEvent({ op: 'S', table: 'breeds', after: { breed, subBreeds: subs }, watermark: breed })
       );
     }
     const res = await fetch(`${this.baseUrl}/breeds/image/random/5`);
     const data = await res.json();
     return (data.message as string[]).map((url, i) =>
-      createEvent({ op: 'S', table: 'images', after: { url }, watermark: String(i )))
+      createEvent({ op: 'S', table: 'images', after: { url }, watermark: String(i) })
     );
   }
 

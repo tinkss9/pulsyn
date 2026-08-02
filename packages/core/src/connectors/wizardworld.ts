@@ -1,4 +1,4 @@
-﻿// Potion API — Wizards (Harry Potter) API (no auth)
+// Potion API — Wizards (Harry Potter) API (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -31,32 +31,32 @@ export class WizardWorldConnector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     if (table === 'houses') {
-      return { table, columns: [
+      return { name: 'houses', table: 'houses', columns: [
         { name: 'id', type: 'string', nullable: false },
         { name: 'name', type: 'string', nullable: false },
         { name: 'houseColours', type: 'string', nullable: true },
         { name: 'founder', type: 'string', nullable: true },
-      ], primaryKeys: ['id'] };
+      ], primaryKey: ['id'], primaryKeys: ['id'] };
     }
     if (table === 'wizards') {
-      return { table, columns: [
+      return { name: 'wizards', table: 'wizards', columns: [
         { name: 'id', type: 'string', nullable: false },
         { name: 'firstName', type: 'string', nullable: false },
         { name: 'lastName', type: 'string', nullable: false },
-      ], primaryKeys: ['id'] };
+      ], primaryKey: ['id'], primaryKeys: ['id'] };
     }
-    return { table, columns: [
+    return { name: table, table, columns: [
       { name: 'id', type: 'string', nullable: false },
       { name: 'name', type: 'string', nullable: false },
       { name: 'difficulty', type: 'string', nullable: true },
       { name: 'ingredients', type: 'array', nullable: true },
-    ], primaryKeys: ['id'] };
+    ], primaryKey: ['id'], primaryKeys: ['id'] };
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     const endpoint = table === 'houses' ? 'Houses' : table === 'wizards' ? 'Wizards' : 'Elixirs';
     const res = await fetch(`${this.baseUrl}/${endpoint}`);
-    const data = await res.json();
+    const data = await res.json() as any[];
     return data.slice(0, 10).map((item: any) =>
       createEvent({ op: 'S', table: table, after: item, watermark: item.id })
     );

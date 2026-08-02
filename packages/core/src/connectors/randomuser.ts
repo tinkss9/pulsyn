@@ -31,7 +31,8 @@ export class RandomUserConnector extends SaaSConnector {
   constructor(id: string, config: DatabaseConfig) {
     super(id, 'randomuser', 'randomuser', config, {
       baseUrl: config.host || 'https://randomuser.me',
-      authType: 'none',
+      authType: 'apikey',
+      engine: 'randomuser',
       resources: RESOURCES,
       paginationType: 'offset',
       healthEndpoint: '/api',

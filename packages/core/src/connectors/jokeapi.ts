@@ -1,4 +1,4 @@
-﻿// JokeAPI — Programming and general jokes (no auth)
+// JokeAPI � Programming and general jokes (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -49,7 +49,7 @@ export class JokeAPIConnector extends BaseConnector {
     for (let i = 0; i < 5; i++) {
       const res = await fetch(`${this.baseUrl}/joke/Any`);
       const data = await res.json();
-      events.push(createEvent({ op: 'S', table: 'jokes', after: data, watermark: String(data.id ))));
+      events.push(createEvent({ op: 'S', table: 'jokes', after: data, watermark: String(data.id) }));
     }
     return events;
   }

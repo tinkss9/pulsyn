@@ -68,6 +68,7 @@ export class AmazonS3Connector extends BaseConnector {
 
   async getTableSchema(table: string): Promise<TableSchema> {
     return {
+      name: table,
       table,
       columns: [
         { name: 'Key', type: 'string', nullable: false },
@@ -75,6 +76,7 @@ export class AmazonS3Connector extends BaseConnector {
         { name: 'LastModified', type: 'datetime', nullable: true },
         { name: 'ETag', type: 'string', nullable: true },
       ],
+      primaryKey: ['Key'],
       primaryKeys: ['Key'],
     };
   }
