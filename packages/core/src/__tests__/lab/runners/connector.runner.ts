@@ -34,14 +34,14 @@ const STUB_ENGINES = [
 
 // Community API engines (no auth, no password)
 const COMMUNITY_ENGINES = [
-  'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi', 'restcountries',
+  'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi',
   'httpbin', 'reqres', 'thedogapi',
   'randomuser', 'exchangerate', 'catfacts', 'openmeteo',
   'kanyerest', 'jokeapi', 'jsonplaceholder2', 'dogceo', 'countriesv3',
   'coingecko', 'frankfurter', 'deckofcards', 'chucknorris', 'httpstatusdogs',
-  'randomfox', 'httpcat', 'waifupics', 'metmuseum', 'artic',
+  'randomfox', 'httpcat', 'metmuseum', 'artic',
   'jikan', 'ghibli', 'wizardworld', 'nagerdate', 'memegen', 'dummyimage',
-  'poetrydb', 'openholidays', 'emojihub', 'coinpaprika', 'coingecko',
+  'poetrydb', 'openholidays', 'emojihub', 'coinpaprika',
 ];
 
 // Engines that don't throw on invalid host/credentials

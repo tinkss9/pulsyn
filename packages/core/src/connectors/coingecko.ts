@@ -9,11 +9,11 @@ export class CoinGeckoConnector extends BaseConnector {
   private baseUrl = 'https://api.coingecko.com/api/v3';
   private cdcActive = false;
 
-  private async fetchWithRetry(url: string, retries = 2): Promise<Response> {
+  private async fetchWithRetry(url: string, retries = 3): Promise<Response> {
     for (let i = 0; i <= retries; i++) {
       const res = await fetch(url);
       if (res.status === 429 && i < retries) {
-        await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+        await new Promise(r => setTimeout(r, 2000 * (i + 1)));
         continue;
       }
       return res;

@@ -160,7 +160,7 @@ export class MSSQLConnector extends BaseConnector {
     while (true) {
       const req = this.pool.request().input('batchSize', sql.Int, this.batchSize);
       let query: string;
-      if (lastKey) {
+      if (lastKey !== null) {
         req.input('lastKey', sql.NVarChar, String(lastKey));
         query = `SELECT TOP (@batchSize) * FROM [${table.replace('.', '].[')}] WHERE [${pk}] > @lastKey ORDER BY [${pk}]`;
       } else {
@@ -179,7 +179,9 @@ export class MSSQLConnector extends BaseConnector {
 
   async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     if (!this.pool) throw new Error('Not connected');
-    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || 'created_at';
+    const schema = await this.getTableSchema(table);
+    const tsCol = schema.columns.find(c => ['datetime', 'datetime2', 'smalldatetime', 'timestamp', 'date'].includes(c.type.toLowerCase()));
+    const wmCol = opts?.watermarkColumn || this.config.watermarkColumn || tsCol?.name || schema.primaryKeys[0] || 'id';
     const watermark = opts?.watermarkValue || null;
     const events: UnifiedChangeEvent[] = [];
     const req = this.pool.request().input('batchSize', sql.Int, this.batchSize);
