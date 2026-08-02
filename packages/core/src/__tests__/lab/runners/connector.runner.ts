@@ -32,14 +32,22 @@ const STUB_ENGINES = [
   'hubspot', 'shopify', 'stripe',
 ];
 
+// Community API engines (no auth, no password)
+const COMMUNITY_ENGINES = [
+  'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi', 'restcountries',
+  'httpbin', 'reqres', 'thedogapi',
+];
+
 // Engines that don't throw on invalid host/credentials
 const NO_AUTH_THROW_ENGINES = [
-  ...STUB_ENGINES, 'redis', 'dynamodb', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'github',
+  ...STUB_ENGINES, ...COMMUNITY_ENGINES,
+  'redis', 'dynamodb', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'github',
 ];
 
 // Engines that don't mask password in getConfig()
 const NO_PASSWORD_MASK_ENGINES = [
-  ...STUB_ENGINES, 'redis', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'r2', 'github',
+  ...STUB_ENGINES, ...COMMUNITY_ENGINES,
+  'redis', 'clickhouse', 's3', 'kafka', 'elasticsearch', 'cassandra', 'r2', 'github',
 ];
 
 export interface ConnectorTestConfig {
@@ -346,7 +354,7 @@ export class ConnectorTestRunner {
         it('should throw when extracting from non-existent table', async () => {
           this.connector = this.createConnector();
           await expectConnect(this.connector, config);
-          const noThrowEngines = ['redis', 'mongodb', 'kafka', 'elasticsearch', 'r2', 's3', 'clickhouse'];
+          const noThrowEngines = ['redis', 'mongodb', 'kafka', 'elasticsearch', 'r2', 's3', 'clickhouse', ...COMMUNITY_ENGINES];
           if (noThrowEngines.includes(this.config.engine) || STUB_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
           } else {
