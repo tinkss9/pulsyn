@@ -1,4 +1,4 @@
-// RestCountries V3 API (alt — more tables)
+﻿// RestCountries V3 API (alt — more tables)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -59,7 +59,7 @@ export class CountriesV3Connector extends BaseConnector {
       const regionMap = new Map<string, number>();
       for (const c of data) { regionMap.set(c.region, (regionMap.get(c.region) || 0) + 1); }
       return Array.from(regionMap.entries()).map(([region, count]) =>
-        createEvent('countriesv3', 'regions', 'c', { region, count }, region)
+        createEvent({ op: 'S', table: 'regions', after: { region, watermark: count }, region })
       );
     }
     if (table === 'currencies') {
@@ -74,15 +74,15 @@ export class CountriesV3Connector extends BaseConnector {
         }
       }
       return Array.from(currMap.values()).slice(0, 20).map((c: any) =>
-        createEvent('countriesv3', 'currencies', 'c', c, c.code)
+        createEvent({ op: 'S', table: 'currencies', after: c, watermark: c.code })
       );
     }
     const res = await fetch(`${this.baseUrl}/all?fields=name,capital,region,population,cca2`);
     const data = await res.json();
     return data.slice(0, 20).map((c: any) =>
-      createEvent('countriesv3', 'countries', 'c', {
-        cca2: c.cca2, name: c.name?.common, capital: c.capital?.[0], region: c.region, population: c.population,
-      }, c.cca2)
+      createEvent({ op: 'S', table: 'countries', after: {
+        cca2: c.cca2, watermark: name: c.name?.common, capital: c.capital?.[0], region: c.region, population: c.population,
+      }, c.cca2 })
     );
   }
 

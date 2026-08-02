@@ -1,4 +1,4 @@
-// Memegen API — Meme generator (no auth)
+﻿// Memegen API — Meme generator (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -46,7 +46,7 @@ export class MemegenConnector extends BaseConnector {
     const res = await fetch(`${this.baseUrl}/templates`);
     const data = await res.json();
     return data.slice(0, 10).map((t: any) =>
-      createEvent('memegen', 'templates', 'c', t, t.id)
+      createEvent({ op: 'S', table: 'templates', after: t, watermark: t.id })
     );
   }
 

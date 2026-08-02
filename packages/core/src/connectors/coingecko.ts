@@ -1,4 +1,4 @@
-// CoinGecko API — Crypto prices (no auth, free tier)
+﻿// CoinGecko API — Crypto prices (no auth, free tier)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -52,12 +52,12 @@ export class CoinGeckoConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/exchange_rates`);
       const data = await res.json();
       return Object.entries(data.rates).slice(0, 10).map(([name, rate]: [string, any]) =>
-        createEvent('coingecko', 'exchange_rates', 'c', { name, ...rate }, name)
+        createEvent({ op: 'S', table: 'exchange_rates', after: { name, watermark: ...rate }, name })
       );
     }
     const res = await fetch(`${this.baseUrl}/coins/markets?vs_currency=usd&per_page=5&page=1`);
     const data = await res.json();
-    return data.map((c: any) => createEvent('coingecko', 'coins', 'c', c, c.id));
+    return data.map((c: any) => createEvent({ op: 'S', table: 'coins', after: c, watermark: c.id }));
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

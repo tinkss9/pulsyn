@@ -1,4 +1,4 @@
-// Studio Ghibli API (no auth)
+﻿// Studio Ghibli API (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -60,7 +60,7 @@ export class GhibliConnector extends BaseConnector {
     const data = await res.json();
     const idField = data[0]?.id ? 'id' : 'name';
     return data.slice(0, 10).map((item: any) =>
-      createEvent('ghibli', table, 'c', item, item[idField])
+      createEvent({ op: 'S', table: table, after: item, watermark: item[idField] })
     );
   }
 

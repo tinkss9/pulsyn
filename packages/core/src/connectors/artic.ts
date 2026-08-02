@@ -49,11 +49,11 @@ export class ArtICConnector extends BaseConnector {
     if (table === 'artists') {
       const res = await fetch(`${this.baseUrl}/artists?limit=5`);
       const data = await res.json();
-      return data.data.map((a: any) => createEvent('artic', 'artists', 'c', a, String(a.id)));
+      return data.data.map((a: any) => createEvent({ op: 'S', table: 'artists', after: a, watermark: String(a.id) }));
     }
     const res = await fetch(`${this.baseUrl}/artworks?limit=5`);
     const data = await res.json();
-    return data.data.map((a: any) => createEvent('artic', 'artworks', 'c', a, String(a.id)));
+    return data.data.map((a: any) => createEvent({ op: 'S', table: 'artworks', after: a, watermark: String(a.id) }));
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

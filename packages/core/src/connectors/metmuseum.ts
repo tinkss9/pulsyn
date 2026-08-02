@@ -1,4 +1,4 @@
-// Met Museum API — Metropolitan Museum of Art (no auth)
+﻿// Met Museum API — Metropolitan Museum of Art (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -50,7 +50,7 @@ export class MetMuseumConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/departments`);
       const data = await res.json();
       return data.departments.map((d: any) =>
-        createEvent('metmuseum', 'departments', 'c', d, String(d.departmentId))
+        createEvent({ op: 'S', table: 'departments', after: d, watermark: String(d.departmentId )))
       );
     }
     const objIds = [45734, 45910, 436121, 437133, 435809];
@@ -59,7 +59,7 @@ export class MetMuseumConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/objects/${id}`);
       if (res.ok) {
         const data = await res.json();
-        events.push(createEvent('metmuseum', 'objects', 'c', data, String(id)));
+        events.push(createEvent({ op: 'S', table: 'objects', after: data, watermark: String(id ))));
       }
     }
     return events;

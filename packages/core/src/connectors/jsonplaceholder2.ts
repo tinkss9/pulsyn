@@ -1,4 +1,4 @@
-// JSONPlaceholder-like API — Typicode fake data (no auth, different endpoint)
+﻿// JSONPlaceholder-like API — Typicode fake data (no auth, different endpoint)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -57,7 +57,7 @@ export class JSONPlaceholder2Connector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     const res = await fetch(`${this.baseUrl}/${table}?_limit=10`);
     const data = await res.json();
-    return data.map((item: any) => createEvent('jsonplaceholder2', table, 'c', item, String(item.id)));
+    return data.map((item: any) => createEvent({ op: 'S', table: table, after: item, watermark: String(item.id ))));
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

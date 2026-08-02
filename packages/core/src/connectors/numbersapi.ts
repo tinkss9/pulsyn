@@ -1,4 +1,4 @@
-// Numbers API — Trivia and math facts (no auth)
+﻿// Numbers API — Trivia and math facts (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -47,7 +47,7 @@ export class NumbersAPIConnector extends BaseConnector {
     for (const num of [1, 2, 3, 4, 5]) {
       const res = await fetch(`${this.baseUrl}/${num}?json`);
       const data = await res.json();
-      events.push(createEvent('numbersapi', 'facts', 'c', data, String(data.number)));
+      events.push(createEvent({ op: 'S', table: 'facts', after: data, watermark: String(data.number ))));
     }
     return events;
   }

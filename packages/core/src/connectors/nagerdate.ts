@@ -1,4 +1,4 @@
-// Nager.Date API — Public holidays (no auth)
+﻿// Nager.Date API — Public holidays (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -50,13 +50,13 @@ export class NagerDateConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/AvailableCountries`);
       const data = await res.json();
       return data.slice(0, 20).map((c: any) =>
-        createEvent('nagerdate', 'countries', 'c', c, c.countryCode)
+        createEvent({ op: 'S', table: 'countries', after: c, watermark: c.countryCode })
       );
     }
     const res = await fetch(`${this.baseUrl}/PublicHolidays/2024/US`);
     const data = await res.json();
     return data.slice(0, 10).map((h: any) =>
-      createEvent('nagerdate', 'holidays', 'c', h, h.date)
+      createEvent({ op: 'S', table: 'holidays', after: h, watermark: h.date })
     );
   }
 

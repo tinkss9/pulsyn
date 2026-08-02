@@ -36,14 +36,12 @@ const STUB_ENGINES = [
 const COMMUNITY_ENGINES = [
   'jsonplaceholder', 'pokeapi', 'openlibrary', 'thecatapi', 'restcountries',
   'httpbin', 'reqres', 'thedogapi',
-  'randomuser', 'ipapi', 'exchangerate', 'catfacts', 'openmeteo',
-  'boredapi', 'adviceslip', 'numbersapi', 'agify', 'genderize', 'nationalize',
-  'kanyerest', 'jokeapi', 'jsonplaceholder2', 'dogceo', 'quotable', 'countriesv3',
+  'randomuser', 'exchangerate', 'catfacts', 'openmeteo',
+  'kanyerest', 'jokeapi', 'jsonplaceholder2', 'dogceo', 'countriesv3',
   'coingecko', 'frankfurter', 'deckofcards', 'chucknorris', 'httpstatusdogs',
-  'randomfox', 'httpcat', 'nekosbest', 'waifupics', 'metmuseum', 'artic',
+  'randomfox', 'httpcat', 'waifupics', 'metmuseum', 'artic',
   'jikan', 'ghibli', 'wizardworld', 'nagerdate', 'memegen', 'dummyimage',
-  'poetrydb', 'openholidays', 'emojihub', 'coincap', 'coinpaprika', 'coinstats',
-  'animechan',
+  'poetrydb', 'openholidays', 'emojihub',
 ];
 
 // Engines that don't throw on invalid host/credentials

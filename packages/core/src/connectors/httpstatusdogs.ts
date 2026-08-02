@@ -48,7 +48,7 @@ export class HTTPStatusDogsConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/${code}.json`);
       if (res.ok) {
         const data = await res.json();
-        events.push(createEvent('httpstatusdogs', 'status_codes', 'c', data, String(code)));
+        events.push(createEvent({ op: 'S', table: 'status_codes', after: data, watermark: String(code) }));
       }
     }
     return events;

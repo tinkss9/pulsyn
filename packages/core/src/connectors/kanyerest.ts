@@ -1,4 +1,4 @@
-// Kanye REST API — Random Kanye West quotes (no auth)
+﻿// Kanye REST API — Random Kanye West quotes (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -44,7 +44,7 @@ export class KanyeRestConnector extends BaseConnector {
     for (let i = 0; i < 5; i++) {
       const res = await fetch(this.baseUrl);
       const data = await res.json();
-      events.push(createEvent('kanyerest', 'quotes', 'c', data, String(i)));
+      events.push(createEvent({ op: 'S', table: 'quotes', after: data, watermark: String(i ))));
     }
     return events;
   }

@@ -1,4 +1,4 @@
-// Frankfurter API — Exchange rates from ECB (no auth)
+﻿// Frankfurter API — Exchange rates from ECB (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -48,12 +48,12 @@ export class FrankfurterConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/currencies`);
       const data = await res.json();
       return Object.entries(data).map(([code, name]) =>
-        createEvent('frankfurter', 'currencies', 'c', { code, name }, code)
+        createEvent({ op: 'S', table: 'currencies', after: { code, watermark: name }, code })
       );
     }
     const res = await fetch(`${this.baseUrl}/latest?base=USD`);
     const data = await res.json();
-    return [createEvent('frankfurter', 'latest', 'c', data, 'USD')];
+    return [createEvent({ op: 'S', table: 'latest', after: data, watermark: 'USD' })];
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

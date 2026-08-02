@@ -1,4 +1,4 @@
-// Poetry DB API — Poems and poetry (no auth)
+﻿// Poetry DB API — Poems and poetry (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -48,13 +48,13 @@ export class PoetryDBConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/author`);
       const data = await res.json();
       return data.authors.slice(0, 10).map((name: string) =>
-        createEvent('poetrydb', 'authors', 'c', { name }, name)
+        createEvent({ op: 'S', table: 'authors', after: { name }, watermark: name })
       );
     }
     const res = await fetch(`${this.baseUrl}/author/Shakespeare/title,author,linecount`);
     const data = await res.json();
     return data.slice(0, 5).map((p: any) =>
-      createEvent('poetrydb', 'poems', 'c', p, p.title)
+      createEvent({ op: 'S', table: 'poems', after: p, watermark: p.title })
     );
   }
 

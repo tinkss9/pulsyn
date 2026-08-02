@@ -1,4 +1,4 @@
-// Chuck Norris API — Random Chuck Norris jokes (no auth)
+﻿// Chuck Norris API — Random Chuck Norris jokes (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -47,13 +47,13 @@ export class ChuckNorrisConnector extends BaseConnector {
     if (table === 'categories') {
       const res = await fetch(`${this.baseUrl}/jokes/categories`);
       const data = await res.json();
-      return data.map((cat: string) => createEvent('chucknorris', 'categories', 'c', { name: cat }, cat));
+      return data.map((cat: string) => createEvent({ op: 'S', table: 'categories', after: { name: cat }, watermark: cat }));
     }
     const events: UnifiedChangeEvent[] = [];
     for (let i = 0; i < 5; i++) {
       const res = await fetch(`${this.baseUrl}/jokes/random`);
       const data = await res.json();
-      events.push(createEvent('chucknorris', 'jokes', 'c', data, data.id));
+      events.push(createEvent({ op: 'S', table: 'jokes', after: data, watermark: data.id }));
     }
     return events;
   }

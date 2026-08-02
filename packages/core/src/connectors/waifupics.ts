@@ -1,4 +1,4 @@
-// Waifu Pics API — Anime waifu images (no auth)
+﻿// Waifu Pics API — Anime waifu images (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -45,12 +45,12 @@ export class WaifuPicsConnector extends BaseConnector {
       const res = await fetch(`${this.baseUrl}/endpoints`);
       const data = await res.json();
       return (data.sfw || []).map((cat: string) =>
-        createEvent('waifupics', 'categories', 'c', { name: cat }, cat)
+        createEvent({ op: 'S', table: 'categories', after: { name: cat }, watermark: cat })
       );
     }
     const res = await fetch(`${this.baseUrl}/sfw/neko`);
     const data = await res.json();
-    return [createEvent('waifupics', 'sfw_images', 'c', data, '0')];
+    return [createEvent({ op: 'S', table: 'sfw_images', after: data, watermark: '0' })];
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

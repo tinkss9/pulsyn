@@ -1,4 +1,4 @@
-// Coinpaprika API — Crypto data (no auth, free tier)
+﻿// Coinpaprika API — Crypto data (no auth, free tier)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -51,11 +51,11 @@ export class CoinpaprikaConnector extends BaseConnector {
     if (table === 'global') {
       const res = await fetch(`${this.baseUrl}/global`);
       const data = await res.json();
-      return [createEvent('coinpaprika', 'global', 'c', data, 'global')];
+      return [createEvent({ op: 'S', table: 'global', after: data, watermark: 'global' })];
     }
     const res = await fetch(`${this.baseUrl}/coins?limit=5`);
     const data = await res.json();
-    return data.map((c: any) => createEvent('coinpaprika', 'coins', 'c', c, c.id));
+    return data.map((c: any) => createEvent({ op: 'S', table: 'coins', after: c, watermark: c.id }));
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

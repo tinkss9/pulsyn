@@ -1,4 +1,4 @@
-// Deck of Cards API — Shuffle and draw cards (no auth)
+﻿// Deck of Cards API — Shuffle and draw cards (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -49,11 +49,11 @@ export class DeckOfCardsConnector extends BaseConnector {
     if (table === 'cards') {
       const deckRes = await fetch(`${this.baseUrl}/deck/new/draw/?count=5`);
       const deckData = await deckRes.json();
-      return deckData.cards.map((c: any) => createEvent('deckofcards', 'cards', 'c', c, c.code));
+      return deckData.cards.map((c: any) => createEvent({ op: 'S', table: 'cards', after: c, watermark: c.code }));
     }
     const res = await fetch(`${this.baseUrl}/deck/new/shuffle/?deck_count=1`);
     const data = await res.json();
-    return [createEvent('deckofcards', 'deck', 'c', data, data.deck_id)];
+    return [createEvent({ op: 'S', table: 'deck', after: data, watermark: data.deck_id })];
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {

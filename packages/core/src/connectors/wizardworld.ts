@@ -1,4 +1,4 @@
-// Potion API — Wizards (Harry Potter) API (no auth)
+﻿// Potion API — Wizards (Harry Potter) API (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -58,7 +58,7 @@ export class WizardWorldConnector extends BaseConnector {
     const res = await fetch(`${this.baseUrl}/${endpoint}`);
     const data = await res.json();
     return data.slice(0, 10).map((item: any) =>
-      createEvent('wizardworld', table, 'c', item, item.id)
+      createEvent({ op: 'S', table: table, after: item, watermark: item.id })
     );
   }
 

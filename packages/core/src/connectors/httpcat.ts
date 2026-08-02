@@ -43,7 +43,7 @@ export class HTTPCatConnector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     const codes = [200, 301, 404, 500];
     return codes.map(code =>
-      createEvent('httpcat', 'status_codes', 'c', { statusCode: code, image: `${this.baseUrl}/${code}` }, String(code))
+      createEvent({ op: 'S', table: 'status_codes', after: { statusCode: code, image: `${this.baseUrl}/${code}` }, watermark: String(code) })
     );
   }
 

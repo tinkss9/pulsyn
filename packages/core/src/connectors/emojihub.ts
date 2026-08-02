@@ -1,4 +1,4 @@
-// EmojiHub API — Emoji data (no auth)
+﻿// EmojiHub API — Emoji data (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -47,16 +47,16 @@ export class EmojiHubConnector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     if (table === 'categories') {
       const cats = ['smileys-and-people', 'animals-and-nature', 'food-and-drink', 'travel-and-places', 'activities', 'objects', 'symbols', 'flags'];
-      return cats.map(c => createEvent('emojihub', 'categories', 'c', { name: c }, c));
+      return cats.map(c => createEvent({ op: 'S', table: 'categories', after: { name: c }, watermark: c }));
     }
     if (table === 'groups') {
       const groups = ['happy', 'sad', 'angry', 'surprised', 'neutral'];
-      return groups.map(g => createEvent('emojihub', 'groups', 'c', { name: g }, g));
+      return groups.map(g => createEvent({ op: 'S', table: 'groups', after: { name: g }, watermark: g }));
     }
     const res = await fetch(`${this.baseUrl}/all/category/smileys-and-people`);
     const data = await res.json();
     return data.slice(0, 10).map((e: any) =>
-      createEvent('emojihub', 'emojis', 'c', e, e.name)
+      createEvent({ op: 'S', table: 'emojis', after: e, watermark: e.name })
     );
   }
 
