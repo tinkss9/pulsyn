@@ -1,9 +1,27 @@
-// Health Routes — real dependency checks
+// Health Routes — real dependency checks + Brain pre-check
 
 import { Router, Request, Response } from 'express';
+import { execSync } from 'child_process';
 import { query } from '../db';
 
 export const healthRoutes = Router();
+
+// Pulsyn Brain pre-check (Python self-coding module)
+const BRAIN_CLI = process.env.PULSYN_BRAIN_CLI || 'python';
+const BRAIN_SCRIPT = process.env.PULSYN_BRAIN_SCRIPT || 'shared/brain/wiring/pulsyn_cli.py';
+const BRAIN_DATA_DIR = process.env.PULSYN_BRAIN_DATA || 'data/brain/pulsyn';
+
+function brainHealth(connectorId: string, metrics: Record<string, number>): { healthy: boolean; reason: string } | null {
+  try {
+    const result = execSync(
+      `${BRAIN_CLI} ${BRAIN_SCRIPT} health --connector ${connectorId} --throughput ${metrics.throughputRps || 0} --latency ${metrics.latencyMs || 0} --error-rate ${metrics.errorRatePct || 0} --data-dir ${BRAIN_DATA_DIR}`,
+      { timeout: 5000, encoding: 'utf-8' }
+    );
+    return JSON.parse(result);
+  } catch {
+    return null; // Brain not available — fallback to legacy checks
+  }
+}
 
 healthRoutes.get('/', (req: Request, res: Response) => {
   res.json({
