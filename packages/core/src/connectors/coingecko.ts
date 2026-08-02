@@ -64,6 +64,7 @@ export class CoinGeckoConnector extends BaseConnector {
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
     if (!this.connected) throw new Error('Not connected');
     // No retries for extraction — return empty on 429 to avoid timeouts
+    try {
     if (table === 'exchange_rates') {
       const res = await fetch(`${this.baseUrl}/exchange_rates`);
       if (!res.ok) return [];
@@ -78,6 +79,7 @@ export class CoinGeckoConnector extends BaseConnector {
     const data = await res.json();
     if (!Array.isArray(data)) return [];
     return data.map((c: any) => createEvent({ op: 'S', table: 'coins', after: c, watermark: c.id }));
+    } catch { return []; }
   }
 
   async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {
