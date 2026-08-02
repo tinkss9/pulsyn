@@ -41,7 +41,7 @@ const COMMUNITY_ENGINES = [
   'coingecko', 'frankfurter', 'deckofcards', 'chucknorris', 'httpstatusdogs',
   'randomfox', 'httpcat', 'waifupics', 'metmuseum', 'artic',
   'jikan', 'ghibli', 'wizardworld', 'nagerdate', 'memegen', 'dummyimage',
-  'poetrydb', 'openholidays', 'emojihub',
+  'poetrydb', 'openholidays', 'emojihub', 'coinpaprika', 'coingecko',
 ];
 
 // Engines that don't throw on invalid host/credentials

@@ -1,4 +1,4 @@
-﻿// Coinpaprika API — Crypto data (no auth, free tier)
+// Coinpaprika API — Crypto data (no auth, free tier)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -11,6 +11,9 @@ export class CoinpaprikaConnector extends BaseConnector {
 
   async connect(config: DatabaseConfig): Promise<void> {
     this.config = config;
+    // Validate connection
+    const res = await fetch(`${this.baseUrl}/coins?limit=1`);
+    if (!res.ok) throw new Error(`coinpaprika connection failed: HTTP ${res.status}`);
     this.connected = true;
   }
 
@@ -26,33 +29,37 @@ export class CoinpaprikaConnector extends BaseConnector {
   }
 
   async getTables(): Promise<string[]> {
+    if (!this.connected) throw new Error('Not connected');
     return ['coins', 'global'];
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    if (table === 'global') {
-      return { table, columns: [
+    const schemas: Record<string, TableSchema> = {
+      global: { table, columns: [
         { name: 'market_cap_usd', type: 'number', nullable: false },
         { name: 'volume_24h_usd', type: 'number', nullable: false },
         { name: 'bitcoin_dominance_percentage', type: 'number', nullable: false },
         { name: 'active_cryptocurrencies', type: 'number', nullable: false },
-      ], primaryKeys: [] };
-    }
-    return { table, columns: [
-      { name: 'id', type: 'string', nullable: false },
-      { name: 'symbol', type: 'string', nullable: false },
-      { name: 'name', type: 'string', nullable: false },
-      { name: 'rank', type: 'number', nullable: false },
-      { name: 'type', type: 'string', nullable: false },
-    ], primaryKeys: ['id'] };
+      ], primaryKeys: [] },
+      coins: { table, columns: [
+        { name: 'id', type: 'string', nullable: false },
+        { name: 'symbol', type: 'string', nullable: false },
+        { name: 'name', type: 'string', nullable: false },
+        { name: 'rank', type: 'number', nullable: false },
+        { name: 'type', type: 'string', nullable: false },
+      ], primaryKeys: ['id'] },
+    };
+    return schemas[table] || schemas.coins;
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+    if (!this.connected) throw new Error('Not connected');
     if (table === 'global') {
       const res = await fetch(`${this.baseUrl}/global`);
       const data = await res.json();
       return [createEvent({ op: 'S', table: 'global', after: data, watermark: 'global' })];
     }
+    if (table !== 'coins') throw new Error(`Table '${table}' not found`);
     const res = await fetch(`${this.baseUrl}/coins?limit=5`);
     const data = await res.json();
     return data.map((c: any) => createEvent({ op: 'S', table: 'coins', after: c, watermark: c.id }));

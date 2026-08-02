@@ -1,4 +1,4 @@
-﻿// CoinGecko API — Crypto prices (no auth, free tier)
+// CoinGecko API — Crypto prices (no auth, free tier, rate-limited)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -9,8 +9,22 @@ export class CoinGeckoConnector extends BaseConnector {
   private baseUrl = 'https://api.coingecko.com/api/v3';
   private cdcActive = false;
 
+  private async fetchWithRetry(url: string, retries = 2): Promise<Response> {
+    for (let i = 0; i <= retries; i++) {
+      const res = await fetch(url);
+      if (res.status === 429 && i < retries) {
+        await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+        continue;
+      }
+      return res;
+    }
+    return fetch(url);
+  }
+
   async connect(config: DatabaseConfig): Promise<void> {
     this.config = config;
+    const res = await this.fetchWithRetry(`${this.baseUrl}/ping`);
+    if (!res.ok) throw new Error(`coingecko connection failed: HTTP ${res.status}`);
     this.connected = true;
   }
 
@@ -20,12 +34,13 @@ export class CoinGeckoConnector extends BaseConnector {
 
   async testConnection(): Promise<boolean> {
     try {
-      const res = await fetch(`${this.baseUrl}/ping`);
+      const res = await this.fetchWithRetry(`${this.baseUrl}/ping`);
       return res.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
+    if (!this.connected) throw new Error('Not connected');
     return ['coins', 'exchange_rates'];
   }
 
@@ -48,15 +63,20 @@ export class CoinGeckoConnector extends BaseConnector {
   }
 
   async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+    if (!this.connected) throw new Error('Not connected');
     if (table === 'exchange_rates') {
-      const res = await fetch(`${this.baseUrl}/exchange_rates`);
+      const res = await this.fetchWithRetry(`${this.baseUrl}/exchange_rates`);
+      if (!res.ok) return [];
       const data = await res.json();
+      if (!data.rates) return [];
       return Object.entries(data.rates).slice(0, 10).map(([name, rate]: [string, any]) =>
-        createEvent({ op: 'S', table: 'exchange_rates', after: { name, watermark: ...rate }, name })
+        createEvent({ op: 'S', table: 'exchange_rates', after: { name, ...rate }, watermark: name })
       );
     }
-    const res = await fetch(`${this.baseUrl}/coins/markets?vs_currency=usd&per_page=5&page=1`);
+    const res = await this.fetchWithRetry(`${this.baseUrl}/coins/markets?vs_currency=usd&per_page=5&page=1`);
+    if (!res.ok) return [];
     const data = await res.json();
+    if (!Array.isArray(data)) return [];
     return data.map((c: any) => createEvent({ op: 'S', table: 'coins', after: c, watermark: c.id }));
   }
 
