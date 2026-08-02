@@ -19,8 +19,12 @@ export class SupabaseConnector extends BaseConnector {
     const cfg = config || this.config;
     this.baseUrl = cfg.host || this.baseUrl;
     this.apiKey = cfg.password || this.apiKey;
-    const resp = await fetch(this.baseUrl + '/health', {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    // Supabase REST API - check connectivity by querying root endpoint
+    const resp = await fetch(this.baseUrl + '/rest/v1/', {
+      headers: { 
+        'Authorization': 'Bearer ' + this.apiKey,
+        'apikey': this.apiKey
+      }
     });
     if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
@@ -32,34 +36,63 @@ export class SupabaseConnector extends BaseConnector {
 
   async testConnection(): Promise<boolean> {
     try {
-      const resp = await fetch(this.baseUrl + '/health', {
-        headers: { 'Authorization': 'Bearer ' + this.apiKey }
+      const resp = await fetch(this.baseUrl + '/rest/v1/', {
+        headers: { 
+          'Authorization': 'Bearer ' + this.apiKey,
+          'apikey': this.apiKey
+        }
       });
       return resp.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
-    const resp = await fetch(this.baseUrl + '/resources', {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    // Supabase REST API - get tables from the OpenAPI spec
+    const resp = await fetch(this.baseUrl + '/rest/v1/', {
+      headers: { 
+        'Authorization': 'Bearer ' + this.apiKey,
+        'apikey': this.apiKey
+      }
     });
     const data = await resp.json();
-    return Array.isArray(data) ? data.map((r: Record<string, unknown>) => String(r.name || r.id)) : [];
+    // Extract table names from the paths
+    const paths = data.paths || {};
+    return Object.keys(paths)
+      .filter(p => p.startsWith('/') && !p.startsWith('/rpc/'))
+      .map(p => p.substring(1))
+      .filter(p => !p.startsWith('_'));
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    const resp = await fetch(this.baseUrl + '/resources/' + table + '/schema', {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    // Supabase REST API - get schema from the OpenAPI spec
+    const resp = await fetch(this.baseUrl + '/rest/v1/', {
+      headers: { 
+        'Authorization': 'Bearer ' + this.apiKey,
+        'apikey': this.apiKey
+      }
     });
-    return await resp.json();
+    const data = await resp.json();
+    const tableDef = data.definitions?.[table];
+    if (!tableDef) return { columns: [] };
+    
+    const columns = Object.entries(tableDef.properties || {}).map(([name, prop]: [string, any]) => ({
+      name,
+      type: prop.format || prop.type || 'unknown',
+      nullable: !tableDef.required?.includes(name),
+      primaryKey: name === 'id',
+    }));
+    return { columns };
   }
 
   async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
     const params = new URLSearchParams();
     if (opts?.limit) params.set('limit', String(opts.limit));
     if (opts?.offset) params.set('offset', String(opts.offset));
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    const resp = await fetch(this.baseUrl + '/rest/v1/' + table + '?' + params, {
+      headers: { 
+        'Authorization': 'Bearer ' + this.apiKey,
+        'apikey': this.apiKey
+      }
     });
     const data = await resp.json();
     const items = Array.isArray(data) ? data : data.data || data.items || [];
@@ -72,10 +105,13 @@ export class SupabaseConnector extends BaseConnector {
   async extractIncremental(table: string, opts?: { watermarkColumn?: string; watermarkValue?: string }): Promise<UnifiedChangeEvent[]> {
     const params = new URLSearchParams();
     if (opts?.watermarkColumn && opts?.watermarkValue) {
-      params.set('filter', opts.watermarkColumn + '>:' + opts.watermarkValue);
+      params.set(opts.watermarkColumn, 'gt.' + opts.watermarkValue);
     }
-    const resp = await fetch(this.baseUrl + '/' + table + '?' + params, {
-      headers: { 'Authorization': 'Bearer ' + this.apiKey }
+    const resp = await fetch(this.baseUrl + '/rest/v1/' + table + '?' + params, {
+      headers: { 
+        'Authorization': 'Bearer ' + this.apiKey,
+        'apikey': this.apiKey
+      }
     });
     const data = await resp.json();
     const items = Array.isArray(data) ? data : data.data || data.items || [];
