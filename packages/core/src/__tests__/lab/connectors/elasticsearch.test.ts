@@ -16,7 +16,7 @@ const config: ConnectorTestConfig = {
     ssl: false,
     watermarkColumn: 'created_at',
   },
-  testTables: ['indices'],
+  testTables: ['users'],
   skipCDC: true,
   skipBenchmark: true,
   maxConnectionLatencyMs: 10000,

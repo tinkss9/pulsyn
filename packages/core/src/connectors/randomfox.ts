@@ -1,4 +1,4 @@
-﻿// Random Fox API — Random fox images (no auth)
+// Random Fox API — Random fox images (no auth)
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
 import { UnifiedChangeEvent, createEvent } from '../events';
@@ -45,7 +45,7 @@ export class RandomFoxConnector extends BaseConnector {
     for (let i = 0; i < 5; i++) {
       const res = await fetch(`${this.baseUrl}/floof/`);
       const data = await res.json();
-      events.push(createEvent({ op: 'S', table: 'foxes', after: data, watermark: String(i ))));
+      events.push(createEvent({ op: 'S', table: 'foxes', after: data, watermark: String(i) }));
     }
     return events;
   }

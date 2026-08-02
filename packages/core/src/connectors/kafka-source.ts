@@ -71,6 +71,7 @@ export class KafkaSourceConnector extends BaseConnector {
   async getTableSchema(_table: string): Promise<TableSchema> {
     // Kafka topics are schemaless (schema registry would be separate)
     return {
+      table: _table,
       columns: [
         { name: 'key', type: 'bytes', nullable: true, primaryKey: false },
         { name: 'value', type: 'bytes', nullable: true, primaryKey: false },
@@ -79,6 +80,7 @@ export class KafkaSourceConnector extends BaseConnector {
         { name: 'timestamp', type: 'timestamp', nullable: true, primaryKey: false },
         { name: 'headers', type: 'json', nullable: true, primaryKey: false },
       ],
+      primaryKeys: ['offset'],
     };
   }
 

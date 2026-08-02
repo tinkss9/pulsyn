@@ -24,7 +24,7 @@ const config: ConnectorTestConfig = {
     ssl: true,
     prefix: 'pulsyn-test/',
   } as any,
-  testTables: ['data/users.csv', 'data/orders.json'],
+  testTables: ['pulsyn-test/data/users.csv', 'pulsyn-test/data/orders.json'],
   skipCDC: true,
   skipBenchmark: false,
   maxConnectionLatencyMs: 5000,
