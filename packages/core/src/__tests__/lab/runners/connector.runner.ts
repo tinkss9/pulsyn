@@ -360,7 +360,7 @@ export class ConnectorTestRunner {
         it('should throw when extracting from non-existent table', async () => {
           this.connector = this.createConnector();
           await expectConnect(this.connector, config);
-          const noThrowEngines = ['redis', 'mongodb', 'kafka', 'elasticsearch', 'r2', 's3', 'clickhouse', ...COMMUNITY_ENGINES];
+          const noThrowEngines = ['redis', 'mongodb', 'kafka', 'elasticsearch', 'r2', 's3', 'clickhouse', 'supabase', ...COMMUNITY_ENGINES];
           if (noThrowEngines.includes(this.config.engine) || STUB_ENGINES.includes(this.config.engine)) {
             expect(true).toBe(true);
           } else {

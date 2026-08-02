@@ -14,7 +14,7 @@ const config: ConnectorTestConfig = {
     password: SUPABASE_KEY,
     accessToken: SUPABASE_KEY,
   },
-  testTables: ['organizations', 'api_keys', 'connectors'],
+  testTables: ['target_users', 'api_keys', 'connectors'],
   skipCDC: true,
   skipBenchmark: true,
   maxConnectionLatencyMs: 15000,

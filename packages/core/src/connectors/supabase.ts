@@ -8,72 +8,64 @@ import { UnifiedChangeEvent } from '../events';
 export class SupabaseConnector extends BaseConnector {
   private baseUrl: string;
   private apiKey: string;
+  private specCache: any = null;
 
-  constructor(id: string, config: DatabaseConfig) {
-    super(id, 'supabase', 'supabase', config);
-    this.baseUrl = config.host || '';
-    this.apiKey = config.password || '';
+  constructor(id: string, nameOrConfig: any, engineOrConfig?: any, config?: DatabaseConfig) {
+    // Support both 2-arg (id, config) and 4-arg (id, name, engine, config) forms
+    const actualConfig = config || nameOrConfig;
+    super(id, 'supabase', 'supabase', actualConfig);
+    this.baseUrl = actualConfig?.host || '';
+    this.apiKey = actualConfig?.password || '';
+  }
+
+  private headers() {
+    return { 'Authorization': 'Bearer ' + this.apiKey, 'apikey': this.apiKey };
+  }
+
+  private async getSpec(): Promise<any> {
+    if (this.specCache) return this.specCache;
+    const resp = await fetch(this.baseUrl + '/rest/v1/', { headers: this.headers() });
+    this.specCache = await resp.json();
+    return this.specCache;
   }
 
   async connect(config?: DatabaseConfig): Promise<void> {
     const cfg = config || this.config;
     this.baseUrl = cfg.host || this.baseUrl;
     this.apiKey = cfg.password || this.apiKey;
-    // Supabase REST API - check connectivity by querying root endpoint
-    const resp = await fetch(this.baseUrl + '/rest/v1/', {
-      headers: { 
-        'Authorization': 'Bearer ' + this.apiKey,
-        'apikey': this.apiKey
-      }
-    });
+    this.specCache = null;
+    const resp = await fetch(this.baseUrl + '/rest/v1/', { headers: this.headers() });
     if (!resp.ok) throw new Error('Connection failed: ' + resp.status);
     this.connected = true;
   }
 
   async disconnect(): Promise<void> {
     this.connected = false;
+    this.specCache = null;
   }
 
   async testConnection(): Promise<boolean> {
     try {
-      const resp = await fetch(this.baseUrl + '/rest/v1/', {
-        headers: { 
-          'Authorization': 'Bearer ' + this.apiKey,
-          'apikey': this.apiKey
-        }
-      });
+      const resp = await fetch(this.baseUrl + '/rest/v1/', { headers: this.headers() });
       return resp.ok;
     } catch { return false; }
   }
 
   async getTables(): Promise<string[]> {
-    // Supabase REST API - get tables from the OpenAPI spec
-    const resp = await fetch(this.baseUrl + '/rest/v1/', {
-      headers: { 
-        'Authorization': 'Bearer ' + this.apiKey,
-        'apikey': this.apiKey
-      }
-    });
-    const data = await resp.json();
-    // Extract table names from the paths
+    if (!this.connected) throw new Error('Not connected');
+    const data = await this.getSpec();
     const paths = data.paths || {};
     return Object.keys(paths)
-      .filter(p => p.startsWith('/') && !p.startsWith('/rpc/'))
+      .filter(p => p.startsWith('/') && !p.startsWith('/rpc/') && p.length > 1)
       .map(p => p.substring(1))
-      .filter(p => !p.startsWith('_'));
+      .filter(p => !p.startsWith('_') && p.length > 0);
   }
 
   async getTableSchema(table: string): Promise<TableSchema> {
-    // Supabase REST API - get schema from the OpenAPI spec
-    const resp = await fetch(this.baseUrl + '/rest/v1/', {
-      headers: { 
-        'Authorization': 'Bearer ' + this.apiKey,
-        'apikey': this.apiKey
-      }
-    });
-    const data = await resp.json();
+    if (!this.connected) throw new Error('Not connected');
+    const data = await this.getSpec();
     const tableDef = data.definitions?.[table];
-    if (!tableDef) return { columns: [] };
+    if (!tableDef) return { table, columns: [], primaryKeys: [] };
     
     const columns = Object.entries(tableDef.properties || {}).map(([name, prop]: [string, any]) => ({
       name,
@@ -81,19 +73,19 @@ export class SupabaseConnector extends BaseConnector {
       nullable: !tableDef.required?.includes(name),
       primaryKey: name === 'id',
     }));
-    return { columns };
+    return { table, columns, primaryKeys: columns.filter(c => c.primaryKey).map(c => c.name) };
   }
 
   async extractFull(table: string, opts?: { limit?: number; offset?: number }): Promise<UnifiedChangeEvent[]> {
+    if (!this.connected) throw new Error('Not connected');
     const params = new URLSearchParams();
     if (opts?.limit) params.set('limit', String(opts.limit));
     if (opts?.offset) params.set('offset', String(opts.offset));
-    const resp = await fetch(this.baseUrl + '/rest/v1/' + table + '?' + params, {
-      headers: { 
-        'Authorization': 'Bearer ' + this.apiKey,
-        'apikey': this.apiKey
-      }
-    });
+    const resp = await fetch(this.baseUrl + '/rest/v1/' + table + '?' + params, { headers: this.headers() });
+    if (!resp.ok) {
+      if (resp.status === 404) throw new Error(`Table '${table}' not found`);
+      throw new Error(`Failed to extract: ${resp.status}`);
+    }
     const data = await resp.json();
     const items = Array.isArray(data) ? data : data.data || data.items || [];
     return items.map((item: Record<string, unknown>) => ({
@@ -107,12 +99,7 @@ export class SupabaseConnector extends BaseConnector {
     if (opts?.watermarkColumn && opts?.watermarkValue) {
       params.set(opts.watermarkColumn, 'gt.' + opts.watermarkValue);
     }
-    const resp = await fetch(this.baseUrl + '/rest/v1/' + table + '?' + params, {
-      headers: { 
-        'Authorization': 'Bearer ' + this.apiKey,
-        'apikey': this.apiKey
-      }
-    });
+    const resp = await fetch(this.baseUrl + '/rest/v1/' + table + '?' + params, { headers: this.headers() });
     const data = await resp.json();
     const items = Array.isArray(data) ? data : data.data || data.items || [];
     return items.map((item: Record<string, unknown>) => ({
@@ -121,9 +108,6 @@ export class SupabaseConnector extends BaseConnector {
     }));
   }
 
-  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
-    // REST API polling CDC: poll every 5s
-  }
-
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {}
   async stopCDC(): Promise<void> {}
 }
