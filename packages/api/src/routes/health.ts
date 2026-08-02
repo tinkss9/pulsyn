@@ -43,10 +43,23 @@ healthRoutes.get('/ready', async (req: Request, res: Response) => {
     checks.database = 'failed';
   }
 
+  // Brain connector health check
+  const brainResult = brainHealth('pulsyn-db', {
+    throughputRps: 100,
+    latencyMs: checks.database === 'ok' ? 50 : 5000,
+    errorRatePct: checks.database === 'ok' ? 0 : 100,
+  });
+
+  const brainMeta = brainResult ? {
+    healthy: brainResult.healthy,
+    reason: brainResult.reason,
+  } : { healthy: null, reason: 'brain_unavailable' };
+
   const allOk = Object.values(checks).every(v => v === 'ok');
 
   res.status(allOk ? 200 : 503).json({
     status: allOk ? 'ready' : 'not_ready',
     checks,
+    brain: brainMeta,
   });
 });
