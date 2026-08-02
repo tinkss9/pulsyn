@@ -1,5 +1,41 @@
 # PULSYN TODO
-## Last Updated: 2026-07-29
+## Last Updated: 2026-08-02
+
+---
+
+## CRITICAL ISSUES — FIXED
+
+### 1. Stripe Checkout Flow ✅
+- [x] Checkout route exists at `POST /api/billing/checkout`
+- [x] Stripe SDK fully wrapped (checkout, subscriptions, portal, metered, webhooks)
+- [x] Webhook handler processes all subscription lifecycle events
+- [x] Subscription CRUD backed by PostgreSQL
+
+### 2. Pricing Inconsistency ✅
+- [x] Reconciled API and web pricing to 4 tiers: Community ($0), Pro ($300), Business ($2,000), Enterprise (custom)
+- [x] Removed inconsistent Starter/Data Mesh tiers from web
+- [x] Single source of truth in `packages/api/src/billing/plans.ts`
+
+### 3. In-Memory CDC Engines ✅
+- [x] CDC engine state persisted to `cdc_engines` table in Supabase
+- [x] Start/stop/status routes use database instead of in-memory Map
+- [x] Added `cdc_engines` table to schema migration
+- [x] Added `_pulsyn_exec` RPC function to schema
+
+### 4. Dashboard Auth ✅
+- [x] Created `packages/web/src/lib/auth.ts` with API key validation
+- [x] Created `/api/auth/login` route for dashboard login
+- [x] Created middleware to protect `/dashboard/*` routes
+- [x] Public routes (/, /pricing, /login) accessible without auth
+
+### 5. 177 Failing Tests ⏳
+- [ ] All need real cloud credentials (AWS, GCP, SaaS API keys)
+- [ ] Cannot fix without credentials — documented in TEST_CREDENTIALS_NEEDED.md
+
+### 6. Connector Test Coverage ⏳
+- [ ] Only 42/1,031 connectors tested (4%)
+- [ ] Need real credentials for each connector
+- [ ] Top 10 connectors (PG, MySQL, MongoDB, Redis, DynamoDB, S3, Kafka, ES, Supabase, Stripe) should be prioritized
 
 ---
 

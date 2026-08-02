@@ -126,6 +126,23 @@ CREATE TABLE IF NOT EXISTS benchmark_reports (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- CDC Engines (persistent state for running pipelines)
+CREATE TABLE IF NOT EXISTS cdc_engines (
+  id TEXT PRIMARY KEY,
+  pipeline_id TEXT NOT NULL REFERENCES pipelines(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'stopped',
+  started_at TIMESTAMPTZ,
+  stopped_at TIMESTAMPTZ,
+  events_processed BIGINT NOT NULL DEFAULT 0,
+  batches_committed BIGINT NOT NULL DEFAULT 0,
+  errors BIGINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cdc_engines_pipeline ON cdc_engines(pipeline_id);
+CREATE INDEX IF NOT EXISTS idx_cdc_engines_status ON cdc_engines(status);
+
 -- Enable RLS on all tables
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE api_keys ENABLE ROW LEVEL SECURITY;
@@ -137,6 +154,7 @@ ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE usage_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE _pulsyn_changes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE benchmark_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cdc_engines ENABLE ROW LEVEL SECURITY;
 
 -- Service role bypass policies (for API server)
 DO $$
@@ -146,7 +164,7 @@ BEGIN
   FOR t IN SELECT unnest(ARRAY[
     'organizations', 'api_keys', 'api_usage_log', 'connectors',
     'pipelines', 'checkpoints', 'subscriptions', 'usage_records',
-    '_pulsyn_changes', 'benchmark_reports'
+    '_pulsyn_changes', 'benchmark_reports', 'cdc_engines'
   ]) LOOP
     EXECUTE format(
       'CREATE POLICY IF NOT EXISTS "service_role_all_%s" ON %I FOR ALL TO service_role USING (true) WITH CHECK (true)',
@@ -157,3 +175,29 @@ END $$;
 
 -- Notify PostgREST to reload schema
 NOTIFY pgrst, 'reload schema';
+
+-- Create _pulsyn_exec RPC function for raw SQL execution
+CREATE OR REPLACE FUNCTION _pulsyn_exec(sql TEXT, params TEXT[] DEFAULT '{}')
+RETURNS JSONB AS $$
+DECLARE
+  result JSONB;
+  param_count INT;
+BEGIN
+  -- Count parameters in the SQL
+  param_count := array_length(params, 1);
+
+  -- Execute the query and return results as JSONB array
+  IF param_count IS NULL OR param_count = 0 THEN
+    EXECUTE 'SELECT COALESCE(jsonb_agg(row_to_json(t)), ''[]''::jsonb) FROM (' || sql || ') t'
+    INTO result;
+  ELSE
+    -- Use parameterized query with dynamic parameter substitution
+    EXECUTE 'SELECT COALESCE(jsonb_agg(row_to_json(t)), ''[]''::jsonb) FROM (' || sql || ') t'
+    INTO result
+    USING params[1], params[2], params[3], params[4], params[5],
+          params[6], params[7], params[8], params[9], params[10];
+  END IF;
+
+  RETURN COALESCE(result, '[]'::jsonb);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
