@@ -1,38 +1,70 @@
-// Exchange Rates API Connector — Community API (No Auth)
-import { SaaSConnector, SaaSResource } from './saas-base';
+// Exchange Rates API — open.er-api.com (No Auth)
+import { BaseConnector } from './base';
 import { registerSource } from './registry';
-import type { DatabaseConfig } from '../types';
-
-const RESOURCES: SaaSResource[] = [
-  {
-    name: 'rates',
-    endpoint: '/latest',
-    schema: {
-      name: 'rates',
-      table: 'rates',
-      columns: [
-        { name: 'base', type: 'string', nullable: false, primaryKey: false },
-        { name: 'date', type: 'string', nullable: false, primaryKey: false },
-        { name: 'rates_USD', type: 'number', nullable: true, primaryKey: false },
-        { name: 'rates_EUR', type: 'number', nullable: true, primaryKey: false },
-        { name: 'rates_GBP', type: 'number', nullable: true, primaryKey: false },
-        { name: 'rates_JPY', type: 'number', nullable: true, primaryKey: false },
-      ],
-      primaryKey: ['base'],
-    },
-    idField: 'base',
-  },
-];
+import { UnifiedChangeEvent, createEvent } from '../events';
+import type { DatabaseConfig, TableSchema, CDCEvent } from '../types';
 
 @registerSource('exchangerate')
-export class ExchangeRateConnector extends SaaSConnector {
-  constructor(id: string, config: DatabaseConfig) {
-    super(id, 'exchangerate', 'exchangerate', config, {
-      baseUrl: config.host || 'https://open.er-api.com/v6',
-      authType: 'none',
-      resources: RESOURCES,
-      paginationType: 'offset',
-      healthEndpoint: '/latest/USD',
-    });
+export class ExchangeRateConnector extends BaseConnector {
+  private baseUrl = 'https://open.er-api.com/v6';
+  private cdcActive = false;
+
+  async connect(config: DatabaseConfig): Promise<void> {
+    this.config = config;
+    const res = await fetch(`${this.baseUrl}/latest/USD`);
+    if (!res.ok) throw new Error(`exchangerate connection failed: HTTP ${res.status}`);
+    this.connected = true;
+  }
+
+  async disconnect(): Promise<void> {
+    this.connected = false;
+  }
+
+  async testConnection(): Promise<boolean> {
+    try {
+      const res = await fetch(`${this.baseUrl}/latest/USD`);
+      return res.ok;
+    } catch { return false; }
+  }
+
+  async getTables(): Promise<string[]> {
+    if (!this.connected) throw new Error('Not connected');
+    return ['rates'];
+  }
+
+  async getTableSchema(table: string): Promise<TableSchema> {
+    return {
+      table,
+      columns: [
+        { name: 'base_code', type: 'string', nullable: false },
+        { name: 'conversion_rates', type: 'object', nullable: false },
+      ],
+      primaryKeys: ['base_code'],
+    };
+  }
+
+  async extractFull(table: string): Promise<UnifiedChangeEvent[]> {
+    if (!this.connected) throw new Error('Not connected');
+    const currencies = ['USD', 'EUR', 'GBP'];
+    const events: UnifiedChangeEvent[] = [];
+    for (const base of currencies) {
+      const res = await fetch(`${this.baseUrl}/latest/${base}`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      events.push(createEvent({ op: 'S', table: 'rates', after: data, watermark: base }));
+    }
+    return events;
+  }
+
+  async extractIncremental(table: string): Promise<UnifiedChangeEvent[]> {
+    return [];
+  }
+
+  async startCDC(callback: (event: CDCEvent) => void): Promise<void> {
+    this.cdcActive = true;
+  }
+
+  async stopCDC(): Promise<void> {
+    this.cdcActive = false;
   }
 }

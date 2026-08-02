@@ -25,7 +25,7 @@ export class GithubConnector extends SaaSConnector {
     // Direct calls may use 2 args: (id, config)
     const actualConfig = (typeof nameOrConfig === 'object' ? nameOrConfig : config) as DatabaseConfig;
     super(id, 'github', 'github', actualConfig, {
-      baseUrl: config.host || 'https://api.github.com',
+      baseUrl: actualConfig?.host || 'https://api.github.com',
       authType: 'bearer',
       resources: RESOURCES,
       paginationType: 'link',
