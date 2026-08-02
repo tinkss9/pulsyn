@@ -61,7 +61,7 @@ export class MSSQLConnector extends BaseConnector {
     const result = await this.pool.request().query(
       `SELECT s.name + '.' + t.name AS full_name
        FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id
-       WHERE t.type = 'U' ORDER BY full_name`
+       WHERE t.type = 'U' AND t.name NOT LIKE 'spt_%' AND t.name != 'MSreplication_options' ORDER BY full_name`
     );
     return result.recordset.map((r) => r.full_name);
   }
