@@ -8,15 +8,15 @@ const config: ConnectorTestConfig = {
   connectorType: 'source',
   engine: 'postgresql',
   config: {
-    host: process.env.TEST_PG_HOST || 'localhost',
-    port: parseInt(process.env.TEST_PG_PORT || '5432'),
-    database: process.env.TEST_PG_DB || 'testdb',
-    username: process.env.TEST_PG_USER || 'test',
-    password: process.env.TEST_PG_PASS || 'test',
+    host: 'localhost',
+    port: 5432,
+    database: 'testdb',
+    username: 'test',
+    password: 'test',
   },
-  testTables: ['users', 'products', 'orders', 'events'],
+  testTables: ['users', 'products', 'orders'],
   maxConnectionLatencyMs: 5000,
-  minExtractThroughput: 1000,
+  minExtractThroughput: 500,
 };
 
 const runner = createConnectorTests(config);

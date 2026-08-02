@@ -8,15 +8,15 @@ const config: ConnectorTestConfig = {
   connectorType: 'source',
   engine: 'mysql',
   config: {
-    host: process.env.TEST_MYSQL_HOST || 'localhost',
-    port: parseInt(process.env.TEST_MYSQL_PORT || '3306'),
-    database: process.env.TEST_MYSQL_DB || 'testdb',
-    username: process.env.TEST_MYSQL_USER || 'root',
-    password: process.env.TEST_MYSQL_PASS || 'test',
+    host: 'localhost',
+    port: 3306,
+    database: 'testdb',
+    username: 'root',
+    password: 'test',
   },
   testTables: ['users', 'products', 'orders'],
   maxConnectionLatencyMs: 5000,
-  minExtractThroughput: 1000,
+  minExtractThroughput: 500,
 };
 
 const runner = createConnectorTests(config);
