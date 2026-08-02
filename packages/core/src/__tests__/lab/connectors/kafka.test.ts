@@ -1,6 +1,6 @@
 // Kafka Connector — Full Lab Test Suite
 import { createConnectorTests, ConnectorTestConfig } from '../runners/connector.runner';
-import '../../../connectors/kafka';
+import '../../../connectors/kafka-source';
 
 const config: ConnectorTestConfig = {
   connectorId: 'test-kafka',

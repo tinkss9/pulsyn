@@ -1,6 +1,6 @@
 // Redis Connector — Full Lab Test Suite
 import { createConnectorTests, ConnectorTestConfig } from '../runners/connector.runner';
-import '../../../connectors/redis';
+import '../../../connectors/redis-source';
 
 const config: ConnectorTestConfig = {
   connectorId: 'test-redis',
