@@ -2,10 +2,11 @@
 // Ported from DMS Replicate src/replication/registry.py
 
 import { BaseConnector } from './base';
+import { SaaSConnector } from './saas-base';
 import { DatabaseConfig, TableSchema } from '../types';
 import { UnifiedChangeEvent } from '../events';
 
-type ConnectorConstructor = new (id: string, name: string, engine: string, config: DatabaseConfig, batchSize?: number) => BaseConnector;
+type ConnectorConstructor = new (...args: any[]) => BaseConnector;
 
 const sources: Map<string, ConnectorConstructor> = new Map();
 const targets: Map<string, ConnectorConstructor> = new Map();
@@ -24,13 +25,22 @@ export function registerTarget(name: string) {
   };
 }
 
+function createConnector(cls: ConnectorConstructor, id: string, name: string, config: DatabaseConfig): BaseConnector {
+  // SaaS connectors have constructor(id, config) — check by prototype chain
+  if (cls.prototype instanceof SaaSConnector) {
+    return new cls(id, config);
+  }
+  // Base connectors have constructor(id, name, engine, config)
+  return new cls(id, name, name, config);
+}
+
 export class ConnectorRegistry {
   static getSource(name: string, id: string, config: DatabaseConfig, options?: any): BaseConnector {
     const cls = sources.get(name);
     if (!cls) {
       throw new Error(`Unknown source connector: ${name}. Available: ${sources.keys()}`);
     }
-    return new cls(id, name, name, config);
+    return createConnector(cls, id, name, config);
   }
 
   static getTarget(name: string, id: string, config: DatabaseConfig, options?: any): BaseConnector {
@@ -38,7 +48,7 @@ export class ConnectorRegistry {
     if (!cls) {
       throw new Error(`Unknown target connector: ${name}. Available: ${targets.keys()}`);
     }
-    return new cls(id, name, name, config);
+    return createConnector(cls, id, name, config);
   }
 
   static listSources(): string[] {

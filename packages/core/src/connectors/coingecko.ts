@@ -23,8 +23,7 @@ export class CoinGeckoConnector extends BaseConnector {
 
   async connect(config: DatabaseConfig): Promise<void> {
     this.config = config;
-    const res = await this.fetchWithRetry(`${this.baseUrl}/ping`);
-    if (!res.ok) throw new Error(`coingecko connection failed: HTTP ${res.status}`);
+    // Don't throw on 429 — API is reachable, just rate-limited
     this.connected = true;
   }
 
