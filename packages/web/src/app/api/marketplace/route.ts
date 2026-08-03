@@ -25,9 +25,9 @@ export async function GET(req: NextRequest) {
 
   sql += ` ORDER BY is_verified DESC, download_count DESC, avg_rating DESC`;
   params.push(limit);
-  sql += ` LIMIT $${params.length}`;
+  sql += ` LIMIT $${params.length}::int`;
   params.push(offset);
-  sql += ` OFFSET $${params.length}`;
+  sql += ` OFFSET $${params.length}::int`;
 
   const result = await query(sql, params);
   return NextResponse.json({ data: result.rows, total: result.rowCount });
