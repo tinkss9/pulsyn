@@ -156,12 +156,11 @@ export async function POST(req: NextRequest) {
     engine: template.source.engine,
     config: sourceConfig,
     status: 'disconnected',
-    organization_id: organizationId,
   });
 
   await query(
-    `INSERT INTO connectors (id, name, engine, config, status, organization_id)
-     SELECT c->>'id', c->>'name', c->>'engine', (c->'config')::jsonb, c->>'status', c->>'organization_id'
+    `INSERT INTO connectors (id, name, engine, config, status)
+     SELECT c->>'id', c->>'name', c->>'engine', (c->'config')::jsonb, c->>'status'
      FROM (SELECT $1::jsonb AS c) sub`,
     [connectorData]
   );
@@ -180,12 +179,11 @@ export async function POST(req: NextRequest) {
     target: targetConfig || {},
     tables: template.tables,
     config: pipelineConfig,
-    organization_id: organizationId,
   });
 
   await query(
-    `INSERT INTO pipelines (id, name, source, target, tables, config, organization_id)
-     SELECT p->>'id', p->>'name', (p->'source')::jsonb, (p->'target')::jsonb, (p->'tables')::jsonb, (p->'config')::jsonb, p->>'organization_id'
+    `INSERT INTO pipelines (id, name, source, target, tables, config)
+     SELECT p->>'id', p->>'name', (p->'source')::jsonb, (p->'target')::jsonb, (p->'tables')::jsonb, (p->'config')::jsonb
      FROM (SELECT $1::jsonb AS p) sub`,
     [pipelineData]
   );

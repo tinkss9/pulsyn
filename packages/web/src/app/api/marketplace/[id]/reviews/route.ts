@@ -37,8 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // New review
   const reviewId = `rev-${Date.now()}`;
-  // Use JSONB to avoid 6-param limit in _pulsyn_exec
-  const reviewData = JSON.stringify({ id: reviewId, connector_id: id, user_id: userId, rating, title: title || '', review_text: reviewText || '' });
+  const reviewData = JSON.stringify({ id: reviewId, connector_id: id, user_id: userId, rating: Number(rating), title: title || '', review_text: reviewText || '' });
   await query(
     `INSERT INTO marketplace_reviews (id, connector_id, user_id, rating, title, review_text)
      SELECT r->>'id', r->>'connector_id', r->>'user_id', (r->>'rating')::int, r->>'title', r->>'review_text'
