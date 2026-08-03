@@ -317,7 +317,9 @@ export default function LandingPage() {
                   { feature: 'AI Agent (MCP)', pulsyn: '26 tools', fivetran: 'None', airbyte: 'None', debezium: 'None' },
                   { feature: 'In-flight Masking', pulsyn: 'FPE + hash', fivetran: 'Hash only', airbyte: 'Hash only', debezium: 'None' },
                   { feature: 'Starting Price', pulsyn: 'Free', fivetran: '~$550/mo', airbyte: 'Free (self)', debezium: 'Free (self)' },
-                  { feature: 'At 10M rows/day', pulsyn: '$2,000/mo', fivetran: '$15,000+/mo', airbyte: 'Custom', debezium: 'Infra cost' },
+                  { feature: 'Pro Plan', pulsyn: '$499/mo', fivetran: '~$1,500/mo', airbyte: '$299/mo', debezium: 'Free (self)' },
+                  { feature: 'Business Plan', pulsyn: '$3,500/mo', fivetran: '$12K+/yr ELA', airbyte: 'Custom', debezium: 'Infra cost' },
+                  { feature: 'At 10M rows/day', pulsyn: '$3,500/mo', fivetran: '$15,000+/mo', airbyte: 'Custom', debezium: 'Infra cost' },
                 ].map((row) => (
                   <tr key={row.feature} className="border-b border-white/5">
                     <td className="py-3 text-gray-300">{row.feature}</td>
@@ -487,11 +489,12 @@ export default function LandingPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Simple, transparent pricing</h2>
           <p className="text-gray-400 text-lg mb-12">Start free. Scale as you grow. 10x cheaper than Fivetran.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
-              { name: 'Free', price: '$0', desc: 'Try Pulsyn risk-free', features: ['3 pipelines', '1K rows/day', '5 connectors', 'Community support'] },
-              { name: 'Pro', price: '$499', desc: 'For growing teams', features: ['50 pipelines', '1M rows/day', '100 connectors', 'AI schema mapping', 'Priority support'], popular: true },
-              { name: 'Enterprise', price: '$9,999+', desc: 'For large organizations', features: ['Unlimited pipelines', 'Unlimited rows', 'All 763 connectors', 'Dedicated engineer', 'SLA'], enterprise: true },
+              { name: 'Free', price: '$0', desc: 'Try Pulsyn risk-free', features: ['3 pipelines', '50K rows/day', '3 connectors', 'Community support'] },
+              { name: 'Pro', price: '$499', desc: 'For growing teams', features: ['Unlimited pipelines', '5M rows/day', 'All 763 connectors', 'AI schema mapping', 'MCP server (26 tools)', 'API access', 'Priority support'], popular: true },
+              { name: 'Business', price: '$3,500', desc: 'For production workloads', features: ['Everything in Pro', '100M rows/day', 'SSO + RBAC', 'Audit logs', 'Custom connectors', '99.99% SLA', 'Dedicated support'] },
+              { name: 'Enterprise', price: 'Custom', desc: 'For large organizations', features: ['Everything in Business', 'Unlimited rows', 'On-prem deployment', 'Dedicated engineer', '99.999% SLA', 'Custom integrations'], enterprise: true },
             ].map((tier) => (
               <div key={tier.name} className={`relative rounded-2xl p-8 ${
                 tier.popular ? 'bg-cyan-600 border-2 border-cyan-400' : tier.enterprise ? 'bg-gray-800 border-2 border-purple-500' : 'bg-gray-800 border border-gray-700'

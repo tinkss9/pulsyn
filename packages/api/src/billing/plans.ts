@@ -85,7 +85,7 @@ export const PLANS: Record<string, Plan> = {
     id: 'pro',
     name: 'Pro',
     description: 'For growing teams running production pipelines',
-    price: 30000, // $300/mo
+    price: 49900, // $499/mo
     currency: 'usd',
     interval: 'month',
     features: {
@@ -117,7 +117,7 @@ export const PLANS: Record<string, Plan> = {
     id: 'business',
     name: 'Business',
     description: 'For production workloads with SLA requirements',
-    price: 200000, // $2,000/mo
+    price: 350000, // $3,500/mo
     currency: 'usd',
     interval: 'month',
     features: {

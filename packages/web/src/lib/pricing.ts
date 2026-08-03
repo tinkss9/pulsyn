@@ -57,7 +57,7 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 300,
+    price: 499,
     priceId: 'price_pro_monthly',
     popular: true,
     features: {
@@ -83,7 +83,7 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: 'business',
     name: 'Business',
-    price: 2000,
+    price: 3500,
     priceId: 'price_business_monthly',
     features: {
       pipelines: -1,
