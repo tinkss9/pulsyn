@@ -84,13 +84,9 @@ DECLARE
   skip_count BIGINT := 0;
   err_details JSONB := '[]'::JSONB;
   err_msg TEXT;
-  col TEXT;
-  val TEXT;
   set_clause TEXT;
   where_clause TEXT;
-  columns TEXT[];
-  values TEXT[];
-  pk_col TEXT := 'id';
+  sql TEXT;
 BEGIN
   FOR change_rec IN
     SELECT c.id, c.table_name, c.operation, c.row_data, c.old_data,
@@ -102,71 +98,57 @@ BEGIN
     LIMIT 100
   LOOP
     BEGIN
-      -- Get pipeline config for target table mapping
+      -- Resolve target table from pipeline config tableMapping or naming convention
+      target_table := change_rec.table_name;  -- default: same name
       IF change_rec.pipeline_id IS NOT NULL THEN
         SELECT * INTO pipeline_rec FROM pipelines WHERE id = change_rec.pipeline_id;
-        IF FOUND AND pipeline_rec.target IS NOT NULL THEN
-          -- Use same table name for target (can be customized via config)
-          target_table := change_rec.table_name;
-        ELSE
-          target_table := change_rec.table_name;
+        IF FOUND AND pipeline_rec.config IS NOT NULL THEN
+          -- Check config.tableMapping for source→target mapping
+          IF pipeline_rec.config ? 'tableMapping' 
+             AND pipeline_rec.config->'tableMapping' ? change_rec.table_name THEN
+            target_table := pipeline_rec.config->'tableMapping'->>change_rec.table_name;
+          -- Check config.table_mapping (snake_case variant)
+          ELSIF pipeline_rec.config ? 'table_mapping' 
+                AND pipeline_rec.config->'table_mapping' ? change_rec.table_name THEN
+            target_table := pipeline_rec.config->'table_mapping'->>change_rec.table_name;
+          END IF;
         END IF;
-      ELSE
-        target_table := change_rec.table_name;
       END IF;
 
       -- Apply the change
       CASE change_rec.operation
         WHEN 'INSERT' THEN
-          -- Build dynamic INSERT
-          columns := ARRAY(SELECT jsonb_object_keys(change_rec.row_data));
-          values := ARRAY(SELECT change_rec.row_data->>col FROM unnest(columns) AS col);
+          -- Build INSERT SQL from JSONB keys/values
+          SELECT INTO set_clause, where_clause
+            string_agg(quote_ident(key), ', '),
+            string_agg(format('%L', value), ', ')
+          FROM jsonb_each_text(change_rec.row_data);
 
-          EXECUTE format(
+          sql := format(
             'INSERT INTO %I (%s) VALUES (%s) ON CONFLICT DO NOTHING',
-            target_table,
-            array_to_string(ARRAY(SELECT format('%I', c) FROM unnest(columns) AS c), ', '),
-            array_to_string(ARRAY(SELECT format('%L', v) FROM unnest(values) AS v), ', ')
+            target_table, set_clause, where_clause
           );
+          EXECUTE sql;
 
         WHEN 'UPDATE' THEN
-          -- Build dynamic UPDATE
-          IF change_rec.old_data IS NOT NULL THEN
-            set_clause := '';
-            where_clause := '';
+          IF change_rec.old_data IS NOT NULL AND change_rec.old_data ? 'id' THEN
+            -- Build SET clause from row_data (excluding id)
+            SELECT INTO set_clause
+              string_agg(format('%I = %L', key, value), ', ')
+            FROM jsonb_each_text(change_rec.row_data)
+            WHERE key != 'id';
 
-            FOR col IN SELECT jsonb_object_keys(change_rec.row_data)
-            LOOP
-              val := change_rec.row_data->>col;
-              IF col = pk_col THEN
-                where_clause := format('%I = %L', col, val);
-              ELSE
-                IF set_clause != '' THEN set_clause := set_clause || ', '; END IF;
-                set_clause := set_clause || format('%I = %L', col, val);
-              END IF;
-            END LOOP;
-
-            IF where_clause = '' THEN
-              -- Fallback: use first key as PK
-              col := (SELECT jsonb_object_keys(change_rec.old_data) LIMIT 1);
-              where_clause := format('%I = %L', col, change_rec.old_data->>col);
-            END IF;
-
-            IF set_clause != '' THEN
-              EXECUTE format('UPDATE %I SET %s WHERE %s', target_table, set_clause, where_clause);
-            END IF;
+            sql := format(
+              'UPDATE %I SET %s WHERE id = %L',
+              target_table, set_clause, change_rec.old_data->>'id'
+            );
+            EXECUTE sql;
           END IF;
 
         WHEN 'DELETE' THEN
-          -- Build dynamic DELETE
-          IF change_rec.old_data IS NOT NULL THEN
-            col := pk_col;
-            val := change_rec.old_data->>col;
-            IF val IS NULL THEN
-              col := (SELECT jsonb_object_keys(change_rec.old_data) LIMIT 1);
-              val := change_rec.old_data->>col;
-            END IF;
-            EXECUTE format('DELETE FROM %I WHERE %I = %L', target_table, col, val);
+          IF change_rec.old_data IS NOT NULL AND change_rec.old_data ? 'id' THEN
+            sql := format('DELETE FROM %I WHERE id = %L', target_table, change_rec.old_data->>'id');
+            EXECUTE sql;
           END IF;
       END CASE;
 
