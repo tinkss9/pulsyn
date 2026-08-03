@@ -209,18 +209,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof — Trusted By */}
-      <section className="py-12 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-gray-500 text-sm mb-6">Trusted by data teams at</p>
-          <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-            {['Stripe', 'Shopify', 'HubSpot', 'Snowflake', 'Databricks', 'PostgreSQL'].map((name) => (
-              <div key={name} className="text-gray-500 text-lg font-semibold tracking-wide">{name}</div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* How It Works — 3 Steps */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
