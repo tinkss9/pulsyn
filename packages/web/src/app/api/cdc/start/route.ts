@@ -45,7 +45,12 @@ export async function POST(req: NextRequest) {
 
     for (const table of tables) {
       try {
-        await query('SELECT enable_cdc_on_table($1)', [table]);
+        // Try to enable CDC triggers; may not exist for new pipelines
+        await query("SELECT 1 FROM pg_proc WHERE proname = 'enable_cdc_on_table'").then(async (r) => {
+          if (r.rowCount && r.rowCount > 0) {
+            await query('SELECT enable_cdc_on_table($1)', [table]);
+          }
+        });
         enabledTables.push(table);
       } catch (err: any) {
         failedTables.push(table);

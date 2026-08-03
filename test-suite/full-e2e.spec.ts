@@ -3,27 +3,27 @@ import { test, expect } from '@playwright/test';
 const BASE = 'https://pulsynai.com';
 const E2E_SECRET = 'pulsyn-e2e-test-2026';
 
-// Helper: get API key via test-signup endpoint (bypasses email verification)
-async function getTestApiKey(request: any): Promise<string> {
+// Helper: get API key + orgId via test-signup endpoint (bypasses email verification)
+async function getTestApiKey(request: any): Promise<{ apiKey: string; orgId: string }> {
   const resp = await request.post(`${BASE}/api/auth/test-signup`, {
     headers: { 'x-e2e-secret': E2E_SECRET },
     data: { name: `E2E Test ${Date.now()}` },
   });
   const body = await resp.json();
-  return body.data?.apiKey || '';
+  return { apiKey: body.data?.apiKey || '', orgId: body.data?.organizationId || '' };
 }
 
 test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
 
   test('API: Signup and get API key', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
     expect(apiKey).toBeTruthy();
     expect(apiKey).toMatch(/^pulsyn_/);
     console.log(`PASS: Signup — key=${apiKey.slice(0, 25)}...`);
   });
 
   test('API: Create connector via POST /api/connectors', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     const resp = await request.post(`${BASE}/api/connectors`, {
       headers: { 'x-api-key': apiKey },
@@ -41,7 +41,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: Create pipeline via POST /api/pipelines', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     const resp = await request.post(`${BASE}/api/pipelines`, {
       headers: { 'x-api-key': apiKey },
@@ -60,7 +60,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: List pipelines via GET /api/pipelines', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     await request.post(`${BASE}/api/pipelines`, {
       headers: { 'x-api-key': apiKey },
@@ -83,7 +83,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: Start and stop CDC', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     const pipeResp = await request.post(`${BASE}/api/pipelines`, {
       headers: { 'x-api-key': apiKey },
@@ -116,7 +116,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: MCP template deployment', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     const resp = await request.post(`${BASE}/api/mcp/templates`, {
       headers: { 'x-api-key': apiKey },
@@ -130,11 +130,11 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: Marketplace install', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey, orgId } = await getTestApiKey(request);
 
     const resp = await request.post(`${BASE}/api/marketplace/mkt-oanda`, {
       headers: { 'x-api-key': apiKey },
-      data: { organizationId: 'test-org' },
+      data: { organizationId: orgId },
     });
     expect(resp.ok()).toBeTruthy();
     const body = await resp.json();
@@ -143,7 +143,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: Submit marketplace review', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     const resp = await request.post(`${BASE}/api/marketplace/mkt-cmc-markets/reviews`, {
       headers: { 'x-api-key': apiKey },
@@ -161,7 +161,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: Billing status', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     const resp = await request.get(`${BASE}/api/billing/status?orgId=test`, {
       headers: { 'x-api-key': apiKey },
@@ -171,7 +171,7 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
   });
 
   test('API: Rate limiting works', async ({ request }) => {
-    const apiKey = await getTestApiKey(request);
+    const { apiKey } = await getTestApiKey(request);
 
     let successCount = 0;
     for (let i = 0; i < 5; i++) {
