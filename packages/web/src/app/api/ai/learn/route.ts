@@ -1,131 +1,72 @@
 // Self-Learning LLM API — Pulsyn AI that learns from pipeline behavior
+// v2: Full self-learning engine with pattern recognition, anomaly detection, predictions
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '@/lib/db';
-
-// Pulsyn AI Knowledge Base — learns from pipeline patterns
-interface PulsynKnowledge {
-  connectorPatterns: Record<string, { successRate: number; avgLatency: number; commonErrors: string[] }>;
-  pipelineInsights: { optimalBatchSize: number; bestCheckpointInterval: number; commonTransformations: string[] };
-  userPatterns: { commonQueries: string[]; popularTemplates: string[]; avgTimeToFirstPipeline: number };
-}
+import { getLLM } from '@/lib/ai/self-learning-llm';
 
 // GET /api/ai/learn — Get AI insights from pipeline data
 export async function GET() {
   try {
-    // Analyze connector performance
-    const connectorStats = await query(
-      `SELECT 
-         c.engine,
-         COUNT(*) as total_connectors,
-         COUNT(CASE WHEN c.status = 'connected' THEN 1 END) as connected,
-         COUNT(CASE WHEN c.status = 'error' THEN 1 END) as errors
-       FROM connectors c
-       GROUP BY c.engine
-       ORDER BY total_connectors DESC
-       LIMIT 20`
-    );
+    const llm = getLLM();
 
-    // Analyze pipeline success rates
-    const pipelineStats = await query(
-      `SELECT 
-         status,
-         COUNT(*) as count,
-         AVG(EXTRACT(EPOCH FROM (NOW() - created_at))) as avg_age_seconds
-       FROM pipelines
-       GROUP BY status`
-    );
+    // Run learning cycle
+    const data = await llm.learn();
 
-    // Analyze CDC event patterns
-    let cdcPatterns = { totalEvents: 0, operations: {} as Record<string, number>, topTables: [] as any[] };
-    try {
-      const eventStats = await query(
-        `SELECT 
-           operation,
-           COUNT(*) as count
-         FROM _pulsyn_changes
-         GROUP BY operation
-         ORDER BY count DESC`
-      );
-      cdcPatterns.operations = eventStats.rows.reduce((acc: Record<string, number>, r: any) => {
-        acc[r.operation] = parseInt(r.count);
-        return acc;
-      }, {});
+    // Generate insights
+    const insights = await llm.generateInsights();
 
-      const tableStats = await query(
-        `SELECT 
-           table_name,
-           COUNT(*) as event_count,
-           MAX(changed_at) as last_event
-         FROM _pulsyn_changes
-         GROUP BY table_name
-         ORDER BY event_count DESC
-         LIMIT 10`
-      );
-      cdcPatterns.topTables = tableStats.rows;
-      cdcPatterns.totalEvents = Object.values(cdcPatterns.operations).reduce((a, b) => a + b, 0);
-    } catch { /* _pulsyn_changes may not exist */ }
-
-    // Analyze marketplace popularity
-    let marketplaceInsights: any[] = [];
-    try {
-      const mktStats = await query(
-        `SELECT 
-           engine,
-           category,
-           download_count,
-           avg_rating,
-           rating_count
-         FROM marketplace_connectors
-         WHERE is_published = true
-         ORDER BY download_count DESC
-         LIMIT 10`
-      );
-      marketplaceInsights = mktStats.rows;
-    } catch { /* marketplace tables may not exist */ }
-
-    // Generate AI recommendations
-    const recommendations = generateRecommendations(
-      connectorStats.rows,
-      pipelineStats.rows,
-      cdcPatterns,
-      marketplaceInsights
-    );
+    // Get model status
+    const status = llm.getStatus();
 
     return NextResponse.json({
       ai: {
-        version: '1.0.0',
-        lastTrained: new Date().toISOString(),
+        version: status.version,
+        lastTrained: data.cdcEvents.totalEvents > 0 ? new Date().toISOString() : null,
+        modelStatus: 'active',
         dataPoints: {
-          connectors: connectorStats.rows.reduce((sum: number, r: any) => sum + parseInt(r.total_connectors), 0),
-          pipelines: pipelineStats.rows.reduce((sum: number, r: any) => sum + parseInt(r.count), 0),
-          cdcEvents: cdcPatterns.totalEvents,
-          marketplaceConnectors: marketplaceInsights.length,
+          connectors: data.connectors.reduce((sum, c) => sum + c.totalCount, 0),
+          pipelines: data.pipelines.reduce((sum, p) => sum + p.count, 0),
+          cdcEvents: data.cdcEvents.totalEvents,
+          marketplaceConnectors: data.marketplace.topConnectors.length,
+          feedbackEntries: data.feedback.length,
+          anomaliesDetected: data.anomalies.length,
+          predictionsGenerated: data.predictions.length,
+          insightsGenerated: insights.length,
         },
-        insights: {
-          connectorPerformance: connectorStats.rows.map((r: any) => ({
-            engine: r.engine,
-            total: parseInt(r.total_connectors),
-            connected: parseInt(r.connected),
-            errors: parseInt(r.errors),
-            successRate: parseInt(r.total_connectors) > 0
-              ? ((parseInt(r.connected) / parseInt(r.total_connectors)) * 100).toFixed(1) + '%'
-              : 'N/A',
-          })),
-          pipelineHealth: pipelineStats.rows.map((r: any) => ({
-            status: r.status,
-            count: parseInt(r.count),
-            avgAgeHours: r.avg_age_seconds ? (parseFloat(r.avg_age_seconds) / 3600).toFixed(1) : 'N/A',
-          })),
-          cdcPatterns,
-          marketplacePopularity: marketplaceInsights,
-        },
-        recommendations,
         learning: {
           status: 'active',
-          dataCollected: true,
-          modelVersion: 'pulsyn-ai-v1',
+          dataCollected: data.cdcEvents.totalEvents > 0,
+          modelVersion: status.version,
+          learningRate: status.learningRate,
           nextTraining: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          historySize: status.dataPoints,
         },
+        insights: {
+          connectorPerformance: data.connectors.map(c => ({
+            engine: c.engine,
+            total: c.totalCount,
+            connected: c.connectedCount,
+            errors: c.errorCount,
+            successRate: c.successRate.toFixed(1) + '%',
+          })),
+          pipelineHealth: data.pipelines.map(p => ({
+            status: p.status,
+            count: p.count,
+            avgAgeHours: p.avgAgeHours.toFixed(1),
+          })),
+          cdcPatterns: {
+            totalEvents: data.cdcEvents.totalEvents,
+            eventsPerHour: data.cdcEvents.eventsPerHour.toFixed(0),
+            throughputTrend: data.cdcEvents.throughputTrend,
+            peakHours: data.cdcEvents.peakHours,
+            topTables: data.cdcEvents.topTables.slice(0, 5),
+            operations: data.cdcEvents.operations,
+          },
+          marketplacePopularity: data.marketplace.topConnectors.slice(0, 5),
+        },
+        anomalies: data.anomalies,
+        predictions: data.predictions,
+        aiInsights: insights,
+        recommendations: insights.flatMap(i => i.actionItems).slice(0, 10),
       },
     });
   } catch (error: any) {
@@ -135,65 +76,34 @@ export async function GET() {
 
 // POST /api/ai/learn — Submit feedback for AI learning
 export async function POST(req: NextRequest) {
-  const { type, feedback, context, rating } = await req.json();
+  try {
+    const { type, feedback, context, rating } = await req.json();
 
-  // Store feedback for training
-  const feedbackId = `fb-${Date.now()}`;
-  console.log(`[Pulsyn AI] Feedback: ${feedbackId}, type: ${type}, rating: ${rating}`);
+    const llm = getLLM();
+    const feedbackId = `fb-${Date.now()}`;
 
-  // In production, this would:
-  // 1. Store feedback in a training dataset
-  // 2. Trigger fine-tuning job
-  // 3. Update recommendation engine
-  // 4. Log for analytics
+    await llm.incorporateFeedback({
+      id: feedbackId,
+      type: type || 'general',
+      feedback: feedback || '',
+      context: context || '',
+      rating: rating || 0,
+      timestamp: new Date().toISOString(),
+      incorporated: false
+    });
 
-  return NextResponse.json({
-    data: {
-      feedbackId,
-      status: 'recorded',
-      message: 'Thank you! Your feedback helps Pulsyn AI learn and improve.',
-      impact: 'Your feedback will be incorporated in the next training cycle (24h).',
-    },
-  });
-}
+    console.log(`[Pulsyn AI] Feedback incorporated: ${feedbackId}, type: ${type}, rating: ${rating}`);
 
-function generateRecommendations(
-  connectors: any[],
-  pipelines: any[],
-  cdcPatterns: any,
-  marketplace: any[]
-): string[] {
-  const recommendations: string[] = [];
-
-  // Connector recommendations
-  const errorConnectors = connectors.filter((c: any) => parseInt(c.errors) > 0);
-  if (errorConnectors.length > 0) {
-    recommendations.push(`${errorConnectors.length} connector(s) have errors. Consider updating configuration or checking network connectivity.`);
+    return NextResponse.json({
+      data: {
+        feedbackId,
+        status: 'incorporated',
+        message: 'Thank you! Your feedback has been incorporated into Pulsyn AI\'s learning pipeline.',
+        impact: 'This feedback will influence future recommendations and insights.',
+        nextCycle: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      },
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  // Pipeline recommendations
-  const idlePipelines = pipelines.filter((p: any) => p.status === 'idle');
-  if (idlePipelines.length > 0) {
-    recommendations.push(`${idlePipelines.length} pipeline(s) are idle. Start CDC to begin replication.`);
-  }
-
-  // CDC recommendations
-  if (cdcPatterns.totalEvents > 1000) {
-    recommendations.push(`High CDC event volume (${cdcPatterns.totalEvents} events). Consider increasing batch size for better throughput.`);
-  }
-
-  // Marketplace recommendations
-  if (marketplace.length > 0) {
-    const topConnector = marketplace[0];
-    recommendations.push(`Most popular connector: ${topConnector.name} (${topConnector.download_count} installs). Consider using it for your next pipeline.`);
-  }
-
-  // General recommendations
-  if (recommendations.length === 0) {
-    recommendations.push('System is healthy. No immediate actions required.');
-    recommendations.push('Consider exploring MCP templates for AI-driven pipeline management.');
-    recommendations.push('Try the marketplace for pre-built connectors to common data sources.');
-  }
-
-  return recommendations;
 }

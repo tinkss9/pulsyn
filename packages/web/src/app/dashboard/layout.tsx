@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/connectors', label: 'Connectors', icon: '🔌' },
   { href: '/marketplace', label: 'Marketplace', icon: '🏪' },
   { href: '/mcp/templates', label: 'MCP Templates', icon: '🤖' },
+  { href: '/ai/insights', label: 'AI Insights', icon: '🧠' },
   { href: '/dashboard/usage', label: 'Usage', icon: '📈' },
   { href: '/dashboard/billing', label: 'Billing', icon: '💳' },
   { href: '/dashboard/api-keys', label: 'API Keys', icon: '🔑' },
