@@ -6,35 +6,37 @@ export async function POST(req: NextRequest) {
   const { email, code } = await req.json();
 
   if (!email || !code) {
-    return NextResponse.json({ error: 'Email and code are required' }, { status: 400 });
+    return NextResponse.json({ error: 'Email and verification code are required' }, { status: 400 });
   }
 
   try {
-    const codeHash = crypto.createHash('sha256').update(String(code)).digest('hex');
-
-    const org = await query(
-      `SELECT id, name, email, company, verification_code, verified FROM organizations WHERE email = $1`,
+    const result = await query(
+      `SELECT id, verification_code, code_expires_at, verified FROM organizations WHERE email = $1`,
       [email]
     );
 
-    if (org.rowCount === 0) {
-      return NextResponse.json({ error: 'No account found for this email' }, { status: 404 });
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'No account found for this email. Please sign up first.' }, { status: 404 });
     }
 
-    const orgData = org.rows[0];
+    const org = result.rows[0];
 
-    if (orgData.verified) {
-      return NextResponse.json({ error: 'Email already verified. Use login instead.' }, { status: 409 });
+    if (org.verified) {
+      return NextResponse.json({ error: 'Email already verified. Please log in.' }, { status: 409 });
     }
 
-    if (orgData.verification_code !== codeHash) {
+    if (!org.verification_code || org.verification_code !== code) {
       return NextResponse.json({ error: 'Invalid verification code' }, { status: 400 });
     }
 
-    // Mark as verified
+    if (org.code_expires_at && new Date(org.code_expires_at) < new Date()) {
+      return NextResponse.json({ error: 'Verification code has expired. Please sign up again.' }, { status: 400 });
+    }
+
+    // Mark as verified and clear the code
     await query(
-      `UPDATE organizations SET verified = true, verification_code = NULL, updated_at = NOW() WHERE id = $1`,
-      [orgData.id]
+      `UPDATE organizations SET verified = true, verification_code = NULL, code_expires_at = NULL WHERE id = $1`,
+      [org.id]
     );
 
     // Generate API key
@@ -44,19 +46,14 @@ export async function POST(req: NextRequest) {
 
     await query(
       `INSERT INTO api_keys (id, organization_id, key_hash, name, plan_id, is_active, created_at) VALUES ($1, $2, $3, 'Default Key', 'community', true, NOW())`,
-      [keyId, orgData.id, keyHash]
+      [keyId, org.id, keyHash]
     );
 
     return NextResponse.json({
-      data: {
-        organizationId: orgData.id,
-        apiKey,
-        plan: 'community',
-        message: 'Email verified! Save your API key — it cannot be retrieved later.',
-      },
-    }, { status: 201 });
+      data: { organizationId: org.id, apiKey, plan: 'community', message: 'Email verified. Save your API key — it cannot be retrieved later.' },
+    });
   } catch (err) {
-    console.error('[Auth] Verify error:', err);
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 });
+    console.error('[Auth] Verification error:', err);
+    return NextResponse.json({ error: 'Failed to verify email' }, { status: 500 });
   }
 }

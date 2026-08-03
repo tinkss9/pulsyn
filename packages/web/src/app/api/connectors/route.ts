@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import {
+  validateString,
+  validateEngine,
+  validateRequiredObject,
+  collectErrors,
+  validationErrorsResponse,
+} from '@/lib/validate';
 
 export async function GET() {
   try {
@@ -27,11 +34,15 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, engine, config } = body;
-  if (!name || !engine) {
-    return NextResponse.json(
-      { error: 'Missing required fields: name, engine', code: 'MISSING_FIELD' },
-      { status: 400 }
-    );
+
+  const errors = collectErrors(
+    validateString(name, 'name', { maxLength: 100 }),
+    validateEngine(engine),
+    validateRequiredObject(config, 'config'),
+  );
+
+  if (errors.length > 0) {
+    return validationErrorsResponse(errors);
   }
 
   const id = `connector-${Date.now()}`;

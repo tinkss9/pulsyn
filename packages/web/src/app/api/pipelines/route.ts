@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import {
+  validateString,
+  validateEngine,
+  validateRequiredObject,
+  validateArray,
+  collectErrors,
+  validationErrorsResponse,
+} from '@/lib/validate';
 
 function maskConfig(config: any): any {
   if (!config) return config;
@@ -43,11 +51,26 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, source, target, tables, config } = body;
-  if (!name) {
-    return NextResponse.json(
-      { error: 'Missing required field: name', code: 'MISSING_FIELD' },
-      { status: 400 }
-    );
+
+  const errors = collectErrors(
+    validateString(name, 'name', { maxLength: 100 }),
+    validateRequiredObject(source, 'source', ['host', 'engine']),
+    validateRequiredObject(target, 'target', ['host', 'engine']),
+    validateArray(tables, 'tables'),
+  );
+
+  // Validate nested engine fields
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const sourceEngineErr = validateEngine(source.engine, 'source.engine');
+    if (sourceEngineErr) errors.push(sourceEngineErr);
+  }
+  if (target && typeof target === 'object' && !Array.isArray(target)) {
+    const targetEngineErr = validateEngine(target.engine, 'target.engine');
+    if (targetEngineErr) errors.push(targetEngineErr);
+  }
+
+  if (errors.length > 0) {
+    return validationErrorsResponse(errors);
   }
 
   const id = `pipeline-${Date.now()}`;

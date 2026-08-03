@@ -52,3 +52,4 @@ supabase/
 # Temp files
 temp_imports.txt
 temp_*
+.env*

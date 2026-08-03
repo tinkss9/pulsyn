@@ -1,25 +1,49 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function MarketplacePage() {
   const [connectors, setConnectors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Debounce search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
+    // Cancel any in-flight request before starting a new one
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     const params = new URLSearchParams();
-    if (search) params.set('q', search);
+    if (debouncedSearch) params.set('q', debouncedSearch);
     if (category) params.set('category', category);
 
-    fetch(`/api/marketplace?${params}`)
-      .then(r => r.json())
-      .then(data => setConnectors(data.data || []))
-      .catch(() => setConnectors([]))
-      .finally(() => setLoading(false));
-  }, [search, category]);
+    fetch(`/api/marketplace?${params}`, { signal: controller.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        setConnectors(data.data || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          setLoading(false);
+        }
+      });
+
+    return () => controller.abort();
+  }, [debouncedSearch, category]);
 
   const handleInstall = async (id: string) => {
     const token = localStorage.getItem('pulsyn_api_key');
