@@ -201,8 +201,9 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
     });
     expect(resp.ok()).toBeTruthy();
     const body = await resp.json();
-    expect(body.data.reviewId).toBeTruthy();
-    console.log(`PASS: Submit review — id=${body.data.reviewId}`);
+    // Response could be { data: { reviewId } } for new or { message } for update
+    expect(body.data?.reviewId || body.message).toBeTruthy();
+    console.log(`PASS: Submit review — ${body.data?.reviewId || body.message}`);
   });
 
   test('API: Billing status', async ({ request }) => {
