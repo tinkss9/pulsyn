@@ -7,8 +7,8 @@ import { query } from '@/lib/db';
 export interface LearningData {
   connectors: ConnectorPattern[];
   pipelines: PipelinePattern[];
-  cdcEvents: CDCPattern[];
-  marketplace: MarketplacePattern[];
+  cdcEvents: CDCPattern;
+  marketplace: MarketplacePattern;
   feedback: FeedbackEntry[];
   anomalies: Anomaly[];
   predictions: Prediction[];
