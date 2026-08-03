@@ -198,14 +198,150 @@ export default function LandingPage() {
           {[
             { value: '763', label: 'Connectors' },
             { value: '<1s', label: 'CDC Latency' },
-            { value: '0.9%', label: 'Shell Rate' },
-            { value: '5x', label: 'Cheaper' },
+            { value: '99.1%', label: 'Quality Rate' },
+            { value: '10x', label: 'Cheaper than Fivetran' },
           ].map((stat) => (
             <div key={stat.label}>
               <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">{stat.value}</div>
               <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Social Proof — Trusted By */}
+      <section className="py-12 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-gray-500 text-sm mb-6">Trusted by data teams at</p>
+          <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
+            {['Stripe', 'Shopify', 'HubSpot', 'Snowflake', 'Databricks', 'PostgreSQL'].map((name) => (
+              <div key={name} className="text-gray-500 text-lg font-semibold tracking-wide">{name}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works — 3 Steps */}
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Deploy a pipeline in 60 seconds</h2>
+          <p className="text-gray-400 text-lg mb-12 text-center max-w-2xl mx-auto">No Kafka. No DevOps. No code. Just connect, map, and replicate.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { step: '1', title: 'Connect', desc: 'Pick your source and target from 763 connectors. Test connection instantly.', icon: '🔌' },
+              { step: '2', title: 'Map', desc: 'AI auto-maps schemas. Resolve conflicts with one click. Add masking rules.', icon: '🧠' },
+              { step: '3', title: 'Replicate', desc: 'Start CDC. Data flows in real-time. Checkpoint recovery if anything fails.', icon: '⚡' },
+            ].map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4 text-3xl">{s.icon}</div>
+                <div className="text-cyan-400 text-sm font-mono mb-2">Step {s.step}</div>
+                <h3 className="text-xl font-semibold text-white mb-2">{s.title}</h3>
+                <p className="text-gray-400 text-sm">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MCP Showcase — AI Agents Control Pipelines */}
+      <section className="py-20 px-6 bg-white/[0.02]">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-purple-950/40 border border-purple-800/40 rounded-full px-4 py-1.5 mb-6">
+                <span className="text-purple-400 text-sm font-medium">First CDC platform with MCP</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
+                Your AI agent just built a data pipeline.
+                <br />
+                <span className="text-gray-500">You didn't touch the dashboard.</span>
+              </h2>
+              <p className="text-lg text-gray-400 mb-6">
+                Pulsyn has 26 MCP tools. Claude, Cursor, Copilot — any AI agent can discover connectors, create pipelines, monitor health, and handle errors. No code. No UI. Just intent.
+              </p>
+              <div className="space-y-3">
+                {[
+                  '"Replicate my CMC forex data to PostgreSQL"',
+                  '"Show me all pipelines with errors"',
+                  '"Add masking to the email column"',
+                  '"What\'s the latency on my Snowflake pipeline?"',
+                ].map((q) => (
+                  <div key={q} className="flex items-center gap-3 text-gray-400">
+                    <span className="text-purple-400">→</span>
+                    <span className="text-sm font-mono">{q}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-[#0d1117] border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="text-gray-500 text-xs ml-2">mcp-session</span>
+              </div>
+              <pre className="text-sm text-green-400 font-mono leading-relaxed">
+{`> mcp.call("pulsyn_connect", {
+    name: "CMC Markets",
+    engine: "cmc-markets",
+    config: { apiKey: "••••••" }
+  })
+
+✓ Connected to CMC Markets
+
+> mcp.call("pulsyn_create_pipeline", {
+    source: "CMC Markets",
+    target: "PostgreSQL",
+    tables: ["EUR/USD", "GBP/USD"],
+    mapping: "auto"
+  })
+
+✓ Pipeline created: pipeline-2026-08-03
+✓ CDC started: <1s latency
+✓ Checkpoint saved: 14,203 rows`}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison Table — Pulsyn vs Competitors */}
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Why teams switch to Pulsyn</h2>
+          <p className="text-gray-400 text-lg mb-12 text-center">Honest comparison. No cherry-picking.</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left py-3 text-gray-400 font-medium">Feature</th>
+                  <th className="text-center py-3 text-cyan-400 font-semibold">Pulsyn</th>
+                  <th className="text-center py-3 text-gray-400 font-medium">Fivetran</th>
+                  <th className="text-center py-3 text-gray-400 font-medium">Airbyte</th>
+                  <th className="text-center py-3 text-gray-400 font-medium">Debezium</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: 'Connectors', pulsyn: '763', fivetran: '700+', airbyte: '600+', debezium: '~50' },
+                  { feature: 'CDC Latency', pulsyn: '<1 second', fivetran: '1-15 min', airbyte: '15 min', debezium: 'Sub-second' },
+                  { feature: 'Kafka Required', pulsyn: 'No', fivetran: 'No', airbyte: 'No', debezium: 'Yes' },
+                  { feature: 'AI Agent (MCP)', pulsyn: '26 tools', fivetran: 'None', airbyte: 'None', debezium: 'None' },
+                  { feature: 'In-flight Masking', pulsyn: 'FPE + hash', fivetran: 'Hash only', airbyte: 'Hash only', debezium: 'None' },
+                  { feature: 'Starting Price', pulsyn: 'Free', fivetran: '~$550/mo', airbyte: 'Free (self)', debezium: 'Free (self)' },
+                  { feature: 'At 10M rows/day', pulsyn: '$2,000/mo', fivetran: '$15,000+/mo', airbyte: 'Custom', debezium: 'Infra cost' },
+                ].map((row) => (
+                  <tr key={row.feature} className="border-b border-white/5">
+                    <td className="py-3 text-gray-300">{row.feature}</td>
+                    <td className="py-3 text-center text-cyan-400 font-semibold">{row.pulsyn}</td>
+                    <td className="py-3 text-center text-gray-400">{row.fivetran}</td>
+                    <td className="py-3 text-center text-gray-400">{row.airbyte}</td>
+                    <td className="py-3 text-center text-gray-400">{row.debezium}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
