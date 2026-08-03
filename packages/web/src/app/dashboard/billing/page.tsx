@@ -121,8 +121,14 @@ export default function BillingPage() {
               )}
               <h3 className="text-xl font-semibold mb-2">{tier.name}</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold">{formatPrice(tier.price)}</span>
-                {tier.price > 0 && <span className="text-gray-400">/mo</span>}
+                {tier.enterprise ? (
+                  <span className="text-3xl font-bold">Custom</span>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold">{formatPrice(tier.price)}</span>
+                    {tier.price > 0 && <span className="text-gray-400">/mo</span>}
+                  </>
+                )}
               </div>
               <ul className="space-y-2 mb-6">
                 <li className="text-sm flex items-center gap-2">
@@ -176,6 +182,8 @@ export default function BillingPage() {
                       </svg>
                       Processing...
                     </span>
+                  ) : tier.enterprise ? (
+                    'Contact Sales'
                   ) : tier.price === 0 ? (
                     'Get Started Free'
                   ) : (

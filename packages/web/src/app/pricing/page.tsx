@@ -100,17 +100,24 @@ export default function PricingPage() {
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
                 <div className="text-5xl font-bold text-white mb-2">
-                  {billingPeriod === 'annual'
-                    ? formatPrice(Math.round(tier.price * 0.8))
-                    : formatPrice(tier.price)}
-                  {tier.price > 0 && (
+                  {tier.enterprise ? (
+                    <span className="text-4xl">Custom</span>
+                  ) : billingPeriod === 'annual' ? (
+                    formatPrice(Math.round(tier.price * 0.8))
+                  ) : (
+                    formatPrice(tier.price)
+                  )}
+                  {!tier.enterprise && tier.price > 0 && (
                     <span className="text-lg text-gray-400">/mo</span>
                   )}
                 </div>
-                {billingPeriod === 'annual' && tier.price > 0 && (
+                {billingPeriod === 'annual' && tier.price > 0 && !tier.enterprise && (
                   <p className="text-sm text-green-400">
                     Save ${Math.round(tier.price * 12 * 0.2)}/year
                   </p>
+                )}
+                {tier.enterprise && (
+                  <p className="text-sm text-purple-300">Contact sales for pricing</p>
                 )}
               </div>
 

@@ -505,7 +505,7 @@ export default function LandingPage() {
                   </div>
                 )}
                 <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
-                <div className="text-5xl font-bold text-white mb-4">{tier.price}<span className="text-lg text-gray-400">/mo</span></div>
+                <div className="text-5xl font-bold text-white mb-4">{tier.enterprise ? 'Custom' : tier.price}{!tier.enterprise && <span className="text-lg text-gray-400">/mo</span>}{tier.enterprise && <p className="text-sm text-purple-300 font-normal mt-1">Contact sales</p>}</div>
                 <p className="text-gray-400 mb-6">{tier.desc}</p>
                 <ul className="space-y-3 mb-8">
                   {tier.features.map((f) => (
