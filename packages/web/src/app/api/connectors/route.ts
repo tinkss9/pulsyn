@@ -2,24 +2,61 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
 export async function GET() {
-  const result = await query(
-    'SELECT id, name, engine, status, created_at, updated_at FROM connectors ORDER BY created_at DESC'
-  );
-  return NextResponse.json({ data: result.rows, total: result.rowCount });
+  try {
+    const result = await query(
+      'SELECT id, name, engine, status, created_at, updated_at FROM connectors ORDER BY created_at DESC'
+    );
+    return NextResponse.json({ data: result.rows, total: result.rowCount });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: `Failed to fetch connectors: ${err.message}`, code: 'CONNECTORS_FETCH_FAILED' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const { name, engine, config } = await req.json();
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid JSON in request body', code: 'INVALID_JSON' },
+      { status: 400 }
+    );
+  }
+
+  const { name, engine, config } = body;
+  if (!name || !engine) {
+    return NextResponse.json(
+      { error: 'Missing required fields: name, engine', code: 'MISSING_FIELD' },
+      { status: 400 }
+    );
+  }
+
   const id = `connector-${Date.now()}`;
 
-  const result = await query(
-    `INSERT INTO connectors (id, name, engine, config) VALUES ($1, $2, $3, $4::jsonb) RETURNING *`,
-    [id, name, engine, JSON.stringify(config)]
-  );
+  try {
+    const result = await query(
+      `INSERT INTO connectors (id, name, engine, config) VALUES ($1, $2, $3, $4::jsonb) RETURNING *`,
+      [id, name, engine, JSON.stringify(config)]
+    );
 
-  const connector = result.rows[0];
-  if (connector.config?.password) {
-    connector.config = { ...connector.config, password: '***' };
+    const connector = result.rows[0];
+    if (connector.config?.password) {
+      connector.config = { ...connector.config, password: '***' };
+    }
+    return NextResponse.json({ data: connector }, { status: 201 });
+  } catch (err: any) {
+    if (err.code === '23505') {
+      return NextResponse.json(
+        { error: `Connector "${name}" already exists`, code: 'CONNECTOR_ALREADY_EXISTS' },
+        { status: 409 }
+      );
+    }
+    return NextResponse.json(
+      { error: `Failed to create connector: ${err.message}`, code: 'CONNECTOR_CREATE_FAILED' },
+      { status: 500 }
+    );
   }
-  return NextResponse.json({ data: connector }, { status: 201 });
 }

@@ -9,6 +9,7 @@ export default function MarketplacePage() {
   const [category, setCategory] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (search) params.set('q', search);
     if (category) params.set('category', category);
@@ -16,7 +17,7 @@ export default function MarketplacePage() {
     fetch(`/api/marketplace?${params}`)
       .then(r => r.json())
       .then(data => setConnectors(data.data || []))
-      .catch(() => {})
+      .catch(() => setConnectors([]))
       .finally(() => setLoading(false));
   }, [search, category]);
 
@@ -26,7 +27,7 @@ export default function MarketplacePage() {
       alert('Please sign in first');
       return;
     }
-    const res = await fetch(`/api/marketplace/${id}/install`, {
+    const res = await fetch(`/api/marketplace/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': token },
       body: JSON.stringify({ organizationId: 'default' }),
@@ -34,19 +35,24 @@ export default function MarketplacePage() {
     const data = await res.json();
     if (res.ok) {
       alert(`Installed! ${data.data.message}`);
+      // Refresh to update download count
+      setConnectors(prev => prev.map(c => c.id === id ? { ...c, download_count: (c.download_count || 0) + 1 } : c));
     } else {
-      alert(data.error);
+      alert(data.error || 'Installation failed');
     }
   };
 
-  const categories = ['all', 'forex', 'crypto', 'finance', 'database', 'saas', 'general'];
+  const categories = [
+    'all', 'forex', 'crypto', 'finance', 'database', 'saas', 'payments',
+    'analytics', 'healthcare', 'fintech', 'education', 'government', 'logistics', 'travel', 'general',
+  ];
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <div className="p-6 max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Connector Marketplace</h1>
-          <p className="text-gray-400">763+ pre-built connectors. Install in one click.</p>
+          <p className="text-gray-400">31+ pre-built connectors across 15 categories. Install in one click.</p>
         </div>
 
         <div className="flex gap-4 mb-6">
@@ -58,7 +64,7 @@ export default function MarketplacePage() {
             className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500"
           />
           <select
-            value={category}
+            value={category || 'all'}
             onChange={e => setCategory(e.target.value === 'all' ? '' : e.target.value)}
             className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white"
           >
@@ -68,8 +74,26 @@ export default function MarketplacePage() {
           </select>
         </div>
 
+        {/* Result count */}
+        <p className="text-sm text-gray-500 mb-4">
+          {loading ? 'Loading...' : `${connectors.length} connector${connectors.length !== 1 ? 's' : ''} found`}
+        </p>
+
         {loading ? (
-          <div className="text-gray-400">Loading connectors...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-gray-900 rounded-lg p-5 border border-gray-800 animate-pulse">
+                <div className="h-4 bg-gray-800 rounded w-3/4 mb-3" />
+                <div className="h-3 bg-gray-800 rounded w-full mb-2" />
+                <div className="h-3 bg-gray-800 rounded w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : connectors.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-lg mb-2">No connectors found</p>
+            <p className="text-sm">Try a different search or category</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {connectors.map(conn => (
@@ -86,7 +110,7 @@ export default function MarketplacePage() {
                 <p className="text-sm text-gray-400 mb-4 line-clamp-2">{conn.description}</p>
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                   <span>{conn.engine}</span>
-                  <span>{conn.download_count?.toLocaleString()} installs</span>
+                  <span>{Number(conn.download_count || 0).toLocaleString()} installs</span>
                   <span>{conn.avg_rating > 0 ? `${Number(conn.avg_rating).toFixed(1)} ★` : 'No ratings'}</span>
                 </div>
                 <button

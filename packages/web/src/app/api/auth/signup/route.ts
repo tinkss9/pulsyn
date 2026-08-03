@@ -14,30 +14,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
   }
 
+  if (name.length > 100) {
+    return NextResponse.json({ error: 'Name must be 100 characters or less' }, { status: 400 });
+  }
+
   try {
-    const existing = await query('SELECT id FROM organizations WHERE email = $1', [email]);
-    if (existing.rows.length > 0) {
+    const existing = await query('SELECT id, verified FROM organizations WHERE email = $1', [email]);
+    if (existing.rows.length > 0 && existing.rows[0].verified) {
       return NextResponse.json({ error: 'Email already registered. Use login instead.' }, { status: 409 });
     }
 
-    const orgId = `org-${crypto.randomUUID()}`;
-    await query(
-      `INSERT INTO organizations (id, name, email, company, plan_id, created_at) VALUES ($1, $2, $3, $4, 'community', NOW())`,
-      [orgId, name, email, company || null]
-    );
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const codeHash = crypto.createHash('sha256').update(code).digest('hex');
 
-    const apiKey = `pulsyn_${crypto.randomBytes(32).toString('hex')}`;
-    const keyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
-    const keyId = `key-${crypto.randomUUID()}`;
+    if (existing.rows.length > 0) {
+      // Update existing unverified org
+      await query(
+        `UPDATE organizations SET name = $1, company = $2, verification_code = $3, updated_at = NOW() WHERE email = $4`,
+        [name, company || null, codeHash, email]
+      );
+    } else {
+      // Create new org (unverified)
+      const orgId = `org-${crypto.randomUUID()}`;
+      await query(
+        `INSERT INTO organizations (id, name, email, company, plan_id, verified, verification_code, created_at) VALUES ($1, $2, $3, $4, 'community', false, $5, NOW())`,
+        [orgId, name, email, company || null, codeHash]
+      );
+    }
 
-    await query(
-      `INSERT INTO api_keys (id, organization_id, key_hash, name, plan_id, is_active, created_at) VALUES ($1, $2, $3, 'Default Key', 'community', true, NOW())`,
-      [keyId, orgId, keyHash]
-    );
+    // Log verification code (in production, send email via Resend/SendGrid)
+    console.log(`[AUTH] Verification code for ${email}: ${code}`);
 
     return NextResponse.json({
-      data: { organizationId: orgId, apiKey, plan: 'community', message: 'Account created. Save your API key — it cannot be retrieved later.' },
-    }, { status: 201 });
+      data: {
+        email,
+        status: 'verification_required',
+        message: `Verification code sent to ${email}. Check your inbox. (Dev mode: check server logs for code)`,
+      },
+    }, { status: 200 });
   } catch (err) {
     console.error('[Auth] Signup error:', err);
     return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });

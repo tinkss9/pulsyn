@@ -143,8 +143,7 @@ export function getTierByPriceId(priceId: string): PricingTier | undefined {
 
 export function formatPrice(price: number): string {
   if (price === 0) return 'Free';
-  if (price >= 1000) return `$${(price / 1000).toFixed(price % 1000 === 0 ? 0 : 1)}K`;
-  return `$${price}`;
+  return `$${price.toLocaleString('en-US')}`;
 }
 
 export function formatLimit(value: number, unit: string): string {
