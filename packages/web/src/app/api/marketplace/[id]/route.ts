@@ -1,0 +1,83 @@
+// Marketplace API — Get connector details, install, review
+import { NextRequest, NextResponse } from 'next/server';
+import { query } from '@/lib/db';
+
+// GET /api/marketplace/[id] — Get connector details with reviews
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const connResult = await query(
+    `SELECT * FROM marketplace_connectors WHERE id = $1 AND is_published = true`,
+    [id]
+  );
+  if (connResult.rowCount === 0) {
+    return NextResponse.json({ error: 'Connector not found' }, { status: 404 });
+  }
+
+  const reviewsResult = await query(
+    `SELECT id, user_id, rating, title, review_text, is_verified_purchase, helpful_count, created_at
+     FROM marketplace_reviews WHERE connector_id = $1 ORDER BY created_at DESC LIMIT 20`,
+    [id]
+  );
+
+  return NextResponse.json({
+    data: connResult.rows[0],
+    reviews: reviewsResult.rows,
+  });
+}
+
+// POST /api/marketplace/[id]/install — Install a connector
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { organizationId } = await req.json();
+
+  if (!organizationId) {
+    return NextResponse.json({ error: 'Missing organizationId' }, { status: 400 });
+  }
+
+  const connResult = await query(
+    `SELECT * FROM marketplace_connectors WHERE id = $1 AND is_published = true`,
+    [id]
+  );
+  if (connResult.rowCount === 0) {
+    return NextResponse.json({ error: 'Connector not found' }, { status: 404 });
+  }
+
+  const connector = connResult.rows[0];
+
+  // Check if already installed
+  const existing = await query(
+    `SELECT id FROM marketplace_installations WHERE connector_id = $1 AND organization_id = $2`,
+    [id, organizationId]
+  );
+  if (existing.rowCount > 0) {
+    return NextResponse.json({ error: 'Already installed' }, { status: 409 });
+  }
+
+  // Install
+  const installId = `inst-${Date.now()}`;
+  await query(
+    `INSERT INTO marketplace_installations (id, connector_id, organization_id, installed_version, config)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [installId, id, organizationId, connector.version, connector.config_template]
+  );
+
+  // Increment download count
+  await query(
+    `UPDATE marketplace_connectors SET download_count = download_count + 1 WHERE id = $1`,
+    [id]
+  );
+
+  return NextResponse.json({
+    data: {
+      installationId: installId,
+      connector: {
+        id: connector.id,
+        name: connector.name,
+        engine: connector.engine,
+        configTemplate: connector.config_template,
+      },
+      message: `Installed ${connector.name}. Create a connector using the config template.`,
+    },
+  }, { status: 201 });
+}

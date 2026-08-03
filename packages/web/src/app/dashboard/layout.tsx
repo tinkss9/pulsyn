@@ -8,6 +8,8 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Overview', icon: '📊' },
   { href: '/dashboard/pipelines', label: 'Pipelines', icon: '🔄' },
   { href: '/dashboard/connectors', label: 'Connectors', icon: '🔌' },
+  { href: '/marketplace', label: 'Marketplace', icon: '🏪' },
+  { href: '/mcp/templates', label: 'MCP Templates', icon: '🤖' },
   { href: '/dashboard/usage', label: 'Usage', icon: '📈' },
   { href: '/dashboard/billing', label: 'Billing', icon: '💳' },
   { href: '/dashboard/api-keys', label: 'API Keys', icon: '🔑' },
