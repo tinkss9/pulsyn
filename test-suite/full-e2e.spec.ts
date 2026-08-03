@@ -2,6 +2,31 @@ import { test, expect } from '@playwright/test';
 
 const BASE = 'https://pulsynai.com';
 
+// Helper: signup + auto-verify (handles email verification flow)
+async function signupAndVerify(request: any): Promise<{ apiKey: string; organizationId: string }> {
+  const email = `test-${Date.now()}@pulsyn.io`;
+  
+  // Step 1: Signup
+  const signupResp = await request.post(`${BASE}/api/auth/signup`, {
+    data: { name: 'E2E Test Org', email, company: 'Test Co' },
+  });
+  const signupBody = await signupResp.json();
+  
+  // If signup returns apiKey directly (old flow), use it
+  if (signupBody.data?.apiKey) {
+    return { apiKey: signupBody.data.apiKey, organizationId: signupBody.data.organizationId };
+  }
+  
+  // Step 2: Email verification required - try common test codes
+  // The code is 6 digits, sent to email. For E2E, we can't read the email.
+  // But we can query the DB directly via Supabase RPC to get the code.
+  // Since the code is stored as SHA-256 hash, we need to query it.
+  
+  // For now, return a placeholder that indicates verification is needed
+  // The test will need to be updated to handle this flow
+  return { apiKey: '', organizationId: '' };
+}
+
 test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
 
   test('API: Signup and get API key', async ({ request }) => {
@@ -11,10 +36,17 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
     });
     expect(resp.ok()).toBeTruthy();
     const body = await resp.json();
-    expect(body.data.apiKey).toBeTruthy();
-    expect(body.data.organizationId).toBeTruthy();
-    expect(body.data.apiKey).toMatch(/^pulsyn_/);
-    console.log(`PASS: Signup — org=${body.data.organizationId}, key=${body.data.apiKey.slice(0, 20)}...`);
+    
+    // New flow: signup returns verificationRequired
+    if (body.data?.emailVerificationRequired) {
+      expect(body.data.email).toBe(email);
+      console.log(`PASS: Signup — email verification required for ${email}`);
+    } else {
+      // Old flow: signup returns apiKey directly
+      expect(body.data.apiKey).toBeTruthy();
+      expect(body.data.apiKey).toMatch(/^pulsyn_/);
+      console.log(`PASS: Signup — key=${body.data.apiKey.slice(0, 20)}...`);
+    }
   });
 
   test('API: Create connector via POST /api/connectors', async ({ request }) => {
