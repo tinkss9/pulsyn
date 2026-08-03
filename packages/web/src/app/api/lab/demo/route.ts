@@ -98,9 +98,9 @@ export async function GET() {
           '5. This API shows both source and target data in real-time',
         ],
         tryIt: {
-          insert: 'INSERT INTO lab_customers (name, email, company, country) VALUES (''Test User'', ''test@lab.io'', ''Lab Co'', ''US'')',
-          update: 'UPDATE lab_customers SET company = ''Lab Corp'' WHERE email = ''test@lab.io''',
-          delete: 'DELETE FROM lab_customers WHERE email = ''test@lab.io''',
+          insert: "INSERT INTO lab_customers (name, email, company, country) VALUES ('Test User', 'test@lab.io', 'Lab Co', 'US')",
+          update: "UPDATE lab_customers SET company = 'Lab Corp' WHERE email = 'test@lab.io'",
+          delete: "DELETE FROM lab_customers WHERE email = 'test@lab.io'",
         },
       },
     });
