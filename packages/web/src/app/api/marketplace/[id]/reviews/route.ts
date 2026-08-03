@@ -27,10 +27,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   );
   if (existing.rowCount > 0) {
     // Update existing review
+    const updateData = JSON.stringify({ rating: Number(rating), title: title || '', review_text: reviewText || '', connector_id: id, user_id: userId });
     await query(
-      `UPDATE marketplace_reviews SET rating = $1, title = $2, review_text = $3, updated_at = NOW()
-       WHERE connector_id = $4 AND user_id = $5`,
-      [rating, title, reviewText, id, userId]
+      `UPDATE marketplace_reviews SET rating = (r->>'rating')::int, title = r->>'title', review_text = r->>'review_text', updated_at = NOW()
+       FROM (SELECT $1::jsonb AS r) sub
+       WHERE marketplace_reviews.connector_id = r->>'connector_id' AND marketplace_reviews.user_id = r->>'user_id'`,
+      [updateData]
     );
     return NextResponse.json({ message: 'Review updated' });
   }

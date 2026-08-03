@@ -170,8 +170,8 @@ test.describe('Full E2E Suite — API Generation, MCP, Lab Access', () => {
     });
     const { apiKey, organizationId } = (await signupResp.json()).data;
 
-    // Install connector from marketplace
-    const resp = await request.post(`${BASE}/api/marketplace/mkt-oanda/install`, {
+    // Install connector from marketplace (POST to /api/marketplace/[id])
+    const resp = await request.post(`${BASE}/api/marketplace/mkt-oanda`, {
       headers: { 'x-api-key': apiKey },
       data: { organizationId },
     });
