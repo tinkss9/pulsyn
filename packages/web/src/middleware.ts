@@ -17,6 +17,7 @@ const PUBLIC_ROUTES = [
   '/api/health',
   '/api/marketplace',
   '/api/mcp/templates',
+  '/api/billing/status',
   '/vs',
   '/use-cases',
   '/contact',
