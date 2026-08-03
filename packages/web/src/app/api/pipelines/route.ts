@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   const { name, source, target, tables, config } = await req.json();
   const id = `pipeline-${Date.now()}`;
 
-  // Use JSONB approach to avoid 6-param limit
+  // Use single JSONB param to avoid _pulsyn_exec parameter limit
   const pipelineData = JSON.stringify({
     id, name,
     source: source || {},
@@ -37,13 +37,15 @@ export async function POST(req: NextRequest) {
     config: config || {},
   });
 
-  const result = await query(
+  // Insert using JSONB extraction, then select back
+  await query(
     `INSERT INTO pipelines (id, name, source, target, tables, config)
      SELECT p->>'id', p->>'name', (p->'source')::jsonb, (p->'target')::jsonb, (p->'tables')::jsonb, (p->'config')::jsonb
-     FROM (SELECT $1::jsonb AS p) sub
-     RETURNING *`,
+     FROM (SELECT $1::jsonb AS p) sub`,
     [pipelineData]
   );
 
+  // Fetch the created pipeline
+  const result = await query('SELECT * FROM pipelines WHERE id = $1', [id]);
   return NextResponse.json({ data: maskPipeline(result.rows[0]) }, { status: 201 });
 }

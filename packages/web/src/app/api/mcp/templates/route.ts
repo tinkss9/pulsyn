@@ -150,7 +150,6 @@ export async function POST(req: NextRequest) {
     sourceConfig.apiKey = sourceApiKey;
   }
 
-  // Use JSONB approach to avoid param limit
   const connectorData = JSON.stringify({
     id: sourceId,
     name: `${template.name} Source`,
