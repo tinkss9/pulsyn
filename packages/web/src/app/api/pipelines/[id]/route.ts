@@ -1,13 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+function maskConfig(config: any): any {
+  if (!config) return config;
+  const masked = { ...config };
+  if (masked.password) masked.password = '***';
+  return masked;
+}
+
+function maskPipeline(p: any): any {
+  return { ...p, source: maskConfig(p.source), target: maskConfig(p.target) };
+}
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const result = await query('SELECT * FROM pipelines WHERE id = $1', [id]);
   if (result.rowCount === 0) {
     return NextResponse.json({ error: 'Pipeline not found' }, { status: 404 });
   }
-  return NextResponse.json({ data: result.rows[0] });
+  return NextResponse.json({ data: maskPipeline(result.rows[0]) });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

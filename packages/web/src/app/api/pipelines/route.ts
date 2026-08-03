@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+function maskConfig(config: any): any {
+  if (!config) return config;
+  const masked = { ...config };
+  if (masked.password) masked.password = '***';
+  return masked;
+}
+
+function maskPipeline(p: any): any {
+  return {
+    ...p,
+    source: maskConfig(p.source),
+    target: maskConfig(p.target),
+  };
+}
+
 export async function GET() {
   const result = await query('SELECT * FROM pipelines ORDER BY created_at DESC');
-  return NextResponse.json({ data: result.rows, total: result.rowCount });
+  return NextResponse.json({
+    data: result.rows.map(maskPipeline),
+    total: result.rowCount,
+  });
 }
 
 export async function POST(req: NextRequest) {

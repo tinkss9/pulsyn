@@ -32,8 +32,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for API key in header or cookie
-  const apiKey = req.headers.get('x-api-key') || req.cookies.get('pulsyn_token')?.value;
+  // Check for API key in header (x-api-key or Authorization: Bearer) or cookie
+  const authHeader = req.headers.get('authorization');
+  const bearerKey = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const apiKey = req.headers.get('x-api-key') || bearerKey || req.cookies.get('pulsyn_token')?.value;
 
   // For dashboard routes, check for session
   if (pathname.startsWith('/dashboard')) {
