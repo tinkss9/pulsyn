@@ -150,10 +150,21 @@ export async function POST(req: NextRequest) {
     sourceConfig.apiKey = sourceApiKey;
   }
 
+  // Use JSONB approach to avoid param limit
+  const connectorData = JSON.stringify({
+    id: sourceId,
+    name: `${template.name} Source`,
+    engine: template.source.engine,
+    config: sourceConfig,
+    status: 'disconnected',
+    organization_id: organizationId,
+  });
+
   await query(
     `INSERT INTO connectors (id, name, engine, config, status, organization_id)
-     VALUES ($1, $2, $3, $4::jsonb, 'disconnected', $5)`,
-    [sourceId, `${template.name} Source`, template.source.engine, JSON.stringify(sourceConfig), organizationId]
+     SELECT c->>'id', c->>'name', c->>'engine', (c->'config')::jsonb, c->>'status', c->>'organization_id'
+     FROM (SELECT $1::jsonb AS c) sub`,
+    [connectorData]
   );
 
   // Create pipeline
@@ -163,18 +174,21 @@ export async function POST(req: NextRequest) {
     template: templateId,
   };
 
+  const pipelineData = JSON.stringify({
+    id: pipelineId,
+    name: template.name,
+    source: sourceConfig,
+    target: targetConfig || {},
+    tables: template.tables,
+    config: pipelineConfig,
+    organization_id: organizationId,
+  });
+
   await query(
     `INSERT INTO pipelines (id, name, source, target, tables, config, organization_id)
-     VALUES ($1, $2, $3::jsonb, $4::jsonb, $5::jsonb, $6::jsonb, $7)`,
-    [
-      pipelineId,
-      template.name,
-      JSON.stringify(sourceConfig),
-      JSON.stringify(targetConfig || {}),
-      JSON.stringify(template.tables),
-      JSON.stringify(pipelineConfig),
-      organizationId,
-    ]
+     SELECT p->>'id', p->>'name', (p->'source')::jsonb, (p->'target')::jsonb, (p->'tables')::jsonb, (p->'config')::jsonb, p->>'organization_id'
+     FROM (SELECT $1::jsonb AS p) sub`,
+    [pipelineData]
   );
 
   return NextResponse.json({

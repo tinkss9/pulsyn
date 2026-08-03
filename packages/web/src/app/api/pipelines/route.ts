@@ -28,11 +28,22 @@ export async function POST(req: NextRequest) {
   const { name, source, target, tables, config } = await req.json();
   const id = `pipeline-${Date.now()}`;
 
+  // Use JSONB approach to avoid 6-param limit
+  const pipelineData = JSON.stringify({
+    id, name,
+    source: source || {},
+    target: target || {},
+    tables: tables || [],
+    config: config || {},
+  });
+
   const result = await query(
     `INSERT INTO pipelines (id, name, source, target, tables, config)
-     VALUES ($1, $2, $3::jsonb, $4::jsonb, $5::jsonb, $6::jsonb) RETURNING *`,
-    [id, name, JSON.stringify(source), JSON.stringify(target), JSON.stringify(tables || []), JSON.stringify(config || {})]
+     SELECT p->>'id', p->>'name', (p->'source')::jsonb, (p->'target')::jsonb, (p->'tables')::jsonb, (p->'config')::jsonb
+     FROM (SELECT $1::jsonb AS p) sub
+     RETURNING *`,
+    [pipelineData]
   );
 
-  return NextResponse.json({ data: result.rows[0] }, { status: 201 });
+  return NextResponse.json({ data: maskPipeline(result.rows[0]) }, { status: 201 });
 }

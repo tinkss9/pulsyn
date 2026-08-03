@@ -56,10 +56,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // Install
   const installId = `inst-${Date.now()}`;
+  const installData = JSON.stringify({
+    id: installId,
+    connector_id: id,
+    organization_id: organizationId,
+    installed_version: connector.version,
+    config: connector.config_template || {},
+  });
+
   await query(
     `INSERT INTO marketplace_installations (id, connector_id, organization_id, installed_version, config)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [installId, id, organizationId, connector.version, connector.config_template]
+     SELECT i->>'id', i->>'connector_id', i->>'organization_id', i->>'installed_version', (i->'config')::jsonb
+     FROM (SELECT $1::jsonb AS i) sub`,
+    [installData]
   );
 
   // Increment download count
