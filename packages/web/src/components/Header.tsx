@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PulsynLogoFull } from './PulsynLogo';
 import { Menu, X } from 'lucide-react';
@@ -20,9 +20,11 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-8">
           <a href="/#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
           <a href="/#connectors" className="text-sm text-gray-400 hover:text-white transition-colors">Connectors</a>
-          <a href="/#ai" className="text-sm text-gray-400 hover:text-white transition-colors">AI</a>
+          <Link href="/ai" className="text-sm text-gray-400 hover:text-white transition-colors">AI</Link>
           <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
           <a href="/demo" className="text-sm text-gray-400 hover:text-white transition-colors">Demo</a>
+          <a href="/lab" className="text-sm text-purple-400 hover:text-purple-300 transition-colors font-medium">Lab</a>
+          <a href="/competition" className="text-sm text-amber-400 hover:text-amber-300 transition-colors font-medium">Competition</a>
         </nav>
         
         <div className="flex items-center gap-3">
@@ -47,9 +49,11 @@ export default function Header() {
           <nav className="flex flex-col gap-4 mb-4">
             <a href="/#features" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
             <a href="/#connectors" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">Connectors</a>
-            <a href="/#ai" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">AI</a>
+            <Link href="/ai" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">AI</Link>
             <a href="/pricing" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
             <a href="/demo" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">Demo</a>
+            <a href="/lab" onClick={() => setMobileMenuOpen(false)} className="text-sm text-purple-400 hover:text-purple-300 transition-colors font-medium">Lab</a>
+            <a href="/competition" onClick={() => setMobileMenuOpen(false)} className="text-sm text-amber-400 hover:text-amber-300 transition-colors font-medium">Competition</a>
           </nav>
           <div className="flex flex-col gap-3">
             <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-400 hover:text-white transition-colors">Sign In</Link>
