@@ -9,6 +9,12 @@ import { getPredictionEngine, type PredictionResult, type TimeSeriesPoint, type 
 import { query } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
+  // Require authentication
+  const apiKey = req.headers.get('x-api-key') ?? req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!apiKey) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const metric = searchParams.get('metric') || 'capacity';

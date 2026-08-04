@@ -3,12 +3,17 @@ import { query } from '@/lib/db';
 import crypto from 'crypto';
 
 // Test-only endpoint: creates org + API key without email verification
-// Only works when E2E_TEST_SECRET header matches env var
+// DISABLED in production — only works when E2E_TEST_SECRET is set AND NODE_ENV !== 'production'
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get('x-e2e-secret');
-  const expectedSecret = process.env.E2E_TEST_SECRET || 'pulsyn-e2e-test-2026';
+  // Kill switch: completely disable in production
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_E2E_SIGNUP) {
+    return NextResponse.json({ error: 'Test signup is disabled in production' }, { status: 403 });
+  }
 
-  if (secret !== expectedSecret) {
+  const secret = req.headers.get('x-e2e-secret');
+  const expectedSecret = process.env.E2E_TEST_SECRET;
+
+  if (!expectedSecret || secret !== expectedSecret) {
     return NextResponse.json({ error: 'Invalid test secret' }, { status: 403 });
   }
 

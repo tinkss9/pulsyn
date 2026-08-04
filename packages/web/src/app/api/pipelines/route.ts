@@ -50,6 +50,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Resource limit: free tier max 5 pipelines
+  const existingCount = await query('SELECT COUNT(*) as cnt FROM pipelines');
+  const count = parseInt(existingCount.rows[0]?.cnt || '0');
+  if (count >= 5) {
+    return NextResponse.json(
+      { error: 'Free tier limit reached (5 pipelines). Upgrade to Pro for unlimited.', code: 'LIMIT_REACHED' },
+      { status: 403 }
+    );
+  }
+
   const { name, source, target, tables, config } = body;
 
   const errors = collectErrors(

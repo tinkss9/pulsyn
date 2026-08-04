@@ -33,6 +33,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Resource limit: free tier max 3 connectors
+  const existingCount = await query('SELECT COUNT(*) as cnt FROM connectors');
+  const count = parseInt(existingCount.rows[0]?.cnt || '0');
+  if (count >= 3) {
+    return NextResponse.json(
+      { error: 'Free tier limit reached (3 connectors). Upgrade to Pro for unlimited.', code: 'LIMIT_REACHED' },
+      { status: 403 }
+    );
+  }
+
   const { name, engine, config } = body;
 
   const errors = collectErrors(

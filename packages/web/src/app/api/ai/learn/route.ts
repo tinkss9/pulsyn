@@ -3,8 +3,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLLM } from '@/lib/ai/self-learning-llm';
 
-// GET /api/ai/learn — Get AI insights from pipeline data
-export async function GET() {
+// GET /api/ai/learn — Get AI insights from pipeline data (REQUIRES AUTH)
+export async function GET(req: NextRequest) {
+  // Require authentication
+  const apiKey = req.headers.get('x-api-key') ?? req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!apiKey) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   try {
     const llm = getLLM();
 
