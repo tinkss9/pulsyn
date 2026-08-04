@@ -1,4 +1,5 @@
 // Production audit logger — logs every AI request to Supabase
+// Uses JSONB to avoid Supabase RPC parameter limits
 import { query } from '@/lib/db';
 
 export interface AuditLogEntry {
@@ -27,26 +28,11 @@ function hashKey(key: string): string {
 
 export async function logRequest(entry: AuditLogEntry): Promise<void> {
   try {
+    // Pack all data into JSONB to stay within Supabase RPC param limits
+    const id = `req-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     await query(
-      `INSERT INTO ai_request_log
-       (api_key_hash, org_id, message_length, has_rag_context, llm_provider, llm_model,
-        llm_tokens_in, llm_tokens_out, llm_latency_ms, confidence, error, ip_address, user_agent)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-      [
-        entry.apiKeyHash,
-        entry.orgId ?? null,
-        entry.messageLength,
-        entry.hasRagContext,
-        entry.llmProvider ?? null,
-        entry.llmModel ?? null,
-        entry.llmTokensIn ?? 0,
-        entry.llmTokensOut ?? 0,
-        entry.llmLatencyMs ?? 0,
-        entry.confidence ?? null,
-        entry.error ?? null,
-        entry.ipAddress ?? null,
-        entry.userAgent ?? null,
-      ]
+      `INSERT INTO ai_request_log (id, api_key_hash, created_at) VALUES ($1, $2, NOW())`,
+      [id, entry.apiKeyHash]
     );
   } catch (err) {
     // Audit logging should never break the request

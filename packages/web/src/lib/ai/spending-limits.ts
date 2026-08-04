@@ -27,7 +27,7 @@ export async function checkSpendingLimit(orgId: string): Promise<SpendingCheck> 
       // New org — create default limits
       await query(
         `INSERT INTO ai_spending_limits (org_id, daily_limit_usd, monthly_limit_usd)
-         VALUES ($1, $2, $3)`,
+         VALUES ($1, $2::numeric, $3::numeric)`,
         [orgId, DEFAULT_DAILY_LIMIT, DEFAULT_MONTHLY_LIMIT]
       );
       return {
@@ -117,8 +117,8 @@ export async function recordSpending(orgId: string, tokensIn: number, tokensOut:
   try {
     await query(
       `UPDATE ai_spending_limits
-       SET daily_spend_usd = daily_spend_usd + $2,
-           monthly_spend_usd = monthly_spend_usd + $2,
+       SET daily_spend_usd = daily_spend_usd + $2::numeric,
+           monthly_spend_usd = monthly_spend_usd + $2::numeric,
            updated_at = NOW()
        WHERE org_id = $1`,
       [orgId, cost]
