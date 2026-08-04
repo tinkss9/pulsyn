@@ -47,7 +47,7 @@ function sseResponse(data: string, eventName = 'message') {
   const stream = new ReadableStream({
     start(controller) {
       // Send in small chunks to simulate streaming
-      const chunks = data.match(/.{1,100}/gs) ?? [data];
+      const chunks = data.match(/[\s\S]{1,100}/g) ?? [data];
       for (const chunk of chunks) {
         controller.enqueue(
           encoder.encode(`event: ${eventName}\ndata: ${JSON.stringify({ chunk })}\n\n`),
