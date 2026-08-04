@@ -75,13 +75,37 @@ function errorResponse(message: string, status = 400) {
 // Handler
 // ---------------------------------------------------------------------------
 
+// Security constants
+const MAX_MESSAGE_LENGTH = 4000;
+const MAX_CONTEXT_LENGTH = 2000;
+const MAX_HISTORY_MESSAGES = 10;
+const MAX_HISTORY_MESSAGE_LENGTH = 2000;
+
+/** Strip any system-role messages from user-controlled input to prevent injection */
+function sanitizeHistory(
+  history: { role: string; content: string }[],
+): ChatMessage[] {
+  return history
+    .filter(
+      (m) =>
+        typeof m.content === 'string' &&
+        (m.role === 'user' || m.role === 'assistant') && // drop system roles
+        m.content.length <= MAX_HISTORY_MESSAGE_LENGTH,
+    )
+    .slice(-MAX_HISTORY_MESSAGES)
+    .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // Extract API key from header or query
+    // Require authentication — reject anonymous
     const apiKey =
       req.headers.get('x-api-key') ??
-      req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
-      'anonymous';
+      req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+
+    if (!apiKey || apiKey === 'anonymous') {
+      return errorResponse('Authentication required. Provide x-api-key or Authorization header.', 401);
+    }
 
     checkApiKeyRateLimit(apiKey);
 
@@ -96,20 +120,24 @@ export async function POST(req: NextRequest) {
       return errorResponse('Missing required field: message');
     }
 
-    // Use the RAG-powered Q&A for rich answers
+    // Enforce input length limits
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return errorResponse(`Message exceeds maximum length of ${MAX_MESSAGE_LENGTH} characters`);
+    }
+
+    // Sanitize conversation history — drop system-role messages from user input
     const history: ChatMessage[] = Array.isArray(conversationHistory)
-      ? conversationHistory
-          .filter(
-            (m): m is { role: 'system' | 'user' | 'assistant'; content: string } =>
-              typeof m.content === 'string' &&
-              (m.role === 'system' || m.role === 'user' || m.role === 'assistant'),
-          )
-          .slice(-10) // keep last 10 messages
+      ? sanitizeHistory(conversationHistory)
       : [];
 
-    // If there's extra context, prepend it as a system message
-    if (context) {
-      history.unshift({ role: 'system', content: `Additional context:\n${context}` });
+    // Sanitize context — strip any system-role injection attempts, enforce length
+    const sanitizedContext =
+      typeof context === 'string' && context.length > 0
+        ? context.slice(0, MAX_CONTEXT_LENGTH).replace(/\b(system|assistant|ignore previous|ignore all)\b/gi, '[filtered]')
+        : undefined;
+
+    if (sanitizedContext) {
+      history.unshift({ role: 'user', content: `[Additional context]\n${sanitizedContext}` }); // inject as user, not system
     }
 
     const result = await answerQuestion(message, history, apiKey);
