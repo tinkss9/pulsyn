@@ -4,6 +4,7 @@
 
 import { query } from '@/lib/db';
 import { getPredictionEngine, type PredictionResult, type TimeSeriesPoint, type PipelineUsage } from './prediction-engine';
+import { chat, analyze, type ChatMessage, type ChatResponse } from './llm-client';
 
 export interface LearningData {
   connectors: ConnectorPattern[];
@@ -528,17 +529,31 @@ export class SelfLearningLLM {
     // Optimization insights
     for (const conn of data.connectors) {
       if (conn.successRate > 0 && conn.successRate < 95) {
+        const priority = conn.successRate < 80 ? 'high' : 'medium';
+        let description = `${conn.engine} connectors are ${conn.successRate.toFixed(1)}% successful. Optimizing configuration could improve reliability.`;
+
+        // Enhance description with LLM
+        try {
+          const llmResp = await analyze(
+            { engine: conn.engine, successRate: conn.successRate, connected: conn.connectedCount, errors: conn.errorCount },
+            `Write a 1-2 sentence insight about improving ${conn.engine} connector reliability at ${conn.successRate.toFixed(1)}% success rate. Be specific and actionable.`,
+          );
+          description = llmResp.content;
+        } catch {
+          // LLM unavailable — keep rule-based text
+        }
+
         insights.push({
           id: `opt-conn-${conn.engine}`,
           category: 'optimization',
           title: `Improve ${conn.engine} connector reliability`,
-          description: `${conn.engine} connectors are ${conn.successRate.toFixed(1)}% successful. Optimizing configuration could improve reliability.`,
+          description,
           evidence: [
             `${conn.connectedCount} of ${conn.totalCount} connectors are connected`,
             `${conn.errorCount} connectors have errors`
           ],
           confidence: 0.85,
-          priority: conn.successRate < 80 ? 'high' : 'medium',
+          priority,
           actionItems: [
             `Review ${conn.engine} connector configurations`,
             'Check network connectivity and firewall rules',
@@ -553,15 +568,31 @@ export class SelfLearningLLM {
 
     // Risk insights
     for (const anomaly of data.anomalies) {
+      let description = anomaly.description;
+      let suggestedAction = anomaly.suggestedAction;
+
+      // Enhance anomaly explanation with LLM
+      try {
+        const llmResp = await analyze(
+          anomaly,
+          `Explain this CDC anomaly and suggest a specific fix in 1-2 sentences. Return JSON: {"description":"...","action":"..."}`,
+        );
+        const parsed = JSON.parse(llmResp.content);
+        if (parsed.description) description = parsed.description;
+        if (parsed.action) suggestedAction = parsed.action;
+      } catch {
+        // Keep rule-based text
+      }
+
       insights.push({
         id: `risk-${anomaly.type}-${Date.now()}`,
         category: 'risk',
         title: `${anomaly.type.replace(/_/g, ' ')} detected`,
-        description: anomaly.description,
+        description,
         evidence: [`Confidence: ${(anomaly.confidence * 100).toFixed(0)}%`],
         confidence: anomaly.confidence,
         priority: anomaly.severity === 'critical' ? 'critical' : anomaly.severity === 'high' ? 'high' : 'medium',
-        actionItems: [anomaly.suggestedAction],
+        actionItems: [suggestedAction],
         estimatedImpact: anomaly.severity === 'high' ? 'Significant operational impact' : 'Moderate impact',
         generatedAt: new Date().toISOString()
       });
@@ -652,6 +683,59 @@ export class SelfLearningLLM {
     }
 
     return insights;
+  }
+
+  /**
+   * Chat with the AI about Pulsyn platform data.
+   * Uses RAG to pull relevant context, then calls the LLM.
+   * Falls back to a rule-based response if LLM is unavailable.
+   */
+  async chatWithAI(
+    message: string,
+    conversationHistory: ChatMessage[] = [],
+    orgId: string = 'default',
+  ): Promise<ChatResponse & { fallback: boolean }> {
+    try {
+      // Gather fresh platform context
+      const data = await this.learn();
+      const contextBlock = [
+        `Connectors: ${data.connectors.map(c => `${c.engine}(${c.successRate.toFixed(0)}%)`).join(', ')}`,
+        `Pipelines: ${data.pipelines.map(p => `${p.status}:${p.count}`).join(', ')}`,
+        `CDC events: ${data.cdcEvents.totalEvents} total, ${data.cdcEvents.eventsPerHour.toFixed(0)}/hr`,
+        `Anomalies: ${data.anomalies.length}`,
+        `Predictions: ${data.predictions.length}`,
+      ].join('\n');
+
+      const messages: ChatMessage[] = [
+        {
+          role: 'system',
+          content:
+            'You are Pulsyn AI, the intelligent assistant for the Pulsyn CDC platform. ' +
+            'Answer questions about pipelines, connectors, CDC events, and data replication. ' +
+            'Be concise and actionable.\n\nCurrent platform state:\n' + contextBlock,
+        },
+        ...conversationHistory,
+        { role: 'user', content: message },
+      ];
+
+      const response = await chat({ messages, maxTokens: 1024, temperature: 0.3 }, orgId);
+      return { ...response, fallback: false };
+    } catch {
+      // Rule-based fallback
+      const data = this.knowledgeBase.get('lastLearn') as LearningData | undefined;
+      const statusSummary = data
+        ? `${data.connectors.length} connector types, ${data.anomalies.length} anomalies, ${data.cdcEvents.totalEvents} CDC events`
+        : 'No data available yet. Run a learning cycle first.';
+
+      return {
+        content: `I'm Pulsyn AI (rule-based mode). Platform status: ${statusSummary}. For richer answers, configure an LLM API key.`,
+        provider: 'deepseek',
+        model: 'rule-based-fallback',
+        usage: { promptTokens: 0, completionTokens: 0 },
+        cached: false,
+        fallback: true,
+      };
+    }
   }
 
   async incorporateFeedback(feedback: FeedbackEntry): Promise<void> {
