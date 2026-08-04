@@ -33,7 +33,7 @@ export type LLMProvider = 'deepseek' | 'anthropic';
 // ---------------------------------------------------------------------------
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 10;
+const RATE_LIMIT = 30;
 const RATE_WINDOW_MS = 60_000;
 
 function checkRateLimit(orgId: string): void {

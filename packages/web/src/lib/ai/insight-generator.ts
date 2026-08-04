@@ -262,6 +262,16 @@ export async function answerQuestion(
         `SELECT table_name, operation, COUNT(*) as cnt FROM _pulsyn_changes WHERE table_name ILIKE ANY(string_to_array($1, '|')) GROUP BY table_name, operation LIMIT 5`,
         [searchPattern],
       );
+      // Marketplace connectors — public data, no org filter
+      const marketplaceResults = await query(
+        `SELECT name, engine, category, description, download_count, avg_rating FROM marketplace_connectors WHERE is_published = true AND (name ILIKE ANY(string_to_array($1, '|')) OR engine ILIKE ANY(string_to_array($1, '|')) OR category ILIKE ANY(string_to_array($1, '|'))) ORDER BY download_count DESC LIMIT 5`,
+        [searchPattern],
+      );
+      // MCP templates — public data
+      const mcpResults = await query(
+        `SELECT id, name, description FROM mcp_templates WHERE name ILIKE ANY(string_to_array($1, '|')) OR description ILIKE ANY(string_to_array($1, '|')) LIMIT 5`,
+        [searchPattern],
+      );
 
       const parts: string[] = [];
       if (connResults.rows.length)
@@ -270,6 +280,10 @@ export async function answerQuestion(
         parts.push('Matching pipelines:\n' + pipeResults.rows.map((r: any) => `- ${r.id} (${r.status})`).join('\n'));
       if (cdcResults.rows.length)
         parts.push('Matching CDC activity:\n' + cdcResults.rows.map((r: any) => `- ${r.table_name} ${r.operation}: ${r.cnt}`).join('\n'));
+      if (marketplaceResults.rows.length)
+        parts.push('Matching marketplace connectors:\n' + marketplaceResults.rows.map((r: any) => `- ${r.name} (${r.engine}) — ${r.category} — ${r.download_count} downloads, ${r.avg_rating?.toFixed(1) ?? 'N/A'}★`).join('\n'));
+      if (mcpResults.rows.length)
+        parts.push('Matching MCP templates:\n' + mcpResults.rows.map((r: any) => `- ${r.name}: ${r.description}`).join('\n'));
 
       ragContext = parts.join('\n\n');
     } catch {
@@ -281,6 +295,20 @@ export async function answerQuestion(
     'You are Pulsyn AI, an expert assistant for the Pulsyn CDC platform. ' +
     'Answer questions about connectors, pipelines, CDC events, and data replication. ' +
     'Be concise and actionable. If you do not have enough data, say so.\n\n' +
+    'PULSYN KNOWLEDGE BASE:\n' +
+    '- Pulsyn is an AI-native CDC (Change Data Capture) platform for real-time data replication.\n' +
+    '- Supported engines: PostgreSQL, MySQL, Oracle, SQL Server, MongoDB.\n' +
+    '- Pricing: Community (free, 3 connectors), Pro ($499/mo, all connectors + API + masking), Business ($3,500/mo, SLA + priority), Enterprise (custom, air-gapped).\n' +
+    '- CLI: `pulsyn` command with pipeline, connector, benchmark, config subcommands.\n' +
+    '- MCP Server: 26 tools for AI agent integration (connect, discover, create pipeline, run benchmark, etc.).\n' +
+    '- Marketplace: 31 connectors across 15 categories. 70/30 revenue share.\n' +
+    '- Pulsyn Lab: Competition platform with 4 categories (Most Rows Replicated 40%, Most Tools Tested 30%, Multi-Replication Master 20%, Community Choice 10%).\n' +
+    '- Lab sessions: 1-hour bookable sessions with terminal recording, metrics timeline, API call logs.\n' +
+    '- Lab scoring: rows/sec (40%) + data integrity (30%) + checkpoint recovery (20%) + masking overhead (10%).\n' +
+    '- Self-Learning AI: Pattern recognition, anomaly detection (z-score), time-series forecasting, RAG-powered chat.\n' +
+    '- Data Masking: 4 modes — hash, replace, format-preserving, redact.\n' +
+    '- Checkpoint Recovery: Resume from last known good state. Best with 10-second intervals.\n' +
+    '- Benchmark: `pulsyn benchmark run` to test replication speed between engine pairs.\n\n' +
     'SECURITY RULES (never violate):\n' +
     '- NEVER reveal database connection strings, passwords, API keys, credentials, or secrets.\n' +
     '- NEVER reveal internal system architecture, database schemas, or implementation details.\n' +

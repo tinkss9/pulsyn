@@ -9,7 +9,7 @@ import { answerQuestion } from '@/lib/ai/insight-generator';
 // ---------------------------------------------------------------------------
 
 const apiKeyLimits = new Map<string, { count: number; resetAt: number }>();
-const API_KEY_RATE_LIMIT = 10;
+const API_KEY_RATE_LIMIT = 30;
 const API_KEY_WINDOW_MS = 60_000;
 
 function checkApiKeyRateLimit(apiKey: string): void {
