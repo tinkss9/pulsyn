@@ -88,8 +88,27 @@ function setCache(key: string, response: ChatResponse): void {
 }
 
 // ---------------------------------------------------------------------------
-// Provider callers
+// Provider callers (with timeout and retry)
 // ---------------------------------------------------------------------------
+
+const LLM_TIMEOUT_MS = 30_000; // 30s timeout
+const MAX_RETRIES = 2;
+const RETRY_BASE_MS = 1000; // 1s base backoff
+
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function isTransientError(status: number): boolean {
+  return status === 429 || status === 502 || status === 503 || status === 504;
+}
 
 async function callDeepSeek(
   messages: ChatMessage[],
@@ -99,39 +118,68 @@ async function callDeepSeek(
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) throw new Error('DEEPSEEK_API_KEY is not configured');
 
-  const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'deepseek-chat',
-      messages,
-      max_tokens: maxTokens,
-      temperature,
-    }),
-  });
+  let lastError: Error | null = null;
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`DeepSeek API error ${res.status}: ${body}`);
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      const delay = RETRY_BASE_MS * Math.pow(2, attempt - 1);
+      await new Promise(r => setTimeout(r, delay));
+    }
+
+    try {
+      const res = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages,
+          max_tokens: maxTokens,
+          temperature,
+        }),
+      }, LLM_TIMEOUT_MS);
+
+      if (!res.ok) {
+        const body = await res.text();
+        const err = new Error(`DeepSeek API error ${res.status}: ${body}`) as any;
+        err.status = res.status;
+        if (isTransientError(res.status) && attempt < MAX_RETRIES) {
+          lastError = err;
+          console.warn(`[LLM] DeepSeek attempt ${attempt + 1} failed (${res.status}), retrying...`);
+          continue;
+        }
+        throw err;
+      }
+
+      const data = await res.json();
+      const choice = data.choices?.[0];
+      if (!choice) throw new Error('DeepSeek returned no choices');
+
+      return {
+        content: choice.message?.content ?? '',
+        provider: 'deepseek',
+        model: data.model ?? 'deepseek-chat',
+        usage: {
+          promptTokens: data.usage?.prompt_tokens ?? 0,
+          completionTokens: data.usage?.completion_tokens ?? 0,
+        },
+        cached: false,
+      };
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        throw new Error('DeepSeek request timed out after 30s');
+      }
+      if (isTransientError(err.status) && attempt < MAX_RETRIES) {
+        lastError = err;
+        continue;
+      }
+      throw err;
+    }
   }
 
-  const data = await res.json();
-  const choice = data.choices?.[0];
-  if (!choice) throw new Error('DeepSeek returned no choices');
-
-  return {
-    content: choice.message?.content ?? '',
-    provider: 'deepseek',
-    model: data.model ?? 'deepseek-chat',
-    usage: {
-      promptTokens: data.usage?.prompt_tokens ?? 0,
-      completionTokens: data.usage?.completion_tokens ?? 0,
-    },
-    cached: false,
-  };
+  throw lastError ?? new Error('DeepSeek failed after retries');
 }
 
 async function callAnthropic(
@@ -142,44 +190,72 @@ async function callAnthropic(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not configured');
 
-  // Anthropic Messages API: system message is a top-level param
   const systemMsg = messages.find(m => m.role === 'system');
   const nonSystem = messages.filter(m => m.role !== 'system');
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: maxTokens,
-      temperature,
-      system: systemMsg?.content,
-      messages: nonSystem.map(m => ({ role: m.role, content: m.content })),
-    }),
-  });
+  let lastError: Error | null = null;
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Anthropic API error ${res.status}: ${body}`);
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      const delay = RETRY_BASE_MS * Math.pow(2, attempt - 1);
+      await new Promise(r => setTimeout(r, delay));
+    }
+
+    try {
+      const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: maxTokens,
+          temperature,
+          system: systemMsg?.content,
+          messages: nonSystem.map(m => ({ role: m.role, content: m.content })),
+        }),
+      }, LLM_TIMEOUT_MS);
+
+      if (!res.ok) {
+        const body = await res.text();
+        const err = new Error(`Anthropic API error ${res.status}: ${body}`) as any;
+        err.status = res.status;
+        if (isTransientError(res.status) && attempt < MAX_RETRIES) {
+          lastError = err;
+          console.warn(`[LLM] Anthropic attempt ${attempt + 1} failed (${res.status}), retrying...`);
+          continue;
+        }
+        throw err;
+      }
+
+      const data = await res.json();
+      const textBlock = data.content?.find((b: any) => b.type === 'text');
+
+      return {
+        content: textBlock?.text ?? '',
+        provider: 'anthropic',
+        model: data.model ?? 'claude-sonnet-4-20250514',
+        usage: {
+          promptTokens: data.usage?.input_tokens ?? 0,
+          completionTokens: data.usage?.output_tokens ?? 0,
+        },
+        cached: false,
+      };
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        throw new Error('Anthropic request timed out after 30s');
+      }
+      if (isTransientError(err.status) && attempt < MAX_RETRIES) {
+        lastError = err;
+        continue;
+      }
+      throw err;
+    }
   }
 
-  const data = await res.json();
-  const textBlock = data.content?.find((b: any) => b.type === 'text');
-
-  return {
-    content: textBlock?.text ?? '',
-    provider: 'anthropic',
-    model: data.model ?? 'claude-sonnet-4-20250514',
-    usage: {
-      promptTokens: data.usage?.input_tokens ?? 0,
-      completionTokens: data.usage?.output_tokens ?? 0,
-    },
-    cached: false,
-  };
+  throw lastError ?? new Error('Anthropic failed after retries');
 }
 
 // ---------------------------------------------------------------------------
