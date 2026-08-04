@@ -3,30 +3,7 @@
 import { NextRequest } from 'next/server';
 import { chat, type ChatMessage } from '@/lib/ai/llm-client';
 import { answerQuestion } from '@/lib/ai/insight-generator';
-
-// ---------------------------------------------------------------------------
-// Rate limiting (same bucket as llm-client, plus API-key level)
-// ---------------------------------------------------------------------------
-
-const apiKeyLimits = new Map<string, { count: number; resetAt: number }>();
-const API_KEY_RATE_LIMIT = 30;
-const API_KEY_WINDOW_MS = 60_000;
-
-function checkApiKeyRateLimit(apiKey: string): void {
-  const now = Date.now();
-  const entry = apiKeyLimits.get(apiKey);
-
-  if (!entry || now > entry.resetAt) {
-    apiKeyLimits.set(apiKey, { count: 1, resetAt: now + API_KEY_WINDOW_MS });
-    return;
-  }
-
-  if (entry.count >= API_KEY_RATE_LIMIT) {
-    throw new Error('Rate limit exceeded: 10 requests per minute');
-  }
-
-  entry.count++;
-}
+import { checkRateLimit } from '@/lib/ai/rate-limiter';
 
 // ---------------------------------------------------------------------------
 // SSE helper
@@ -107,7 +84,23 @@ export async function POST(req: NextRequest) {
       return errorResponse('Authentication required. Provide x-api-key or Authorization header.', 401);
     }
 
-    checkApiKeyRateLimit(apiKey);
+    // Serverless-compatible rate limiting via Supabase
+    const rateLimit = await checkRateLimit(apiKey);
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded: 30 requests per minute', resetAt: rateLimit.resetAt }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': '30',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimit.resetAt,
+            'Retry-After': '60',
+          },
+        }
+      );
+    }
 
     const body = await req.json();
     const { message, context, conversationHistory } = body as {
@@ -142,8 +135,8 @@ export async function POST(req: NextRequest) {
 
     const result = await answerQuestion(message, history, apiKey);
 
-    // Return as SSE stream
-    return sseResponse(
+    // Return as SSE stream with rate limit headers
+    const response = sseResponse(
       JSON.stringify({
         answer: result.answer,
         sources: result.sources,
@@ -151,6 +144,10 @@ export async function POST(req: NextRequest) {
       }),
       'message',
     );
+    response.headers.set('X-RateLimit-Limit', '30');
+    response.headers.set('X-RateLimit-Remaining', String(rateLimit.remaining));
+    response.headers.set('X-RateLimit-Reset', rateLimit.resetAt);
+    return response;
   } catch (err: any) {
     if (err.message?.includes('Rate limit')) {
       return errorResponse(err.message, 429);
