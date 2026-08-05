@@ -26,7 +26,7 @@
     "clean": "turbo clean",
     "prepare": "husky install",
     "cert:run": "npx tsx scripts/auto-certify/controller.ts",
-    "cert:run-local": "NODE_ENV=test npx tsx scripts/auto-certify/controller.ts",
+    "cert:run-local": "npx tsx scripts/auto-certify/run-local.ts",
     "cert:monitor": "npx tsx scripts/auto-certify/monitor.ts",
     "cert:report": "npx tsx scripts/auto-certify/report.ts",
     "cert:setup": "npx tsx scripts/auto-certify/setup.ts",
