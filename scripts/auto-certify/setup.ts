@@ -109,7 +109,16 @@ fi
 `;
 
   fs.writeFileSync(healthCheckScript, healthCheckContent);
-  execSync(`chmod +x ${healthCheckScript}`);
+  if (process.platform !== 'win32') {
+    try {
+      execSync(`chmod +x ${healthCheckScript}`);
+      log(`  ✅ Made executable: ${healthCheckScript}`);
+    } catch {
+      log(`  ⚠️  Could not make executable: ${healthCheckScript}`);
+    }
+  } else {
+    log(`  ℹ️  Skipped chmod on Windows: ${healthCheckScript}`);
+  }
   log(`  ✅ Created: ${healthCheckScript}`);
 
   // ─── 4. Create environment config ────────────────────────────
