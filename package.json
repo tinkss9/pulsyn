@@ -6,7 +6,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "description": "The AI-Native CDC Platform — Real-time change data capture without the complexity",
+  "description": "The AI-Native CDC Platform \u2014 Real-time change data capture without the complexity",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
     "build": "turbo build",
     "test": "turbo test",
     "test:unit": "turbo test --filter='./packages/*'",
-    "test:integration": "turbo test --filter='./tests/integration'",
+    "test:integration": "npm run test --workspace=packages/core -- --testPathPattern=src/__tests__/integration",
     "test:e2e": "playwright test",
     "test:bench": "turbo test --filter='./tests/benchmarks'",
     "lint": "turbo lint",
