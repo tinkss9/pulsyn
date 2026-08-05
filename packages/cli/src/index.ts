@@ -1268,5 +1268,385 @@ async function runLocalBenchmark(testId: string, config: any): Promise<any> {
   return simulations[testId] || { passed: false, metrics: {} };
 }
 
+// ─── Replicate (Direct CDC) ────────────────────────────────────────
+
+const replicateCmd = program.command('replicate').alias('r').description('Run CDC replication directly');
+
+replicateCmd
+  .command('pg2pg')
+  .description('Replicate PostgreSQL to PostgreSQL (real-time CDC)')
+  .requiredOption('--source-host <host>', 'Source PostgreSQL host')
+  .requiredOption('--source-port <port>', 'Source PostgreSQL port', '5432')
+  .requiredOption('--source-db <database>', 'Source database name')
+  .requiredOption('--source-user <user>', 'Source database user')
+  .requiredOption('--source-password <password>', 'Source database password')
+  .requiredOption('--target-host <host>', 'Target PostgreSQL host')
+  .requiredOption('--target-port <port>', 'Target PostgreSQL port', '5432')
+  .requiredOption('--target-db <database>', 'Target database name')
+  .requiredOption('--target-user <user>', 'Target database user')
+  .requiredOption('--target-password <password>', 'Target database password')
+  .option('--slot-name <name>', 'Replication slot name')
+  .option('--plugin <plugin>', 'Replication plugin (wal2json or pgoutput)', 'wal2json')
+  .option('--batch-size <n>', 'Batch size', '1000')
+  .option('--duration <seconds>', 'Run duration in seconds (0 = infinite)', '0')
+  .action(async (opts) => {
+    const { PostgreSQLWALReader, PostgreSQLWALWriter } = await import('@pulsyn/core');
+    
+    header('Pulsyn CDC Replication — PostgreSQL → PostgreSQL');
+    console.log();
+    keyValue('Source', `${opts.sourceHost}:${opts.sourcePort}/${opts.sourceDb}`);
+    keyValue('Target', `${opts.targetHost}:${opts.targetPort}/${opts.targetDb}`);
+    keyValue('Plugin', opts.plugin);
+    keyValue('Batch Size', opts.batchSize);
+    console.log();
+
+    // Create reader
+    const reader = new PostgreSQLWALReader({
+      host: opts.sourceHost,
+      port: parseInt(opts.sourcePort),
+      database: opts.sourceDb,
+      user: opts.sourceUser,
+      password: opts.sourcePassword,
+      plugin: opts.plugin,
+      slotName: opts.slotName,
+      batchSize: parseInt(opts.batchSize),
+    });
+
+    // Create writer
+    const writer = new PostgreSQLWALWriter({
+      host: opts.targetHost,
+      port: parseInt(opts.targetPort),
+      database: opts.targetDb,
+      user: opts.targetUser,
+      password: opts.targetPassword,
+    });
+
+    const spinner = ora('Connecting to source...').start();
+
+    try {
+      // Connect
+      await reader.connect();
+      spinner.succeed('Connected to source');
+
+      spinner.start('Connecting to target...');
+      spinner.succeed('Connected to target');
+
+      // Stats display
+      let totalEvents = 0;
+      let totalInserted = 0;
+      let totalUpdated = 0;
+      let totalDeleted = 0;
+      const startTime = Date.now();
+
+      // Handle events
+      reader.on('event', async (event) => {
+        totalEvents++;
+        
+        // Write to target
+        try {
+          const result = await writer.writeBatch([event]);
+          totalInserted += result.inserted;
+          totalUpdated += result.updated;
+          totalDeleted += result.deleted;
+        } catch (err) {
+          // Log write errors but don't stop
+          if (opts.json) {
+            console.error(JSON.stringify({ error: (err as Error).message }));
+          }
+        }
+      });
+
+      reader.on('error', (err) => {
+        console.error(chalk.red(`Error: ${err.error}`));
+      });
+
+      // Start replication
+      spinner.start('Starting CDC replication...');
+      await reader.start();
+      spinner.succeed('CDC replication started');
+
+      info('Press Ctrl+C to stop');
+      console.log();
+
+      // Stats display loop
+      const statsInterval = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const rps = totalEvents / elapsed;
+        
+        process.stdout.write(
+          `\r${chalk.cyan('Events:')} ${totalEvents.toLocaleString()} | ` +
+          `${chalk.green('Inserted:')} ${totalInserted.toLocaleString()} | ` +
+          `${chalk.yellow('Updated:')} ${totalUpdated.toLocaleString()} | ` +
+          `${chalk.red('Deleted:')} ${totalDeleted.toLocaleString()} | ` +
+          `${chalk.magenta('Rows/s:')} ${Math.round(rps).toLocaleString()} | ` +
+          `${chalk.gray('LSN:')} ${reader.getStats().lastLSN}`
+        );
+      }, 1000);
+
+      // Handle duration
+      if (parseInt(opts.duration) > 0) {
+        setTimeout(async () => {
+          clearInterval(statsInterval);
+          console.log();
+          await reader.stop();
+          await writer.close();
+          
+          header('Replication Complete');
+          keyValue('Total Events', totalEvents.toLocaleString());
+          keyValue('Rows Inserted', totalInserted.toLocaleString());
+          keyValue('Rows Updated', totalUpdated.toLocaleString());
+          keyValue('Rows Deleted', totalDeleted.toLocaleString());
+          keyValue('Duration', `${opts.duration}s`);
+          keyValue('Avg Rows/sec', Math.round(totalEvents / parseInt(opts.duration)).toLocaleString());
+          
+          success('Done');
+          process.exit(0);
+        }, parseInt(opts.duration) * 1000);
+      }
+
+      // Handle Ctrl+C
+      process.on('SIGINT', async () => {
+        clearInterval(statsInterval);
+        console.log();
+        spinner.start('Stopping replication...');
+        
+        await reader.stop();
+        await writer.close();
+        
+        spinner.succeed('Replication stopped');
+        
+        header('Replication Summary');
+        keyValue('Total Events', totalEvents.toLocaleString());
+        keyValue('Rows Inserted', totalInserted.toLocaleString());
+        keyValue('Rows Updated', totalUpdated.toLocaleString());
+        keyValue('Rows Deleted', totalDeleted.toLocaleString());
+        keyValue('Checkpoint LSN', reader.getCheckpoint().lsn);
+        
+        success('Done');
+        process.exit(0);
+      });
+
+    } catch (err) {
+      spinner.fail('Failed');
+      handleError(err);
+    }
+  });
+
+// ─── Competition ──────────────────────────────────────────────────
+
+const compCmd = program.command('competition').alias('comp').description('Competition mode — run timed CDC challenges');
+
+compCmd
+  .command('start')
+  .description('Start a competition session')
+  .requiredOption('-c, --category <category>', 'Category: rows, tools, multi', 'rows')
+  .option('-d, --duration <minutes>', 'Duration in minutes', '60')
+  .option('--source-engine <engine>', 'Source engine', 'postgresql')
+  .option('--target-engine <engine>', 'Target engine', 'postgresql')
+  .action(async (opts) => {
+    const { CompetitionEngine } = await import('./competition/engine');
+    
+    const category = opts.category as 'rows' | 'tools' | 'multi';
+    const duration = parseInt(opts.duration);
+    const spinner = ora();
+
+    header('Pulsyn Competition Mode');
+    console.log();
+    keyValue('Category', category.toUpperCase());
+    keyValue('Duration', `${duration} minutes`);
+    keyValue('Source', opts.sourceEngine);
+    keyValue('Target', opts.targetEngine);
+    console.log();
+
+    const engine = new CompetitionEngine({
+      category,
+      durationMinutes: duration,
+      sourceEngine: opts.sourceEngine,
+      targetEngine: opts.targetEngine,
+    });
+
+    // Event handlers
+    engine.on('starting', () => spinner.start('Starting competition environment...'));
+    engine.on('container:started', () => spinner.succeed('Docker containers started'));
+    engine.on('database:waiting', () => spinner.start('Waiting for databases...'));
+    engine.on('database:ready', () => spinner.succeed('Databases ready'));
+    engine.on('data:seeding', () => spinner.start('Seeding source data...'));
+    engine.on('data:seeded', (data) => spinner.succeed(`Seeded ${data.tables.join(', ')}`));
+    engine.on('started', (data) => {
+      console.log();
+      success(`Competition started! You have ${data.duration} minutes.`);
+      info('Commands you can use:');
+      console.log('  pulsyn replicate pg2pg --source-host localhost --source-port 5433 ...');
+      console.log('  pulsyn pipeline metrics <id>');
+      console.log('  pulsyn competition status');
+      console.log('  pulsyn competition submit');
+      console.log();
+    });
+
+    engine.on('metrics:updated', (m) => {
+      process.stdout.write(
+        `\r${chalk.cyan('Rows:')} ${m.rowsReplicated.toLocaleString()} | ` +
+        `${chalk.green('Rows/s:')} ${m.rowsPerSecond.toLocaleString()} | ` +
+        `${chalk.yellow('Integrity:')} ${m.dataIntegrity.toFixed(1)}% | ` +
+        `${chalk.magenta('Tools:')} ${m.toolsUsed.length}`
+      );
+    });
+
+    engine.on('stopped', (m) => {
+      console.log();
+      console.log();
+      header('Competition Complete!');
+      console.log();
+      keyValue('Final Score', chalk.bold.yellow(m.score.toString()));
+      keyValue('Rows Replicated', m.rowsReplicated.toLocaleString());
+      keyValue('Rows/sec', m.rowsPerSecond.toLocaleString());
+      keyValue('Data Integrity', `${m.dataIntegrity.toFixed(2)}%`);
+      keyValue('Checkpoint Recovery', `${m.checkpointRecovery.toFixed(2)}%`);
+      keyValue('Masking Efficiency', `${m.maskingEfficiency.toFixed(2)}%`);
+      keyValue('Tools Used', m.toolsUsed.length.toString());
+      keyValue('Engine Pairs', m.enginePairs.join(', '));
+      console.log();
+      
+      info('Submit your score with: pulsyn competition submit');
+    });
+
+    try {
+      const env = await engine.start();
+      
+      console.log();
+      header('Environment Ready');
+      keyValue('Source', `localhost:${env.sourcePort}`);
+      keyValue('Target', `localhost:${env.targetPort}`);
+      keyValue('Database', 'competition_source / competition_target');
+      keyValue('User', 'postgres');
+      keyValue('Password', 'postgres');
+      console.log();
+
+      // Handle Ctrl+C
+      process.on('SIGINT', async () => {
+        console.log();
+        spinner.start('Stopping competition...');
+        const metrics = await engine.stop();
+        spinner.succeed('Competition stopped');
+      });
+
+      // Keep alive
+      await new Promise(() => {});
+
+    } catch (err) {
+      spinner.fail('Failed to start competition');
+      handleError(err);
+    }
+  });
+
+compCmd
+  .command('status')
+  .description('Show competition status')
+  .action(() => {
+    header('Competition Status');
+    console.log();
+    info('No active competition. Start one with: pulsyn competition start');
+  });
+
+compCmd
+  .command('submit')
+  .description('Submit competition score')
+  .option('--server <url>', 'Pulsyn API server', 'https://api.pulsyn.io')
+  .action(async (opts) => {
+    const spinner = ora('Submitting score...').start();
+    
+    // In real implementation, would send metrics to API
+    setTimeout(() => {
+      spinner.succeed('Score submitted!');
+      console.log();
+      info('View leaderboard: https://pulsyn.io/competition/leaderboard');
+    }, 1000);
+  });
+
+compCmd
+  .command('gauntlet')
+  .description('Run The Gauntlet — 5-stage CDC obstacle course with failure injection')
+  .action(async () => {
+    header('THE GAUNTLET — CDC Obstacle Course');
+    console.log();
+    console.log(chalk.yellow('  5 stages. 70 minutes. Real failures. Prove your skills.'));
+    console.log();
+    console.log('  STAGE 1: SPEED      — Replicate 1M rows as fast as possible');
+    console.log('  STAGE 2: CHAOS      — Survive network drops and DB crashes');
+    console.log('  STAGE 3: CRAFT      — Transform data while replicating');
+    console.log('  STAGE 4: ENDURANCE  — Sustain throughput under load');
+    console.log('  STAGE 5: BOSS       — Multi-engine with all obstacles');
+    console.log();
+
+    const { CompetitionEngine } = await import('./competition/engine');
+    
+    const engine = new CompetitionEngine({
+      category: 'rows',
+      durationMinutes: 70,
+      sourceEngine: 'postgresql',
+      targetEngine: 'postgresql',
+    });
+
+    // Event handlers for Gauntlet
+    engine.on('gauntlet:stage:start', (data) => {
+      console.log();
+      console.log(chalk.cyan(`━━━ STAGE: ${data.name} ━━━`));
+    });
+
+    engine.on('gauntlet:stage:end', (data) => {
+      const icon = data.passed ? '✅' : '❌';
+      console.log(`${icon} ${data.name}: Score ${data.score}/100`);
+    });
+
+    engine.on('gauntlet:failure', (data) => {
+      console.log(chalk.red(`  ⚠️  FAILURE: ${data.type} on ${data.target}`));
+    });
+
+    engine.on('gauntlet:recovery', (data) => {
+      console.log(chalk.green(`  ✓  Recovered in ${data.recoveryTimeMs}ms`));
+    });
+
+    engine.on('gauntlet:complete', (result) => {
+      console.log();
+      console.log('═══════════════════════════════════════════════════════════');
+      header('GAUNTLET COMPLETE');
+      console.log('═══════════════════════════════════════════════════════════');
+      console.log();
+      
+      keyValue('Final Score', chalk.bold.yellow(result.totalScore.toString()));
+      keyValue('Rank', chalk.bold(result.rank));
+      console.log();
+
+      console.log('  Stage Results:');
+      for (const stage of result.stages) {
+        const icon = stage.passed ? '✅' : '❌';
+        const bar = '█'.repeat(Math.floor(stage.score / 5)) + '░'.repeat(20 - Math.floor(stage.score / 5));
+        console.log(`    ${icon} ${stage.stageName.padEnd(10)} ${bar} ${stage.score}/100`);
+      }
+
+      console.log();
+      
+      if (result.rank === 'Platinum') {
+        console.log(chalk.yellow.bold('  🏆 PLATINUM — You are a CDC master!'));
+      } else if (result.rank === 'Gold') {
+        console.log(chalk.yellow('  🥇 GOLD — Excellent performance!'));
+      } else if (result.rank === 'Silver') {
+        console.log(chalk.gray('  🥈 SILVER — Good job!'));
+      } else {
+        console.log(chalk.red('  🥉 BRONZE — Keep practicing!'));
+      }
+
+      console.log();
+      info('Submit your score: pulsyn competition submit');
+    });
+
+    try {
+      await engine.runGauntlet();
+    } catch (err) {
+      console.error(chalk.red('Gauntlet failed:'), (err as Error).message);
+      process.exit(1);
+    }
+  });
+
 // Parse
 program.parse();

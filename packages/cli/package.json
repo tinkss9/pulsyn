@@ -2,6 +2,7 @@
   "name": "@pulsyn/cli",
   "version": "0.1.0",
   "description": "Pulsyn CLI — Command-line interface for pipeline management",
+  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "pulsyn": "dist/index.js"

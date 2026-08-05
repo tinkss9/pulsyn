@@ -1,0 +1,71 @@
+# Task: Pulsyn Self-Learning LLM — Track D: AI Dashboard
+
+## Context
+Pulsyn is an AI-native CDC platform at `C:\Users\onein\pulsyn`. The web dashboard is Next.js at `packages/web`. We need an AI dashboard page.
+
+## What to Build
+
+### 1. Create `packages/web/src/app/ai/page.tsx`
+- Main AI dashboard page at `/ai`
+- Sections: Insights, Predictions, Anomalies, Chat, Learning Status
+- Uses existing Pulsyn design tokens (check `packages/web/src/app/globals.css`)
+- Responsive layout — works on mobile
+- Auto-refresh every 30 seconds
+
+### 2. Create `packages/web/src/components/ai/InsightsPanel.tsx`
+- Displays AI-generated insights with priority badges
+- Each insight: title, description, confidence %, action items
+- Color coding: critical=red, high=orange, medium=yellow, low=green
+- Click to expand details
+- Fetches from GET /api/ai/learn
+
+### 3. Create `packages/web/src/components/ai/PredictionsPanel.tsx`
+- Displays predictions with confidence intervals
+- Mini sparkline charts for trend visualization (pure CSS/SVG, no chart library)
+- Metrics: capacity, performance, cost, reliability, growth
+- Time horizon selector (7d, 30d, 90d)
+- Fetches from GET /api/ai/predict
+
+### 4. Create `packages/web/src/components/ai/AnomaliesPanel.tsx`
+- Real-time anomaly alerts
+- Severity badges with timestamps
+- Affected resource links
+- Suggested actions
+- History of resolved anomalies
+
+### 5. Create `packages/web/src/components/ai/AIChat.tsx`
+- Chat interface for AI Q&A
+- Message history display
+- Input field with send button
+- Streaming response display
+- Suggested questions chips
+- Fetches from POST /api/ai/chat
+
+### 6. Create `packages/web/src/components/ai/LearningStatus.tsx`
+- Model version and last training time
+- Data points collected
+- Learning rate indicator
+- Pattern count
+- Anomaly baseline status
+- Fetches from GET /api/ai/learn
+
+### 7. Update `packages/web/src/components/Header.tsx`
+- Add "AI" nav link to header navigation
+- Position between existing nav items
+
+### Rules
+- Feature branch only, never commit to main
+- Use existing Pulsyn design patterns (check other pages for reference)
+- No external chart libraries — use CSS/SVG for visualizations
+- Mobile responsive
+- Loading states and error handling on all data fetches
+- Commit message: `feat(ai): AI dashboard with insights, predictions, and chat — Track D`
+
+### Files to Create/Modify
+- CREATE: `packages/web/src/app/ai/page.tsx`
+- CREATE: `packages/web/src/components/ai/InsightsPanel.tsx`
+- CREATE: `packages/web/src/components/ai/PredictionsPanel.tsx`
+- CREATE: `packages/web/src/components/ai/AnomaliesPanel.tsx`
+- CREATE: `packages/web/src/components/ai/AIChat.tsx`
+- CREATE: `packages/web/src/components/ai/LearningStatus.tsx`
+- MODIFY: `packages/web/src/components/Header.tsx`

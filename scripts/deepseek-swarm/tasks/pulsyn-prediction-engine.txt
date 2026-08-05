@@ -1,0 +1,52 @@
+# Task: Pulsyn Self-Learning LLM — Track C: Prediction Engine
+
+## Context
+Pulsyn is an AI-native CDC platform at `C:\Users\onein\pulsyn`. Current predictions are naive (`current * 1.2`). We need real forecasting.
+
+## What to Build
+
+### 1. Create `packages/web/src/lib/ai/prediction-engine.ts`
+- `PredictionEngine` class for time-series forecasting
+- `forecastCapacity(history, days)` — linear regression + confidence intervals
+- `forecastPerformance(history, hours)` — exponential smoothing for throughput
+- `forecastCost(pipelines, usage)` — cost projection based on current trends
+- `forecastGrowth(history, days)` — S-curve growth modeling for marketplace
+- `predictFailure(history)` — time-to-failure estimation for connectors
+- All pure TypeScript — no external libraries
+
+### 2. Create `packages/web/src/lib/ai/statistics.ts`
+- Statistical helper functions (shared with anomaly detector)
+- `mean(values)`, `median(values)`, `stddev(values)`
+- `linearRegression(x, y)` — returns slope, intercept, r²
+- `exponentialSmoothing(values, alpha)` — SES forecast
+- `movingAverage(values, window)` — SMA
+- `confidenceInterval(mean, stddev, n, z)` — CI calculation
+- `zScore(value, mean, stddev)` — outlier detection
+- `percentile(values, p)` — p-th percentile
+
+### 3. Create `packages/web/src/app/api/ai/predict/route.ts`
+- GET /api/ai/predict?metric=capacity&days=30
+- GET /api/ai/predict?metric=performance&hours=24
+- GET /api/ai/predict?metric=cost&months=3
+- GET /api/ai/predict?metric=growth&days=90
+- GET /api/ai/predict?metric=reliability
+- Returns: `{ predictions: [{ metric, value, confidence, timeframe, trend }] }`
+
+### 4. Update `packages/web/src/lib/ai/self-learning-llm.ts`
+- Replace `generatePredictions()` with PredictionEngine calls
+- Import and use statistics.ts for calculations
+- Add confidence intervals to all predictions
+- Add trend indicators (up/down/stable) with % change
+
+### Rules
+- Feature branch only, never commit to main
+- Pure TypeScript — NO external ML/statistics packages
+- All calculations must be explainable (no black boxes)
+- Confidence intervals on every prediction
+- Commit message: `feat(ai): prediction engine with time-series forecasting — Track C`
+
+### Files to Create/Modify
+- CREATE: `packages/web/src/lib/ai/prediction-engine.ts`
+- CREATE: `packages/web/src/lib/ai/statistics.ts`
+- CREATE: `packages/web/src/app/api/ai/predict/route.ts`
+- MODIFY: `packages/web/src/lib/ai/self-learning-llm.ts`

@@ -38,6 +38,8 @@ export type { UnifiedChangeEvent, Operation } from './events';
 // Connectors — Source
 export { BaseConnector } from './connectors/base';
 export { PostgreSQLConnector } from './connectors/postgresql';
+export { PostgreSQLWALReader, PostgreSQLWALWriter, PostgreSQLPipeline } from './connectors/postgresql-cdc';
+export type { WALConfig, WALEvent, WALCheckpoint } from './connectors/postgresql-cdc';
 export { MySQLConnector } from './connectors/mysql';
 export { SQLServerConnector } from './connectors/sqlserver';
 export { OracleConnector } from './connectors/oracle';

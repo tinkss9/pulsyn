@@ -1,0 +1,78 @@
+# Pulsyn CDC Demo — Docker Compose
+# Run: docker-compose -f docker-compose.cdc-demo.yml up -d
+
+version: '3.8'
+
+services:
+  # Source PostgreSQL with logical replication enabled
+  source-db:
+    image: postgres:16-alpine
+    container_name: pulsyn-source
+    environment:
+      POSTGRES_DB: pulsyn_source
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - source_data:/var/lib/postgresql/data
+      - ./scripts/init-source.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      postgres
+        -c wal_level=logical
+        -c max_wal_senders=4
+        -c max_replication_slots=4
+        -c hot_standby=on
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Target PostgreSQL
+  target-db:
+    image: postgres:16-alpine
+    container_name: pulsyn-target
+    environment:
+      POSTGRES_DB: pulsyn_target
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - target_data:/var/lib/postgresql/data
+      - ./scripts/init-target.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Pulsyn CDC Engine
+  pulsyn-cdc:
+    build:
+      context: .
+      dockerfile: Dockerfile.cdc
+    container_name: pulsyn-cdc
+    depends_on:
+      source-db:
+        condition: service_healthy
+      target-db:
+        condition: service_healthy
+    environment:
+      SOURCE_HOST: source-db
+      SOURCE_PORT: 5432
+      SOURCE_DB: pulsyn_source
+      SOURCE_USER: postgres
+      SOURCE_PASSWORD: postgres
+      TARGET_HOST: target-db
+      TARGET_PORT: 5432
+      TARGET_DB: pulsyn_target
+      TARGET_USER: postgres
+      TARGET_PASSWORD: postgres
+    volumes:
+      - ./checkpoints:/app/checkpoints
+
+volumes:
+  source_data:
+  target_data:

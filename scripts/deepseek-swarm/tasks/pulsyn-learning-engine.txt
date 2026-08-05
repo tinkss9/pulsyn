@@ -1,0 +1,74 @@
+# Task: Pulsyn Self-Learning LLM — Track B: Learning Engine
+
+## Context
+Pulsyn is an AI-native CDC platform at `C:\Users\onein\pulsyn`. The current self-learning LLM only takes snapshots — no historical learning. We need a real learning engine.
+
+## What to Build
+
+### 1. Create `packages/web/src/lib/ai/learning-engine.ts`
+- `LearningEngine` class that stores and learns from historical data
+- `recordSnapshot(data)` — stores pipeline/connector/CDC metrics with timestamp
+- `getHistory(resourceType, resourceId, days?)` — retrieve historical patterns
+- `detectTrends(metric, window)` — moving average, trend direction, seasonality
+- `learnPatterns(history)` — identify recurring patterns (daily peaks, weekly cycles)
+- `getAnomalyBaseline(metric)` — statistical baseline for anomaly detection
+
+### 2. Create Supabase migration `scripts/learning-tables.sql`
+```sql
+CREATE TABLE IF NOT EXISTS ai_learning_snapshots (
+  id TEXT PRIMARY KEY DEFAULT ('snap-' || EXTRACT(EPOCH FROM NOW()) * 1000),
+  org_id TEXT NOT NULL,
+  resource_type TEXT NOT NULL, -- 'connector', 'pipeline', 'cdc', 'marketplace'
+  resource_id TEXT,
+  metrics JSONB NOT NULL,
+  recorded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS ai_patterns (
+  id TEXT PRIMARY KEY DEFAULT ('pat-' || EXTRACT(EPOCH FROM NOW()) * 1000),
+  org_id TEXT NOT NULL,
+  pattern_type TEXT NOT NULL, -- 'daily_peak', 'weekly_cycle', 'growth_trend', 'error_cluster'
+  pattern_data JSONB NOT NULL,
+  confidence FLOAT DEFAULT 0.5,
+  last_seen TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS ai_anomaly_baselines (
+  id TEXT PRIMARY KEY DEFAULT ('base-' || EXTRACT(EPOCH FROM NOW()) * 1000),
+  org_id TEXT NOT NULL,
+  metric_name TEXT NOT NULL,
+  mean FLOAT NOT NULL,
+  stddev FLOAT NOT NULL,
+  sample_count INT DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(org_id, metric_name)
+);
+```
+
+### 3. Create `packages/web/src/lib/ai/anomaly-detector.ts`
+- `AnomalyDetector` class using statistical methods
+- `updateBaseline(metric, values)` — recalculate mean/stddev
+- `detectAnomaly(metric, value)` — z-score based detection (|z| > 2.5 = anomaly)
+- `detectTrendAnomaly(metric, recentValues)` — trend break detection
+- `clusterAnomalies(anomalies)` — group related anomalies
+- No external ML libraries — pure TypeScript statistics
+
+### 4. Create `packages/web/src/app/api/ai/learn/route.ts` (UPDATE existing)
+- Add POST /api/ai/learn/snapshot — record current metrics
+- Add GET /api/ai/learn/history — get historical data
+- Add GET /api/ai/learn/patterns — get detected patterns
+- Keep existing GET /api/ai/learn working
+
+### Rules
+- Feature branch only, never commit to main
+- Use existing `query()` from `@/lib/db` for database access
+- Pure TypeScript — no external ML/statistics libraries
+- Statistical functions: mean, stddev, z-score, moving average, linear regression
+- Commit message: `feat(ai): learning engine with historical patterns — Track B`
+
+### Files to Create/Modify
+- CREATE: `packages/web/src/lib/ai/learning-engine.ts`
+- CREATE: `packages/web/src/lib/ai/anomaly-detector.ts`
+- CREATE: `scripts/learning-tables.sql`
+- MODIFY: `packages/web/src/app/api/ai/learn/route.ts`

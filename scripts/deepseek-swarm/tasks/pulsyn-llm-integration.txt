@@ -1,0 +1,48 @@
+# Task: Pulsyn Self-Learning LLM — Track A: LLM Integration
+
+## Context
+Pulsyn is an AI-native CDC platform at `C:\Users\onein\pulsyn`. The self-learning LLM v2 exists at `packages/web/src/lib/ai/self-learning-llm.ts` but uses only rule-based logic. We need real LLM integration.
+
+## What to Build
+
+### 1. Create `packages/web/src/lib/ai/llm-client.ts`
+- Unified LLM client supporting DeepSeek and Claude APIs
+- Environment variables: `DEEPSEEK_API_KEY`, `ANTHROPIC_API_KEY`
+- Auto-select cheapest available: DeepSeek first, Claude fallback
+- Functions: `chat(prompt, context?)`, `analyze(data, question?)`, `explain(anomaly)`
+- Rate limiting: max 10 calls/minute per org
+- Response caching: 1-hour TTL for identical prompts
+
+### 2. Create `packages/web/src/lib/ai/insight-generator.ts`
+- Takes raw pipeline/connector/CDC data + LLM client
+- `generateNaturalLanguageInsights(data)` — converts rule-based insights to conversational explanations
+- `explainAnomaly(anomaly)` — LLM explains why an anomaly matters and what to do
+- `recommendOptimizations(pipelineData)` — LLM suggests specific config changes
+- `answerQuestion(question, context)` — RAG-style Q&A about user's infrastructure
+
+### 3. Create `packages/web/src/app/api/ai/chat/route.ts`
+- POST /api/ai/chat — conversational AI endpoint
+- Body: `{ message, context?, conversationHistory? }`
+- Uses LLM client + insight generator
+- Streams responses via SSE for real-time feel
+- Rate limited per API key
+
+### 4. Update `packages/web/src/lib/ai/self-learning-llm.ts`
+- Import and use `llm-client.ts` for generating insights
+- Replace hardcoded strings in `generateInsights()` with LLM-generated text
+- Add `chatWithAI(question)` method that uses RAG context from knowledge base
+- Keep rule-based detection as fallback when LLM unavailable
+
+### Rules
+- Feature branch only, never commit to main
+- Use existing `query()` from `@/lib/db` for database access
+- API key from env vars, never hardcode
+- Error handling: if LLM call fails, fall back to rule-based
+- All new endpoints must be rate-limited
+- Commit message: `feat(ai): LLM integration for self-learning insights — Track A`
+
+### Files to Create/Modify
+- CREATE: `packages/web/src/lib/ai/llm-client.ts`
+- CREATE: `packages/web/src/lib/ai/insight-generator.ts`
+- CREATE: `packages/web/src/app/api/ai/chat/route.ts`
+- MODIFY: `packages/web/src/lib/ai/self-learning-llm.ts`
