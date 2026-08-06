@@ -115,6 +115,20 @@ const COMMUNITY_ENGINES = [
   'github-zen-v3', 'gitlab-public-v2',
   'github-status-v2', 'stripe-status', 'slack-status',
   'publicapis-random', 'httpbin-uuid', 'httpbin-base64', 'randomuser-v2', 'ipapi-v2',
+  // Batch 7: 43 more SaaS/API connectors
+  'google-ads-api', 'facebook-marketing', 'linkedin-ads', 'tiktok-ads', 'pinterest-ads', 'snapchat-ads',
+  'twilio-api', 'sendgrid-api', 'discord-api', 'telegram-api',
+  'google-sheets-api', 'airtable-api', 'confluence-api', 'sharepoint-api',
+  'woocommerce-api', 'bigcommerce-api', 'square-api', 'etsy-api',
+  'mixpanel-api', 'amplitude-api', 'segment-api',
+  'bamboohr-api', 'greenhouse-api', 'lever-api',
+  'intercom-api', 'freshdesk-api', 'zendesk-api',
+  'asana-api', 'monday-api', 'trello-api', 'clickup-api',
+  'quickbooks-api', 'xero-api', 'stripe-billing',
+  'github-actions', 'circleci-api', 'gitlab-ci',
+  'datadog-api', 'newrelic-api', 'pagerduty-api', 'sentry-api',
+  'google-drive-api', 'dropbox-api', 'box-api',
+  'twitter-api', 'mastodon-api', 'reddit-api',
 ];
 
 // All registered connector names — auto-populated at test time
