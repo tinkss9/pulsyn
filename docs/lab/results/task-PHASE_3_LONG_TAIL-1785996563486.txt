@@ -1,0 +1,97 @@
+TASK: Certify connectors — PHASE_3_LONG_TAIL
+AGENT: DeepSeek (parallelize 3 workers)
+APPROVAL_THRESHOLD: 80%
+
+CONNECTORS_TO_TEST:
+- airtable (tier=tier5)
+- amplitude (tier=tier5)
+- asana (tier=tier5)
+- braintree (tier=tier5)
+- brevo (tier=tier5)
+- chargebee (tier=tier5)
+- circle (tier=tier5)
+- cloudflare (tier=tier5)
+- cosmosdb (tier=tier5)
+- couchdb (tier=tier5)
+- csv (tier=tier5)
+- datadog (tier=tier5)
+- duckdb (tier=tier5)
+- ercot (tier=tier5)
+- faunadb (tier=tier5)
+- gentrack-g2 (tier=tier5)
+- gitlab (tier=tier5)
+- hubspot (tier=tier5)
+- influxdb (tier=tier5)
+- jira (tier=tier5)
+- klaviyo (tier=tier5)
+- kraken (tier=tier5)
+- loom (tier=tier5)
+- microsoft-teams (tier=tier5)
+- mixpanel (tier=tier5)
+- neo4j (tier=tier5)
+- netlify (tier=tier5)
+- netsuite (tier=tier5)
+- newrelic (tier=tier5)
+- notion (tier=tier5)
+- nz-ea (tier=tier5)
+- onedrive (tier=tier5)
+- oracle-utilities (tier=tier5)
+- oracle (tier=tier5)
+- pagerduty (tier=tier5)
+- posthog (tier=tier5)
+- quickbooks (tier=tier5)
+- rest-api (tier=tier5)
+- retool (tier=tier5)
+- sap-isu (tier=tier5)
+- sap (tier=tier5)
+- segment (tier=tier5)
+- sendgrid (tier=tier5)
+- servicenow (tier=tier5)
+- shopify (tier=tier5)
+- slack (tier=tier5)
+- spanner (tier=tier5)
+- sqlserver (tier=tier5)
+- squarespace (tier=tier5)
+- stripe (tier=tier5)
+- supabase (tier=tier5)
+- twilio (tier=tier5)
+- vercel (tier=tier5)
+- webflow (tier=tier5)
+- wordpress (tier=tier5)
+- workday (tier=tier5)
+- xero (tier=tier5)
+- planetscale (tier=tier5)
+- neon (tier=tier5)
+- couchbase (tier=tier5)
+- scylladb (tier=tier5)
+- yugabytedb (tier=tier5)
+- doris (tier=tier5)
+- materialize (tier=tier5)
+- starrocks (tier=tier5)
+- vertica (tier=tier5)
+- teradata (tier=tier5)
+- citus (tier=tier5)
+- mariadb (tier=tier5)
+- cockroachdb (tier=tier5)
+- tidb (tier=tier5)
+- singlestore (tier=tier5)
+- timescaledb (tier=tier5)
+- calendly (tier=tier5)
+- figma (tier=tier5)
+
+TEST_SUITE: 17 tests per connector
+- Unit: 6 tests
+- Schema: 3 tests
+- Integration: 4 tests
+- E2E: 2 tests
+- Benchmark: 2 tests
+
+PARALLEL_CONFIG:
+  workers: 3
+  timeout_per_connector: 300s
+  batch_size: 3
+
+APPROVAL_GATE:
+  pass_rate >= 80% → CERTIFIED
+
+OUTPUT_FORMAT: JSON with metrics per connector
