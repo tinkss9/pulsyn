@@ -1,11 +1,15 @@
 {
   "metadata": {
     "version": "2.0",
-    "created_at": "2026-08-06T21:38:23.795Z",
-    "description": "Pulsyn connector certification matrix — REAL Vitest results",
-    "total_connectors": 159,
-    "total_certified": 159,
-    "methodology": "Vitest live API tests + Docker database tests"
+    "generated_at": "2026-08-06T21:38:23.787Z",
+    "description": "Pulsyn connector certification — REAL Vitest results against live APIs",
+    "methodology": "Vitest integration tests against live public APIs (Lane A) and Docker containers (Lane B)",
+    "total_verified": 159,
+    "lanes": {
+      "A": "Community APIs — free, no auth, tested against live endpoints",
+      "B": "Docker databases — tested against local Docker containers",
+      "C": "SaaS connectors — tested against real APIs with credentials"
+    }
   },
   "connectors": {
     "rickandmorty": {
