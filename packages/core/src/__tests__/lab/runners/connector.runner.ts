@@ -77,6 +77,19 @@ const COMMUNITY_ENGINES = [
   'stoic', 'zenquotes', 'kanye', 'trump', 'ronswanson', 'fizzbuzz', 'bacon', 'lorem',
   'shibe', 'placekitten', 'placedog', 'placebear', 'fillmurray', 'stevensegallery',
   'placebeard', 'nicenicejpg', 'placepuppy', 'placecorgi', 'placebeyonce',
+  // Batch 4: 77 simple/fast community APIs
+  'yesno', 'random-dog', 'random-duck', 'random-cat', 'foxes', 'bunny', 'duck-duck',
+  'hipsum', 'samuelsum', 'corporate-ipsum', 'pirateipsum', 'random-num', 'uuid-generator',
+  'json-generator', 'ip-echo', 'ip-api-com', 'httpbin-get', 'httpbin-ip', 'httpbin-ua',
+  'httpbin-headers', 'hashify', 'github-status', 'statuspage-io', 'cloudflare-status',
+  'go-pkg', 'pub-dev', 'hex-pm', 'maven-central', 'cpan', 'tinyurl', 'base64-encode',
+  'colourlovers', 'random-color', 'google-fonts', 'chuck-norris', 'joke-one', 'icanhazdadjoke2',
+  'sv443', 'programming-quotes2', 'stoic2', 'quotable2', 'trump2', 'opennotify2',
+  'peopleinspace', 'numbers-trivia', 'numbers-math', 'numbers-date', 'github-emojis',
+  'github-zen2', 'github-meta', 'ip-geolocation', 'ipwhois', 'ip-api-co', 'adblock-check',
+  'http-headers', 'cookies', 'redirect', 'delay', 'base64', 'bytes', 'stream', 'range',
+  'html', 'xml', 'json', 'robots', 'deny', 'links', 'image', 'image-jpeg', 'image-svg',
+  'gzip', 'deflate', 'encoding', 'cache', 'etag',
 ];
 
 // All registered connector names — auto-populated at test time
