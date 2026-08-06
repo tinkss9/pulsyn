@@ -90,6 +90,18 @@ const COMMUNITY_ENGINES = [
   'http-headers', 'cookies', 'redirect', 'delay', 'base64', 'bytes', 'stream', 'range',
   'html', 'xml', 'json', 'robots', 'deny', 'links', 'image', 'image-jpeg', 'image-svg',
   'gzip', 'deflate', 'encoding', 'cache', 'etag',
+  // Batch 5: 47 more APIs
+  'github-repos', 'github-users-explore', 'gitlab-projects', 'npm-trending', 'pypi-trending',
+  'crates-trending', 'maven-search', 'rubygems-search', 'packagist-search', 'pub-search',
+  'aws-status', 'gcp-status', 'azure-status', 'vercel-status', 'netlify-status',
+  'open-meteo', 'worldbank-indicators', 'open-food-facts', 'rest-countries-v3',
+  'nasa-techport', 'launch-library-2', 'opennotify-iss',
+  'hackernews-top', 'reddit-popular', 'lobsters', 'producthunt',
+  'coingecko-coins', 'coinbase-currencies', 'exchangerate-latest', 'frankfurter-latest',
+  'tmdb-trending', 'omdb-search', 'anime-chan',
+  'worldtimeapi', 'ipinfo-free', 'ip-api-free', 'randomuser-me',
+  'kanye-rest', 'ron-swanson', 'tronalddump-random', 'chuck-norris-random', 'jokeapi-random',
+  'public-apis-list', 'httpbin-all', 'reqres-users', 'fakestore-v2', 'dummyjson-products',
 ];
 
 // All registered connector names — auto-populated at test time
