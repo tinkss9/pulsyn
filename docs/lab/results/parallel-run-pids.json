@@ -1,0 +1,11 @@
+{
+  "started_at": "2026-08-05 17:54:16",
+  "pids": {
+    "integration": 40756,
+    "certification": 25224
+  },
+  "logs": {
+    "integration": "C:\\Users\\onein\\pulsyn\\docs\\lab\\results\\integration-run.log",
+    "certification": "C:\\Users\\onein\\pulsyn\\docs\\lab\\results\\cert-run.log"
+  }
+}

@@ -4,5 +4,335 @@
     "created_at": "2026-08-05T04:47:01.425Z",
     "description": "Pulsyn connector certification matrix"
   },
-  "connectors": {}
+  "connectors": {},
+  "stripe": {
+    "status": "FAILED",
+    "pass_rate": 93.94,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "salesforce": {
+    "status": "CERTIFIED",
+    "pass_rate": 96.03,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "hubspot": {
+    "status": "FAILED",
+    "pass_rate": 63.61,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "shopify": {
+    "status": "FAILED",
+    "pass_rate": 89.58,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "jira": {
+    "status": "FAILED",
+    "pass_rate": 61.67,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "bigquery": {
+    "status": "FAILED",
+    "pass_rate": 94.6,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "redshift": {
+    "status": "CERTIFIED",
+    "pass_rate": 95.11,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "snowflake": {
+    "status": "FAILED",
+    "pass_rate": 90.11,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "github": {
+    "status": "FAILED",
+    "pass_rate": 75.75,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "slack": {
+    "status": "FAILED",
+    "pass_rate": 81.93,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "intercom": {
+    "status": "FAILED",
+    "pass_rate": 78.38,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "notion": {
+    "status": "FAILED",
+    "pass_rate": 87.86,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "airtable": {
+    "status": "FAILED",
+    "pass_rate": 88.34,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "linear": {
+    "status": "FAILED",
+    "pass_rate": 84.31,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "asana": {
+    "status": "FAILED",
+    "pass_rate": 94.08,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "trello": {
+    "status": "FAILED",
+    "pass_rate": 86.78,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "amplitude": {
+    "status": "FAILED",
+    "pass_rate": 83.54,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "mixpanel": {
+    "status": "FAILED",
+    "pass_rate": 71.05,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "braintree": {
+    "status": "FAILED",
+    "pass_rate": 86.6,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "brevo": {
+    "status": "FAILED",
+    "pass_rate": 73.64,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "chargebee": {
+    "status": "FAILED",
+    "pass_rate": 79.52,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "circle": {
+    "status": "FAILED",
+    "pass_rate": 79.89,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "cloudflare": {
+    "status": "FAILED",
+    "pass_rate": 69.39,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "cosmosdb": {
+    "status": "FAILED",
+    "pass_rate": 82.27,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "couchdb": {
+    "status": "FAILED",
+    "pass_rate": 80.88,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "csv": {
+    "status": "FAILED",
+    "pass_rate": 74.34,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "datadog": {
+    "status": "FAILED",
+    "pass_rate": 82.89,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "duckdb": {
+    "status": "FAILED",
+    "pass_rate": 63.95,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "entso-e": {
+    "status": "FAILED",
+    "pass_rate": 79.19,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "ercot": {
+    "status": "FAILED",
+    "pass_rate": 67.24,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "firebase": {
+    "status": "FAILED",
+    "pass_rate": 69.91,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "faunadb": {
+    "status": "FAILED",
+    "pass_rate": 91.29,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "gentrack-g2": {
+    "status": "FAILED",
+    "pass_rate": 74.73,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "gitlab": {
+    "status": "FAILED",
+    "pass_rate": 70.46,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "google-analytics": {
+    "status": "FAILED",
+    "pass_rate": 81.32,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "google-sheets": {
+    "status": "FAILED",
+    "pass_rate": 60.13,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "influxdb": {
+    "status": "FAILED",
+    "pass_rate": 92.46,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "klaviyo": {
+    "status": "FAILED",
+    "pass_rate": 70.93,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "kraken": {
+    "status": "FAILED",
+    "pass_rate": 93.42,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "loom": {
+    "status": "FAILED",
+    "pass_rate": 81.97,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "mailchimp": {
+    "status": "FAILED",
+    "pass_rate": 63.38,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "microsoft-teams": {
+    "status": "FAILED",
+    "pass_rate": 91.64,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "neo4j": {
+    "status": "FAILED",
+    "pass_rate": 70.06,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "netlify": {
+    "status": "FAILED",
+    "pass_rate": 91.43,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "netsuite": {
+    "status": "FAILED",
+    "pass_rate": 93.23,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "newrelic": {
+    "status": "FAILED",
+    "pass_rate": 65.17,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "nz-ea": {
+    "status": "FAILED",
+    "pass_rate": 68.6,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "onedrive": {
+    "status": "FAILED",
+    "pass_rate": 63.37,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "oracle-utilities": {
+    "status": "FAILED",
+    "pass_rate": 79.3,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "oracle": {
+    "status": "FAILED",
+    "pass_rate": 78.58,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "pagerduty": {
+    "status": "FAILED",
+    "pass_rate": 88.55,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "posthog": {
+    "status": "FAILED",
+    "pass_rate": 91.28,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "quickbooks": {
+    "status": "FAILED",
+    "pass_rate": 72.13,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "rest-api": {
+    "status": "FAILED",
+    "pass_rate": 94.51,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  },
+  "retool": {
+    "status": "FAILED",
+    "pass_rate": 69.63,
+    "tested_at": "2026-08-06T06:09:16.261Z",
+    "phase": "PHASE_1_TIER_PRIORITY"
+  }
 }

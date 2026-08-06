@@ -1,0 +1,7 @@
+{
+  "pid": 41484,
+  "started_at": "2026-08-06T08:44:00.048896",
+  "log_file": "C:/Users/onein/pulsyn\\docs/lab/results/cert-run.log",
+  "rollback_tag": "rollback/pre-cert-run-fix-20260806-084353",
+  "branch": "feat/connector-stub-audit-2026-08-05"
+}
