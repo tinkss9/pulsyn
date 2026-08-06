@@ -1,0 +1,227 @@
+{
+  "phase": "PHASE_2_CONTINUATION",
+  "connectors_queued": 45,
+  "connectors_passed": 6,
+  "connectors_failed": 39,
+  "connectors_skipped": 0,
+  "total_duration_seconds": 0,
+  "start_time": "2026-08-06T06:40:12.547Z",
+  "end_time": "2026-08-06T06:40:12.547Z",
+  "connectors": {
+    "github": {
+      "status": "FAILED",
+      "pass_rate": 82.23,
+      "duration_ms": 2867
+    },
+    "slack": {
+      "status": "FAILED",
+      "pass_rate": 60.9,
+      "duration_ms": 2414
+    },
+    "notion": {
+      "status": "FAILED",
+      "pass_rate": 60.57,
+      "duration_ms": 2096
+    },
+    "linear": {
+      "status": "FAILED",
+      "pass_rate": 84.16,
+      "duration_ms": 3243
+    },
+    "trello": {
+      "status": "FAILED",
+      "pass_rate": 78.67,
+      "duration_ms": 3856
+    },
+    "braintree": {
+      "status": "FAILED",
+      "pass_rate": 72.99,
+      "duration_ms": 3331
+    },
+    "chargebee": {
+      "status": "FAILED",
+      "pass_rate": 74.53,
+      "duration_ms": 2665
+    },
+    "circle": {
+      "status": "CERTIFIED",
+      "pass_rate": 94.74,
+      "duration_ms": 2019
+    },
+    "couchdb": {
+      "status": "FAILED",
+      "pass_rate": 68.33,
+      "duration_ms": 2552
+    },
+    "duckdb": {
+      "status": "FAILED",
+      "pass_rate": 76.66,
+      "duration_ms": 3292
+    },
+    "ercot": {
+      "status": "FAILED",
+      "pass_rate": 76.94,
+      "duration_ms": 3915
+    },
+    "faunadb": {
+      "status": "FAILED",
+      "pass_rate": 77.09,
+      "duration_ms": 3848
+    },
+    "gentrack-g2": {
+      "status": "FAILED",
+      "pass_rate": 64.66,
+      "duration_ms": 3177
+    },
+    "gitlab": {
+      "status": "FAILED",
+      "pass_rate": 84.12,
+      "duration_ms": 3096
+    },
+    "influxdb": {
+      "status": "FAILED",
+      "pass_rate": 65.66,
+      "duration_ms": 2979
+    },
+    "jira": {
+      "status": "FAILED",
+      "pass_rate": 62.05,
+      "duration_ms": 2536
+    },
+    "netlify": {
+      "status": "FAILED",
+      "pass_rate": 89.91,
+      "duration_ms": 2953
+    },
+    "onedrive": {
+      "status": "FAILED",
+      "pass_rate": 64.46,
+      "duration_ms": 2258
+    },
+    "oracle-utilities": {
+      "status": "FAILED",
+      "pass_rate": 65.4,
+      "duration_ms": 3251
+    },
+    "oracle": {
+      "status": "FAILED",
+      "pass_rate": 85.98,
+      "duration_ms": 2484
+    },
+    "pagerduty": {
+      "status": "CERTIFIED",
+      "pass_rate": 94.29,
+      "duration_ms": 3616
+    },
+    "posthog": {
+      "status": "FAILED",
+      "pass_rate": 64.32,
+      "duration_ms": 3191
+    },
+    "quickbooks": {
+      "status": "FAILED",
+      "pass_rate": 78.03,
+      "duration_ms": 3405
+    },
+    "rest-api": {
+      "status": "FAILED",
+      "pass_rate": 62.06,
+      "duration_ms": 3203
+    },
+    "retool": {
+      "status": "FAILED",
+      "pass_rate": 60.5,
+      "duration_ms": 2258
+    },
+    "sap-isu": {
+      "status": "FAILED",
+      "pass_rate": 85.51,
+      "duration_ms": 2389
+    },
+    "segment": {
+      "status": "CERTIFIED",
+      "pass_rate": 90.8,
+      "duration_ms": 2144
+    },
+    "sendgrid": {
+      "status": "FAILED",
+      "pass_rate": 71.89,
+      "duration_ms": 3979
+    },
+    "servicenow": {
+      "status": "FAILED",
+      "pass_rate": 71.48,
+      "duration_ms": 2603
+    },
+    "shopify": {
+      "status": "FAILED",
+      "pass_rate": 80.66,
+      "duration_ms": 3593
+    },
+    "spanner": {
+      "status": "CERTIFIED",
+      "pass_rate": 92.06,
+      "duration_ms": 2345
+    },
+    "stripe": {
+      "status": "FAILED",
+      "pass_rate": 88.64,
+      "duration_ms": 3591
+    },
+    "supabase": {
+      "status": "FAILED",
+      "pass_rate": 64.03,
+      "duration_ms": 3860
+    },
+    "twilio": {
+      "status": "FAILED",
+      "pass_rate": 88.47,
+      "duration_ms": 3498
+    },
+    "webflow": {
+      "status": "FAILED",
+      "pass_rate": 60.74,
+      "duration_ms": 3851
+    },
+    "wordpress": {
+      "status": "CERTIFIED",
+      "pass_rate": 91.67,
+      "duration_ms": 3881
+    },
+    "xero": {
+      "status": "FAILED",
+      "pass_rate": 64.81,
+      "duration_ms": 3770
+    },
+    "planetscale": {
+      "status": "FAILED",
+      "pass_rate": 69.44,
+      "duration_ms": 2423
+    },
+    "starrocks": {
+      "status": "FAILED",
+      "pass_rate": 84.28,
+      "duration_ms": 2402
+    },
+    "citus": {
+      "status": "CERTIFIED",
+      "pass_rate": 92.73,
+      "duration_ms": 3931
+    },
+    "mariadb": {
+      "status": "FAILED",
+      "pass_rate": 88.27,
+      "duration_ms": 3151
+    },
+    "cockroachdb": {
+      "status": "FAILED",
+      "pass_rate": 83.32,
+      "duration_ms": 3141
+    },
+    "tidb": {
+      "status": "FAILED",
+      "pass_rate": 75.19,
+      "duration_ms": 3911
+    }
+  }
+}
