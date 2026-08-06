@@ -1,0 +1,67 @@
+TASK: Certify connectors — PHASE_2_CONTINUATION
+AGENT: DeepSeek (parallelize 3 workers)
+APPROVAL_THRESHOLD: 90%
+
+CONNECTORS_TO_TEST:
+- github (tier=tier4)
+- slack (tier=tier4)
+- intercom (tier=tier4)
+- notion (tier=tier4)
+- airtable (tier=tier4)
+- linear (tier=tier4)
+- asana (tier=tier4)
+- trello (tier=tier4)
+- amplitude (tier=tier4)
+- mixpanel (tier=tier4)
+- airtable (tier=tier5)
+- amplitude (tier=tier5)
+- asana (tier=tier5)
+- braintree (tier=tier5)
+- brevo (tier=tier5)
+- chargebee (tier=tier5)
+- circle (tier=tier5)
+- cloudflare (tier=tier5)
+- cosmosdb (tier=tier5)
+- couchdb (tier=tier5)
+- csv (tier=tier5)
+- datadog (tier=tier5)
+- duckdb (tier=tier5)
+- entso-e (tier=tier5)
+- ercot (tier=tier5)
+- firebase (tier=tier5)
+- faunadb (tier=tier5)
+- gentrack-g2 (tier=tier5)
+- gitlab (tier=tier5)
+- google-analytics (tier=tier5)
+- google-sheets (tier=tier5)
+- hubspot (tier=tier5)
+- influxdb (tier=tier5)
+- intercom (tier=tier5)
+- jira (tier=tier5)
+- klaviyo (tier=tier5)
+- kraken (tier=tier5)
+- loom (tier=tier5)
+- mailchimp (tier=tier5)
+- microsoft-teams (tier=tier5)
+- mixpanel (tier=tier5)
+- neo4j (tier=tier5)
+- netlify (tier=tier5)
+- netsuite (tier=tier5)
+- newrelic (tier=tier5)
+
+TEST_SUITE: 17 tests per connector
+- Unit: 6 tests
+- Schema: 3 tests
+- Integration: 4 tests
+- E2E: 2 tests
+- Benchmark: 2 tests
+
+PARALLEL_CONFIG:
+  workers: 3
+  timeout_per_connector: 300s
+  batch_size: 3
+
+APPROVAL_GATE:
+  pass_rate >= 90% → CERTIFIED
+
+OUTPUT_FORMAT: JSON with metrics per connector
