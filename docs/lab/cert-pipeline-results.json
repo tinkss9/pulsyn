@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "run_at": "2026-08-06T22:22:49.077Z",
-    "mode": "quick",
-    "total": 10,
+    "run_at": "2026-08-06T22:44:55.660Z",
+    "mode": "full",
+    "total": 30,
     "certified": 3,
     "failed": 5,
-    "skipped": 2
+    "skipped": 22
   },
   "results": [
     {
@@ -17,7 +17,7 @@
       "tests": {
         "connectivity": {
           "passed": true,
-          "latencyMs": 9398
+          "latencyMs": 9069
         },
         "schemaDiscovery": {
           "passed": false,
@@ -47,8 +47,8 @@
         }
       },
       "passRate": 100,
-      "certifiedAt": "2026-08-06T22:22:08.666Z",
-      "evidence": "25/25 tests passed in 9398ms"
+      "certifiedAt": "2026-08-06T22:44:16.614Z",
+      "evidence": "25/25 tests passed in 9069ms"
     },
     {
       "id": "mysql",
@@ -59,7 +59,7 @@
       "tests": {
         "connectivity": {
           "passed": true,
-          "latencyMs": 8980
+          "latencyMs": 8780
         },
         "schemaDiscovery": {
           "passed": false,
@@ -89,8 +89,8 @@
         }
       },
       "passRate": 100,
-      "certifiedAt": "2026-08-06T22:22:18.066Z",
-      "evidence": "25/25 tests passed in 8980ms"
+      "certifiedAt": "2026-08-06T22:44:25.684Z",
+      "evidence": "25/25 tests passed in 8780ms"
     },
     {
       "id": "mongodb",
@@ -101,7 +101,7 @@
       "tests": {
         "connectivity": {
           "passed": true,
-          "latencyMs": 8928
+          "latencyMs": 8748
         },
         "schemaDiscovery": {
           "passed": false,
@@ -131,8 +131,8 @@
         }
       },
       "passRate": 100,
-      "certifiedAt": "2026-08-06T22:22:27.047Z",
-      "evidence": "25/25 tests passed in 8928ms"
+      "certifiedAt": "2026-08-06T22:44:34.466Z",
+      "evidence": "25/25 tests passed in 8748ms"
     },
     {
       "id": "mssql",
@@ -173,7 +173,7 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:35.976Z",
+      "certifiedAt": "2026-08-06T22:44:43.214Z",
       "evidence": "Command failed: npx vitest run packages/core/src/__tests__/lab/connectors/mssql.test.ts --reporter=json --testTimeout=30000"
     },
     {
@@ -215,7 +215,7 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:40.836Z",
+      "certifiedAt": "2026-08-06T22:44:47.611Z",
       "evidence": "Connector file not found"
     },
     {
@@ -257,7 +257,7 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:40.837Z",
+      "certifiedAt": "2026-08-06T22:44:47.612Z",
       "evidence": "Command failed: npx vitest run packages/core/src/__tests__/lab/connectors/salesforce-real.test.ts --reporter=json --testTimeout=30000"
     },
     {
@@ -299,7 +299,7 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:42.897Z",
+      "certifiedAt": "2026-08-06T22:44:49.619Z",
       "evidence": "Command failed: npx vitest run packages/core/src/__tests__/lab/connectors/stripe-real.test.ts --reporter=json --testTimeout=30000"
     },
     {
@@ -341,7 +341,7 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:44.886Z",
+      "certifiedAt": "2026-08-06T22:44:51.664Z",
       "evidence": "Command failed: npx vitest run packages/core/src/__tests__/lab/connectors/hubspot-real.test.ts --reporter=json --testTimeout=30000"
     },
     {
@@ -383,7 +383,7 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:46.989Z",
+      "certifiedAt": "2026-08-06T22:44:53.668Z",
       "evidence": "Command failed: npx vitest run packages/core/src/__tests__/lab/connectors/google-analytics-real.test.ts --reporter=json --testTimeout=30000"
     },
     {
@@ -425,8 +425,848 @@
         }
       },
       "passRate": 0,
-      "certifiedAt": "2026-08-06T22:22:49.077Z",
+      "certifiedAt": "2026-08-06T22:44:55.657Z",
       "evidence": "No credentials configured. Free development store"
+    },
+    {
+      "id": "snowflake-real",
+      "name": "Snowflake",
+      "tier": 2,
+      "category": "warehouse",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.657Z",
+      "evidence": "No credentials configured. Free trial"
+    },
+    {
+      "id": "bigquery-real",
+      "name": "BigQuery",
+      "tier": 2,
+      "category": "warehouse",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.657Z",
+      "evidence": "No credentials configured. Free sandbox"
+    },
+    {
+      "id": "redshift-real",
+      "name": "Redshift",
+      "tier": 2,
+      "category": "warehouse",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.657Z",
+      "evidence": "No credentials configured. Free tier Serverless"
+    },
+    {
+      "id": "databricks-real",
+      "name": "Databricks",
+      "tier": 2,
+      "category": "warehouse",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Community Edition"
+    },
+    {
+      "id": "elasticsearch-real",
+      "name": "Elasticsearch",
+      "tier": 2,
+      "category": "database",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Docker local"
+    },
+    {
+      "id": "slack-real",
+      "name": "Slack",
+      "tier": 2,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Free workspace + app"
+    },
+    {
+      "id": "jira-real",
+      "name": "Jira",
+      "tier": 2,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Free Cloud (10 users)"
+    },
+    {
+      "id": "mailchimp-real",
+      "name": "Mailchimp",
+      "tier": 2,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Free (500 contacts)"
+    },
+    {
+      "id": "zendesk-real",
+      "name": "Zendesk",
+      "tier": 2,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Free trial (14 days)"
+    },
+    {
+      "id": "google-ads-real",
+      "name": "Google Ads",
+      "tier": 2,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.658Z",
+      "evidence": "No credentials configured. Free account"
+    },
+    {
+      "id": "netsuite-real",
+      "name": "NetSuite",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. Free trial"
+    },
+    {
+      "id": "sap-real",
+      "name": "SAP",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. SAP Cloud trial"
+    },
+    {
+      "id": "marketo-real",
+      "name": "Marketo",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. Free trial"
+    },
+    {
+      "id": "facebook-ads-real",
+      "name": "Facebook Ads",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. Free developer account"
+    },
+    {
+      "id": "intercom-real",
+      "name": "Intercom",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. Free trial (14 days)"
+    },
+    {
+      "id": "freshdesk-real",
+      "name": "Freshdesk",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. Free tier (10 agents)"
+    },
+    {
+      "id": "monday-real",
+      "name": "Monday.com",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.659Z",
+      "evidence": "No credentials configured. Free plan (2 seats)"
+    },
+    {
+      "id": "asana-real",
+      "name": "Asana",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.660Z",
+      "evidence": "No credentials configured. Free plan"
+    },
+    {
+      "id": "paypal-real",
+      "name": "PayPal",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.660Z",
+      "evidence": "No credentials configured. Free sandbox"
+    },
+    {
+      "id": "notion-real",
+      "name": "Notion",
+      "tier": 3,
+      "category": "saas",
+      "status": "NO_CREDENTIALS",
+      "tests": {
+        "connectivity": {
+          "passed": false,
+          "latencyMs": 0
+        },
+        "schemaDiscovery": {
+          "passed": false,
+          "tablesFound": 0
+        },
+        "performance": {
+          "passed": false,
+          "throughputRowsSec": 0,
+          "p50Ms": 0,
+          "p99Ms": 0
+        },
+        "volume": {
+          "passed": false,
+          "maxRowsTested": 0,
+          "memoryMB": 0
+        },
+        "security": {
+          "passed": false,
+          "authReject": false,
+          "configMasking": false
+        },
+        "incremental": {
+          "passed": false
+        },
+        "errorHandling": {
+          "passed": false
+        }
+      },
+      "passRate": 0,
+      "certifiedAt": "2026-08-06T22:44:55.660Z",
+      "evidence": "No credentials configured. Free plan"
     }
   ]
 }

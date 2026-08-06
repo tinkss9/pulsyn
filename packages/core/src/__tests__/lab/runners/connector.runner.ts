@@ -102,6 +102,19 @@ const COMMUNITY_ENGINES = [
   'worldtimeapi', 'ipinfo-free', 'ip-api-free', 'randomuser-me',
   'kanye-rest', 'ron-swanson', 'tronalddump-random', 'chuck-norris-random', 'jokeapi-random',
   'public-apis-list', 'httpbin-all', 'reqres-users', 'fakestore-v2', 'dummyjson-products',
+  // Batch 6: 48 more APIs
+  'dockerhub-search', 'npm-details', 'pypi-package', 'rubygems-package', 'crates-package',
+  'hackernews-item', 'reddit-rising', 'lobsters-newest', 'devto-articles', 'hashnode-posts',
+  'nasa-apod-v2', 'spacex-v4', 'opennotify-v2', 'solarsystem-bodies',
+  'pokemontcg-v2', 'scryfall-cards', 'yugioh-cards', 'magic-cards', 'open5e-spells', 'deckofcards-shuffle',
+  'themealdb-categories', 'thecocktaildb-lists', 'openfoodfacts-search',
+  'restcountries-all', 'zippopotam-us', 'nominatim-search', 'geocode-farm',
+  'wttr-in', 'openweathermap-free',
+  'coindesk-bpi', 'blockchain-ticker', 'exchangerate-free',
+  'quotable-random', 'zenquotes-random', 'stoic-quotes', 'advice-slip-random', 'useless-facts', 'bored-api',
+  'github-zen-v3', 'gitlab-public-v2',
+  'github-status-v2', 'stripe-status', 'slack-status',
+  'publicapis-random', 'httpbin-uuid', 'httpbin-base64', 'randomuser-v2', 'ipapi-v2',
 ];
 
 // All registered connector names — auto-populated at test time
