@@ -1349,3 +1349,15 @@ import './stripe-real';
 import './hubspot-real';
 import './google-analytics-real';
 import './shopify-real';
+
+// Tier 2 Connectors — Real API Integration
+import './snowflake-real';
+import './bigquery-real';
+import './redshift-real';
+import './databricks-real';
+import './elasticsearch-real';
+import './slack-real';
+import './jira-real';
+import './mailchimp-real';
+import './zendesk-real';
+import './google-ads-real';
