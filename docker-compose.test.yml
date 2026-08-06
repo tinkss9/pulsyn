@@ -30,3 +30,44 @@ services:
     image: wiremock/wiremock:latest
     ports: ['8080:8080']
     volumes: ['./fixtures/wiremock:/home/wiremock/mappings']
+  # Lane B: Additional databases
+  mariadb:
+    image: mariadb:11
+    ports: ['3307:3306']
+    environment: { MARIADB_ROOT_PASSWORD: test, MARIADB_DATABASE: testdb }
+  cockroachdb:
+    image: cockroachdb/cockroach:latest
+    ports: ['26257:26257', '8081:8080']
+    command: start-single-node --insecure
+  neo4j:
+    image: neo4j:5
+    ports: ['7474:7474', '7687:7687']
+    environment: { NEO4J_AUTH: neo4j/testpassword }
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports: ['8123:8123', '9000:9000']
+    environment: { CLICKHOUSE_USER: test, CLICKHOUSE_PASSWORD: test, CLICKHOUSE_DB: testdb }
+  influxdb:
+    image: influxdb:2.7
+    ports: ['8086:8086']
+    environment: { DOCKER_INFLUXDB_INIT_MODE: setup, DOCKER_INFLUXDB_INIT_USERNAME: test, DOCKER_INFLUXDB_INIT_PASSWORD: testtest, DOCKER_INFLUXDB_INIT_ORG: testorg, DOCKER_INFLUXDB_INIT_BUCKET: testdb, DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: testtoken }
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    ports: ['9200:9200']
+    environment: { discovery.type: single-node, xpack.security.enabled: 'false', ES_JAVA_OPTS: '-Xms512m -Xmx512m' }
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    ports: ['5433:5432']
+    environment: { POSTGRES_USER: test, POSTGRES_PASSWORD: test, POSTGRES_DB: testdb }
+  cassandra:
+    image: cassandra:4.1
+    ports: ['9042:9042']
+    environment: { CASSANDRA_DC: datacenter1 }
+  scylladb:
+    image: scylladb/scylla:latest
+    ports: ['9043:9042']
+    command: --smp 1 --memory 512M
+  duckdb:
+    image: python:3.11-slim
+    ports: ['8082:8080']
+    command: pip install duckdb && python -c "import duckdb; print('DuckDB ready')"
