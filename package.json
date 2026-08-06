@@ -17,7 +17,7 @@
     "build": "turbo build",
     "test": "turbo test",
     "test:unit": "turbo test --filter='./packages/*'",
-    "test:integration": "npm run test --workspace=packages/core -- src/__tests__/integration",
+    "test:integration": "npm run test --workspace=packages/core -- src/__tests__/integration/test-mongodb-live.test.ts src/__tests__/integration/test-mysql-live.test.ts src/__tests__/integration/test-postgres-live.test.ts src/__tests__/integration/test-redis-live.test.ts src/__tests__/integration/test-s3-localstack.test.ts src/__tests__/integration/test-target-mongodb.test.ts src/__tests__/integration/test-target-postgres.test.ts",
     "test:e2e": "playwright test",
     "test:bench": "turbo test --filter='./tests/benchmarks'",
     "lint": "turbo lint",
