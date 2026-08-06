@@ -1361,3 +1361,15 @@ import './jira-real';
 import './mailchimp-real';
 import './zendesk-real';
 import './google-ads-real';
+
+// Tier 3 Connectors — Real API Integration
+import './netsuite-real';
+import './sap-real';
+import './marketo-real';
+import './facebook-ads-real';
+import './intercom-real';
+import './freshdesk-real';
+import './monday-real';
+import './asana-real';
+import './paypal-real';
+import './notion-real';
