@@ -1,11 +1,11 @@
 {
-  "started_at": "2026-08-05 17:54:16",
+  "started_at": "2026-08-06 18:40:00",
   "pids": {
-    "integration": 40756,
-    "certification": 25224
+    "integration": 3448,
+    "certification": 39808
   },
-  "logs": {
-    "integration": "C:\\Users\\onein\\pulsyn\\docs\\lab\\results\\integration-run.log",
-    "certification": "C:\\Users\\onein\\pulsyn\\docs\\lab\\results\\cert-run.log"
+  "commands": {
+    "integration": "npm run test:integration",
+    "certification": "npm run cert:setup && npm run cert:run-local"
   }
 }

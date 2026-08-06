@@ -1,0 +1,85 @@
+TASK: Certify connectors — PHASE_1_TIER_PRIORITY
+AGENT: DeepSeek (parallelize 3 workers)
+APPROVAL_THRESHOLD: 95%
+
+CONNECTORS_TO_TEST:
+- stripe (tier=tier2)
+- shopify (tier=tier2)
+- jira (tier=tier2)
+- bigquery (tier=tier3)
+- snowflake (tier=tier3)
+- github (tier=tier4)
+- slack (tier=tier4)
+- notion (tier=tier4)
+- linear (tier=tier4)
+- trello (tier=tier4)
+- braintree (tier=tier5)
+- chargebee (tier=tier5)
+- circle (tier=tier5)
+- couchdb (tier=tier5)
+- duckdb (tier=tier5)
+- ercot (tier=tier5)
+- faunadb (tier=tier5)
+- gentrack-g2 (tier=tier5)
+- gitlab (tier=tier5)
+- influxdb (tier=tier5)
+- jira (tier=tier5)
+- netlify (tier=tier5)
+- notion (tier=tier5)
+- onedrive (tier=tier5)
+- oracle-utilities (tier=tier5)
+- oracle (tier=tier5)
+- pagerduty (tier=tier5)
+- posthog (tier=tier5)
+- quickbooks (tier=tier5)
+- rest-api (tier=tier5)
+- retool (tier=tier5)
+- sap-isu (tier=tier5)
+- segment (tier=tier5)
+- sendgrid (tier=tier5)
+- servicenow (tier=tier5)
+- shopify (tier=tier5)
+- slack (tier=tier5)
+- spanner (tier=tier5)
+- stripe (tier=tier5)
+- supabase (tier=tier5)
+- twilio (tier=tier5)
+- webflow (tier=tier5)
+- wordpress (tier=tier5)
+- xero (tier=tier5)
+- planetscale (tier=tier5)
+- starrocks (tier=tier5)
+- citus (tier=tier5)
+- mariadb (tier=tier5)
+- cockroachdb (tier=tier5)
+- tidb (tier=tier5)
+- calendly (tier=tier5)
+- zoom (tier=tier5)
+- dropbox (tier=tier5)
+- pulsar (tier=tier5)
+- rabbitmq (tier=tier5)
+- activemq (tier=tier5)
+- nats (tier=tier5)
+- mqtt (tier=tier5)
+- gcs (tier=tier5)
+- azure-blob (tier=tier5)
+- backblaze-b2 (tier=tier5)
+- wasabi (tier=tier5)
+- linode-object (tier=tier5)
+
+TEST_SUITE: 17 tests per connector
+- Unit: 6 tests
+- Schema: 3 tests
+- Integration: 4 tests
+- E2E: 2 tests
+- Benchmark: 2 tests
+
+PARALLEL_CONFIG:
+  workers: 3
+  timeout_per_connector: 300s
+  batch_size: 3
+
+APPROVAL_GATE:
+  pass_rate >= 95% → CERTIFIED
+
+OUTPUT_FORMAT: JSON with metrics per connector
