@@ -33,7 +33,7 @@ function AIChat() {
       const lower = userMsg.toLowerCase();
 
       if (lower.includes('connector') || lower.includes('how many')) {
-        response = 'Pulsyn has 763 connectors covering databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, education, government, logistics, travel, and more. 756 are solid implementations with real drivers and API calls (99.1% quality rate). We have the most connectors of any CDC platform.';
+        response = 'Pulsyn is building a broad connector catalog covering databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, education, government, logistics, travel, and more. Connector certification is in progress; verified results will be published as testing completes.';
       } else if (lower.includes('price') || lower.includes('cost') || lower.includes('how much')) {
         response = 'Pulsyn starts free (3 pipelines, 1K rows/day). Starter is $99/mo, Pro is $499/mo, Business is $1,999/mo, and Enterprise starts at $9,999/mo. We offer enterprise-grade features at startup-friendly prices.';
       } else if (lower.includes('fast') || lower.includes('latency') || lower.includes('real-time')) {
@@ -51,7 +51,7 @@ function AIChat() {
       } else if (lower.includes('healthcare') || lower.includes('hipaa') || lower.includes('medical')) {
         response = 'We have 8 healthcare connectors: Epic, Cerner, Athenahealth, eClinicalWorks, NextGen, MEDITECH, Practice Fusion, and drchrono. All support FHIR endpoints. Self-hosted deployment available for HIPAA compliance.';
       } else if (lower.includes('test') || lower.includes('demo') || lower.includes('try')) {
-        response = 'Try our demo at pulsynai.com/demo — no signup required. We have 5 demo connectors (PostgreSQL, MySQL, Stripe, Shopify, HubSpot) with simulated data. See real-time metrics, data flow, and pipeline health.';
+        response = 'Try our demo at pulsynai.com/demo — no signup required. We have 5 demo connectors (PostgreSQL, MySQL, Stripe, Shopify, HubSpot) with simulated data. See real-time metrics, data flow, and pipeline health. *Demo data is simulated.*';
       } else {
         response = 'I can help with: connector selection, pricing, setup guides, AI agent integration (MCP), self-hosted deployment, and specific industry use cases. For competitor comparisons, visit our /vs/ pages. What would you like to know?';
       }
@@ -147,7 +147,7 @@ export default function LandingPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span className="text-cyan-200 text-sm font-medium">763 connectors — most in the industry</span>
+            <span className="text-cyan-200 text-sm font-medium">Growing connector catalog</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 60px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.4)' }}>
@@ -157,7 +157,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl text-white/80 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-            763 connectors. &lt;1 second CDC. AI-powered schema mapping. Starting free.
+            Real-time CDC. AI-powered schema mapping. Starting free.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -169,7 +169,7 @@ export default function LandingPage() {
             </a>
           </div>
 
-          <p className="text-gray-400 text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>No credit card · Free forever · 763 connectors</p>
+          <p className="text-gray-400 text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>No credit card · Free forever · Growing catalog</p>
         </div>
       </section>
 
@@ -196,9 +196,9 @@ export default function LandingPage() {
       <section className="py-12 px-6 border-y border-white/5">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { value: '763', label: 'Connectors' },
+            { value: '1,068', label: 'Connector modules' },
             { value: '<1s', label: 'CDC Latency' },
-            { value: '99.1%', label: 'Quality Rate' },
+            { value: 'In progress', label: 'Certification' },
             { value: '10x', label: 'Cheaper than Fivetran' },
           ].map((stat) => (
             <div key={stat.label}>
@@ -216,7 +216,7 @@ export default function LandingPage() {
           <p className="text-gray-400 text-lg mb-12 text-center max-w-2xl mx-auto">No Kafka. No DevOps. No code. Just connect, map, and replicate.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { step: '1', title: 'Connect', desc: 'Pick your source and target from 763 connectors. Test connection instantly.', icon: '🔌' },
+              { step: '1', title: 'Connect', desc: 'Pick your source and target from our connector catalog. Test connection instantly.', icon: '🔌' },
               { step: '2', title: 'Map', desc: 'AI auto-maps schemas. Resolve conflicts with one click. Add masking rules.', icon: '🧠' },
               { step: '3', title: 'Replicate', desc: 'Start CDC. Data flows in real-time. Checkpoint recovery if anything fails.', icon: '⚡' },
             ].map((s) => (
@@ -387,11 +387,11 @@ export default function LandingPage() {
               { icon: Zap, title: 'Real-time CDC', desc: 'Log-based capture with sub-second latency. No polling, no batch jobs.' },
               { icon: RefreshCw, title: 'Checkpoint Recovery', desc: 'Exactly-once semantics. Resume from any point after failure.' },
               { icon: Cpu, title: 'AI Agent Integration', desc: '26 MCP tools. Control pipelines from Claude, Cursor, or any agent.' },
-              { icon: Layers, title: 'AI Schema Mapping', desc: 'Auto-map fields across 763 connectors. Type inference. Conflict resolution.' },
+              { icon: Layers, title: 'AI Schema Mapping', desc: 'Auto-map fields across your connector catalog. Type inference. Conflict resolution.' },
               { icon: Shield, title: 'In-flight Masking', desc: 'Hash, redact, or format-preserving encryption during replication.' },
               { icon: BarChart3, title: 'Connector Certification', desc: 'Measured throughput and correctness benchmarks per pair.' },
               { icon: Lock, title: 'Enterprise Security', desc: 'API keys, rate limiting, IP blocking, brute-force protection.' },
-              { icon: Database, title: '763 Connectors', desc: 'Databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, and more.' },
+              { icon: Database, title: 'Connector Catalog', desc: 'Databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, and more.' },
               { icon: Cloud, title: 'Deploy Anywhere', desc: 'Self-hosted, managed cloud, or hybrid. Docker or Vercel.' },
               { icon: Eye, title: 'Real-time Monitoring', desc: 'Pipeline health, latency, throughput, errors. Grafana integration.' },
               { icon: Grid3X3, title: 'Data Mesh', desc: 'Multi-tenant, governance, compliance. Enterprise-grade data mesh.' },
@@ -413,9 +413,9 @@ export default function LandingPage() {
       <section id="connectors" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">763 connectors. All certified.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Connector catalog.</h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              756 solid implementations (99.1%). 7 shell connectors (0.9%). Industry-best quality rate.
+              Connector certification is in progress. Verified pass/fail results will be published as testing completes.
             </p>
           </div>
 
@@ -444,7 +444,7 @@ export default function LandingPage() {
 
           <div className="text-center mt-12">
             <Link href="/demo" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3.5 rounded-xl text-lg font-semibold transition-all">
-              Browse All 763 Connectors →
+              Browse All Connector Catalog →
             </Link>
           </div>
         </div>
@@ -461,7 +461,7 @@ export default function LandingPage() {
                 <span className="text-gray-500">It knows every connector, every feature.</span>
               </h2>
               <p className="text-lg text-gray-400 mb-8">
-                Our AI has full context of all 763 connectors, pricing, setup guides, and competitor comparisons. Ask it anything — from &quot;which connector for PostgreSQL?&quot; to &quot;how does Pulsyn compare to Fivetran?&quot;
+                Our AI has full context of our connector catalog, pricing, setup guides, and competitor comparisons. Ask it anything — from &quot;which connector for PostgreSQL?&quot; to &quot;how does Pulsyn compare to Fivetran?&quot;
               </p>
               <div className="space-y-4">
                 {[
@@ -492,7 +492,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
               { name: 'Free', price: '$0', desc: 'Try Pulsyn risk-free', features: ['3 pipelines', '50K rows/day', '3 connectors', 'Community support'] },
-              { name: 'Pro', price: '$499', desc: 'For growing teams', features: ['Unlimited pipelines', '5M rows/day', 'All 763 connectors', 'AI schema mapping', 'MCP server (26 tools)', 'API access', 'Priority support'], popular: true },
+              { name: 'Pro', price: '$499', desc: 'For growing teams', features: ['Unlimited pipelines', '5M rows/day', 'All connectors', 'AI schema mapping', 'MCP server (26 tools)', 'API access', 'Priority support'], popular: true },
               { name: 'Business', price: '$3,500', desc: 'For production workloads', features: ['Everything in Pro', '100M rows/day', 'SSO + RBAC', 'Audit logs', 'Custom connectors', '99.99% SLA', 'Dedicated support'] },
               { name: 'Enterprise', price: 'Custom', desc: 'For large organizations', features: ['Everything in Business', 'Unlimited rows', 'On-prem deployment', 'Dedicated engineer', '99.999% SLA', 'Custom integrations'], enterprise: true },
             ].map((tier) => (

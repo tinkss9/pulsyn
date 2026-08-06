@@ -141,7 +141,7 @@ export default function BillingPage() {
                 </li>
                 <li className="text-sm flex items-center gap-2">
                   <span className="text-green-500">✓</span>
-                  <span>{tier.features.connectors === -1 ? 'All 763' : tier.features.connectors} connectors</span>
+                  <span>{tier.features.connectors === -1 ? 'All connectors' : tier.features.connectors} connectors</span>
                 </li>
                 <li className="text-sm flex items-center gap-2">
                   <span className="text-green-500">✓</span>

@@ -33,7 +33,7 @@ export async function GET() {
       {
         id: 'data-lake-sync',
         name: 'Data Lake Sync',
-        description: 'Continuous replication from 763 sources to your data lake (S3, GCS, Azure Blob, Snowflake, BigQuery). Optimized for analytics workloads.',
+        description: 'Continuous replication from your sources to your data lake (S3, GCS, Azure Blob, Snowflake, BigQuery). Optimized for analytics workloads.',
         price: { setup: 15000, monthly: 3000 },
         timeline: '4-8 weeks',
         deliverables: ['Multi-source connectors', 'Lake-optimized schema', 'Incremental sync', 'Partitioning strategy', 'Cost optimization'],

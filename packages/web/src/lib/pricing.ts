@@ -8,7 +8,7 @@ export interface PricingTier {
   features: {
     pipelines: number; // -1 = unlimited
     rowsPerDay: number; // -1 = unlimited
-    connectors: number; // -1 = all 763
+    connectors: number; // -1 = all connectors
     latency: string;
     support: string;
     aiMapping: boolean;
