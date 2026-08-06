@@ -1342,3 +1342,10 @@ import './deflate';
 import './encoding';
 import './cache';
 import './etag';
+
+// Tier 1 SaaS Connectors — Real API Integration
+import './salesforce-real';
+import './stripe-real';
+import './hubspot-real';
+import './google-analytics-real';
+import './shopify-real';
