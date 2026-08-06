@@ -2,4 +2,6 @@
 // Cross-platform wrapper for cert:run-local
 // Sets NODE_ENV=test before loading the controller.
 process.env.NODE_ENV = 'test';
-await import('./controller');
+(async () => {
+  await import('./controller');
+})();
