@@ -1521,3 +1521,15 @@ import './box-api';
 import './twitter-api';
 import './mastodon-api';
 import './reddit-api';
+
+// Chinese Market Connectors
+import './tencentdb';
+import './gaussdb';
+import './polardb';
+import './analyticdb';
+import './tdsql';
+import './huawei-rds';
+import './aliyun-rds';
+import './cynosdb';
+import './gaussdb-mysql';
+import './tablestore';

@@ -71,3 +71,38 @@ services:
     image: python:3.11-slim
     ports: ['8082:8080']
     command: pip install duckdb && python -c "import duckdb; print('DuckDB ready')"
+  # Additional databases for verification
+  singlestore:
+    image: singlestore/cluster-in-a-box:latest
+    ports: ['3308:3306', '8083:8080']
+    environment: { ROOT_PASSWORD: test, START_AFTER_DEPLOY: 'true' }
+  yugabytedb:
+    image: yugabytedb/yugabyte:latest
+    ports: ['5434:5433', '9001:9000']
+    command: bin/yugabyted start --daemon=false
+  scylladb:
+    image: scylladb/scylla:latest
+    ports: ['9044:9042']
+    command: --smp 1 --memory 512M
+  tidb:
+    image: pingcap/tidb:latest
+    ports: ['4001:4000']
+    command: --store=mocktikv
+  raven:
+    image: ravendb/ravendb:latest
+    ports: ['8084:8080']
+    environment: { RAVEN_Setup_Mode: 'None' }
+  rethinkdb:
+    image: rethinkdb:latest
+    ports: ['8085:8080', '28016:28015']
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    ports: ['8086:8000']
+    command: start --log debug --user root --pass test
+  edgedb:
+    image: edgedb/edgedb:latest
+    ports: ['5657:5656']
+    environment: { EDGEDB_SERVER_PASSWORD: test }
+  dgraph:
+    image: dgraph/standalone:latest
+    ports: ['8087:8080', '9081:9080']
