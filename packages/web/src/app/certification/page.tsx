@@ -7,11 +7,11 @@ export const metadata: Metadata = {
 
 // Certification data (from cert-matrix.json)
 const certificationStats = {
-  totalConnectors: 1533,
-  certifiedConnectors: 1490,
-  liveTestedConnectors: 304,
-  databaseConnectors: 57,
-  saasConnectors: 1476,
+  totalConnectors: 1615,
+  certifiedConnectors: 320,
+  liveTestedConnectors: 320,
+  databaseConnectors: 67,
+  saasConnectors: 1548,
   lastUpdated: '2026-08-07',
 };
 
