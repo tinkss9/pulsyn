@@ -122,24 +122,12 @@
                                      "lane":  "B",
                                      "tested_at":  "2026-08-07"
                                  },
-                       "rickandmorty":  {
-                                            "status":  "CERTIFIED",
-                                            "pass_rate":  90.5,
-                                            "lane":  "A",
-                                            "tested_at":  "2026-08-06"
-                                        },
                        "xkcd":  {
                                     "status":  "CERTIFIED",
                                     "pass_rate":  95,
                                     "lane":  "A",
                                     "tested_at":  "2026-08-06"
                                 },
-                       "restcountries":  {
-                                             "status":  "CERTIFIED",
-                                             "pass_rate":  95,
-                                             "lane":  "A",
-                                             "tested_at":  "2026-08-06"
-                                         },
                        "dogapi":  {
                                       "status":  "CERTIFIED",
                                       "pass_rate":  95,
@@ -170,36 +158,12 @@
                                      "lane":  "A",
                                      "tested_at":  "2026-08-06"
                                  },
-                       "deezer":  {
-                                      "status":  "CERTIFIED",
-                                      "pass_rate":  95,
-                                      "lane":  "A",
-                                      "tested_at":  "2026-08-06"
-                                  },
-                       "opendota":  {
-                                        "status":  "CERTIFIED",
-                                        "pass_rate":  95,
-                                        "lane":  "A",
-                                        "tested_at":  "2026-08-06"
-                                    },
-                       "kitsu":  {
-                                     "status":  "CERTIFIED",
-                                     "pass_rate":  95,
-                                     "lane":  "A",
-                                     "tested_at":  "2026-08-06"
-                                 },
                        "gitlab-public":  {
                                              "status":  "CERTIFIED",
                                              "pass_rate":  95,
                                              "lane":  "A",
                                              "tested_at":  "2026-08-06"
                                          },
-                       "disneyapi":  {
-                                         "status":  "CERTIFIED",
-                                         "pass_rate":  95,
-                                         "lane":  "A",
-                                         "tested_at":  "2026-08-06"
-                                     },
                        "potterapi":  {
                                          "status":  "CERTIFIED",
                                          "pass_rate":  95,
@@ -224,24 +188,12 @@
                                             "lane":  "A",
                                             "tested_at":  "2026-08-06"
                                         },
-                       "clevelandart":  {
-                                            "status":  "CERTIFIED",
-                                            "pass_rate":  95,
-                                            "lane":  "A",
-                                            "tested_at":  "2026-08-06"
-                                        },
                        "keycloak":  {
                                         "status":  "CERTIFIED",
                                         "pass_rate":  95,
                                         "lane":  "A",
                                         "tested_at":  "2026-08-06"
                                     },
-                       "magicthegathering":  {
-                                                 "status":  "CERTIFIED",
-                                                 "pass_rate":  95,
-                                                 "lane":  "A",
-                                                 "tested_at":  "2026-08-06"
-                                             },
                        "quotegarden":  {
                                            "status":  "CERTIFIED",
                                            "pass_rate":  95,
@@ -254,12 +206,6 @@
                                               "lane":  "A",
                                               "tested_at":  "2026-08-06"
                                           },
-                       "dictionary":  {
-                                          "status":  "CERTIFIED",
-                                          "pass_rate":  95,
-                                          "lane":  "A",
-                                          "tested_at":  "2026-08-06"
-                                      },
                        "deckofcards2":  {
                                             "status":  "CERTIFIED",
                                             "pass_rate":  95,
@@ -362,18 +308,6 @@
                                           "lane":  "A",
                                           "tested_at":  "2026-08-06"
                                       },
-                       "sportsdb":  {
-                                        "status":  "CERTIFIED",
-                                        "pass_rate":  95,
-                                        "lane":  "A",
-                                        "tested_at":  "2026-08-07"
-                                    },
-                       "nba-api":  {
-                                       "status":  "CERTIFIED",
-                                       "pass_rate":  95,
-                                       "lane":  "A",
-                                       "tested_at":  "2026-08-07"
-                                   },
                        "harrypotter":  {
                                            "status":  "CERTIFIED",
                                            "pass_rate":  95,
@@ -428,18 +362,6 @@
                                           "lane":  "A",
                                           "tested_at":  "2026-08-07"
                                       },
-                       "openlibrary-search":  {
-                                                  "status":  "CERTIFIED",
-                                                  "pass_rate":  95,
-                                                  "lane":  "A",
-                                                  "tested_at":  "2026-08-07"
-                                              },
-                       "gutendex2":  {
-                                         "status":  "CERTIFIED",
-                                         "pass_rate":  89.5,
-                                         "lane":  "A",
-                                         "tested_at":  "2026-08-07"
-                                     },
                        "github-user":  {
                                            "status":  "CERTIFIED",
                                            "pass_rate":  68.4,
@@ -1846,13 +1768,6 @@
                                        "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
-                       "restcountries-all":  {
-                                                 "pass_rate":  95,
-                                                 "status":  "CERTIFIED",
-                                                 "tested_at":  "2026-08-07T18:52:45Z",
-                                                 "method":  "Vitest live API (parallel swarm)",
-                                                 "lane":  "A"
-                                             },
                        "opennotify-v2":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
@@ -1860,20 +1775,6 @@
                                              "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
                                          },
-                       "libretranslate":  {
-                                              "pass_rate":  95,
-                                              "status":  "CERTIFIED",
-                                              "tested_at":  "2026-08-07T18:52:45Z",
-                                              "method":  "Vitest live API (parallel swarm)",
-                                              "lane":  "A"
-                                          },
-                       "mymemory":  {
-                                        "pass_rate":  95,
-                                        "status":  "CERTIFIED",
-                                        "tested_at":  "2026-08-07T18:52:45Z",
-                                        "method":  "Vitest live API (parallel swarm)",
-                                        "lane":  "A"
-                                    },
                        "randomuser-me":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
@@ -1971,6 +1872,167 @@
                                              "tested_at":  "2026-08-07T18:52:45Z",
                                              "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
-                                         }
+                                         },
+                       "clevelandart":  {
+                                            "pass_rate":  100,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T19:03:18Z",
+                                            "method":  "Vitest live API (culture+gaming batch)",
+                                            "lane":  "A"
+                                        },
+                       "openlibrary-books":  {
+                                                 "pass_rate":  100,
+                                                 "status":  "CERTIFIED",
+                                                 "tested_at":  "2026-08-07T19:03:18Z",
+                                                 "method":  "Vitest live API (culture+gaming batch)",
+                                                 "lane":  "A"
+                                             },
+                       "openlibrary-search":  {
+                                                  "pass_rate":  100,
+                                                  "status":  "CERTIFIED",
+                                                  "tested_at":  "2026-08-07T19:03:18Z",
+                                                  "method":  "Vitest live API (culture+gaming batch)",
+                                                  "lane":  "A"
+                                              },
+                       "gutendex":  {
+                                        "pass_rate":  100,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T19:03:18Z",
+                                        "method":  "Vitest live API (culture+gaming batch)",
+                                        "lane":  "A"
+                                    },
+                       "gutendex2":  {
+                                         "pass_rate":  100,
+                                         "status":  "CERTIFIED",
+                                         "tested_at":  "2026-08-07T19:03:18Z",
+                                         "method":  "Vitest live API (culture+gaming batch)",
+                                         "lane":  "A"
+                                     },
+                       "dictionary":  {
+                                          "pass_rate":  100,
+                                          "status":  "CERTIFIED",
+                                          "tested_at":  "2026-08-07T19:03:18Z",
+                                          "method":  "Vitest live API (culture+gaming batch)",
+                                          "lane":  "A"
+                                      },
+                       "mymemory":  {
+                                        "pass_rate":  100,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T19:03:18Z",
+                                        "method":  "Vitest live API (culture+gaming batch)",
+                                        "lane":  "A"
+                                    },
+                       "libretranslate":  {
+                                              "pass_rate":  100,
+                                              "status":  "CERTIFIED",
+                                              "tested_at":  "2026-08-07T19:03:18Z",
+                                              "method":  "Vitest live API (culture+gaming batch)",
+                                              "lane":  "A"
+                                          },
+                       "restcountries":  {
+                                             "pass_rate":  100,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T19:03:18Z",
+                                             "method":  "Vitest live API (culture+gaming batch)",
+                                             "lane":  "A"
+                                         },
+                       "restcountries-all":  {
+                                                 "pass_rate":  100,
+                                                 "status":  "CERTIFIED",
+                                                 "tested_at":  "2026-08-07T19:03:18Z",
+                                                 "method":  "Vitest live API (culture+gaming batch)",
+                                                 "lane":  "A"
+                                             },
+                       "opendota":  {
+                                        "pass_rate":  100,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T19:03:18Z",
+                                        "method":  "Vitest live API (culture+gaming batch)",
+                                        "lane":  "A"
+                                    },
+                       "sportsdb":  {
+                                        "pass_rate":  100,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T19:03:18Z",
+                                        "method":  "Vitest live API (culture+gaming batch)",
+                                        "lane":  "A"
+                                    },
+                       "nba-api":  {
+                                       "pass_rate":  100,
+                                       "status":  "CERTIFIED",
+                                       "tested_at":  "2026-08-07T19:03:18Z",
+                                       "method":  "Vitest live API (culture+gaming batch)",
+                                       "lane":  "A"
+                                   },
+                       "audiodb":  {
+                                       "pass_rate":  100,
+                                       "status":  "CERTIFIED",
+                                       "tested_at":  "2026-08-07T19:03:18Z",
+                                       "method":  "Vitest live API (culture+gaming batch)",
+                                       "lane":  "A"
+                                   },
+                       "deezer":  {
+                                      "pass_rate":  100,
+                                      "status":  "CERTIFIED",
+                                      "tested_at":  "2026-08-07T19:03:18Z",
+                                      "method":  "Vitest live API (culture+gaming batch)",
+                                      "lane":  "A"
+                                  },
+                       "kitsu":  {
+                                     "pass_rate":  100,
+                                     "status":  "CERTIFIED",
+                                     "tested_at":  "2026-08-07T19:03:18Z",
+                                     "method":  "Vitest live API (culture+gaming batch)",
+                                     "lane":  "A"
+                                 },
+                       "aniapi":  {
+                                      "pass_rate":  100,
+                                      "status":  "CERTIFIED",
+                                      "tested_at":  "2026-08-07T19:03:18Z",
+                                      "method":  "Vitest live API (culture+gaming batch)",
+                                      "lane":  "A"
+                                  },
+                       "yugioh-cards":  {
+                                            "pass_rate":  100,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T19:03:18Z",
+                                            "method":  "Vitest live API (culture+gaming batch)",
+                                            "lane":  "A"
+                                        },
+                       "magic-cards":  {
+                                           "pass_rate":  100,
+                                           "status":  "CERTIFIED",
+                                           "tested_at":  "2026-08-07T19:03:18Z",
+                                           "method":  "Vitest live API (culture+gaming batch)",
+                                           "lane":  "A"
+                                       },
+                       "magicthegathering":  {
+                                                 "pass_rate":  100,
+                                                 "status":  "CERTIFIED",
+                                                 "tested_at":  "2026-08-07T19:03:18Z",
+                                                 "method":  "Vitest live API (culture+gaming batch)",
+                                                 "lane":  "A"
+                                             },
+                       "rickandmorty":  {
+                                            "pass_rate":  100,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T19:03:18Z",
+                                            "method":  "Vitest live API (culture+gaming batch)",
+                                            "lane":  "A"
+                                        },
+                       "disneyapi":  {
+                                         "pass_rate":  100,
+                                         "status":  "CERTIFIED",
+                                         "tested_at":  "2026-08-07T19:03:18Z",
+                                         "method":  "Vitest live API (culture+gaming batch)",
+                                         "lane":  "A"
+                                     },
+                       "trekgeneric":  {
+                                           "pass_rate":  100,
+                                           "status":  "CERTIFIED",
+                                           "tested_at":  "2026-08-07T19:03:18Z",
+                                           "method":  "Vitest live API (culture+gaming batch)",
+                                           "lane":  "A"
+                                       }
                    }
 }
