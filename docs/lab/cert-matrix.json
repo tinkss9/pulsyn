@@ -230,18 +230,6 @@
                                             "lane":  "A",
                                             "tested_at":  "2026-08-06"
                                         },
-                       "pypi":  {
-                                    "status":  "CERTIFIED",
-                                    "pass_rate":  95,
-                                    "lane":  "A",
-                                    "tested_at":  "2026-08-06"
-                                },
-                       "npm-registry":  {
-                                            "status":  "CERTIFIED",
-                                            "pass_rate":  95,
-                                            "lane":  "A",
-                                            "tested_at":  "2026-08-06"
-                                        },
                        "keycloak":  {
                                         "status":  "CERTIFIED",
                                         "pass_rate":  95,
@@ -266,12 +254,6 @@
                                               "lane":  "A",
                                               "tested_at":  "2026-08-06"
                                           },
-                       "remoteok":  {
-                                        "status":  "CERTIFIED",
-                                        "pass_rate":  95,
-                                        "lane":  "A",
-                                        "tested_at":  "2026-08-06"
-                                    },
                        "dictionary":  {
                                           "status":  "CERTIFIED",
                                           "pass_rate":  95,
@@ -398,24 +380,12 @@
                                            "lane":  "A",
                                            "tested_at":  "2026-08-07"
                                        },
-                       "codeforces":  {
-                                          "status":  "CERTIFIED",
-                                          "pass_rate":  95,
-                                          "lane":  "A",
-                                          "tested_at":  "2026-08-07"
-                                      },
                        "dockerhub":  {
                                          "status":  "CERTIFIED",
                                          "pass_rate":  95,
                                          "lane":  "A",
                                          "tested_at":  "2026-08-07"
                                      },
-                       "nuget":  {
-                                     "status":  "CERTIFIED",
-                                     "pass_rate":  95,
-                                     "lane":  "A",
-                                     "tested_at":  "2026-08-07"
-                                 },
                        "kanye":  {
                                      "status":  "CERTIFIED",
                                      "pass_rate":  95,
@@ -560,12 +530,6 @@
                                             "lane":  "A",
                                             "tested_at":  "2026-08-07"
                                         },
-                       "pub-dev":  {
-                                       "status":  "CERTIFIED",
-                                       "pass_rate":  95,
-                                       "lane":  "A",
-                                       "tested_at":  "2026-08-07"
-                                   },
                        "chuck-norris":  {
                                             "status":  "CERTIFIED",
                                             "pass_rate":  95,
@@ -710,12 +674,6 @@
                                            "lane":  "A",
                                            "tested_at":  "2026-08-07"
                                        },
-                       "go-pkg":  {
-                                      "status":  "CERTIFIED",
-                                      "pass_rate":  95,
-                                      "lane":  "A",
-                                      "tested_at":  "2026-08-07"
-                                  },
                        "base64-encode":  {
                                              "status":  "CERTIFIED",
                                              "pass_rate":  95,
@@ -842,18 +800,6 @@
                                         "lane":  "A",
                                         "tested_at":  "2026-08-07"
                                     },
-                       "jsdelivr":  {
-                                        "status":  "CERTIFIED",
-                                        "pass_rate":  95,
-                                        "lane":  "A",
-                                        "tested_at":  "2026-08-07"
-                                    },
-                       "cocoapods":  {
-                                         "status":  "CERTIFIED",
-                                         "pass_rate":  95,
-                                         "lane":  "A",
-                                         "tested_at":  "2026-08-07"
-                                     },
                        "adventure":  {
                                          "status":  "CERTIFIED",
                                          "pass_rate":  95,
@@ -1431,522 +1377,599 @@
                                                     "method":  "Vitest live API",
                                                     "lane":  "A"
                                                 },
-                       "pokeapi":  {
-                                       "pass_rate":  95,
-                                       "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
-                                       "lane":  "A"
-                                   },
-                       "restcountries-all":  {
-                                                 "pass_rate":  95,
-                                                 "status":  "CERTIFIED",
-                                                 "tested_at":  "2026-08-07T18:51:40Z",
-                                                 "method":  "Vitest live API",
-                                                 "lane":  "A"
-                                             },
-                       "fakestore-v2":  {
-                                            "pass_rate":  95,
-                                            "status":  "CERTIFIED",
-                                            "tested_at":  "2026-08-07T18:51:40Z",
-                                            "method":  "Vitest live API",
-                                            "lane":  "A"
-                                        },
-                       "dummyjson-products":  {
-                                                  "pass_rate":  95,
-                                                  "status":  "CERTIFIED",
-                                                  "tested_at":  "2026-08-07T18:51:40Z",
-                                                  "method":  "Vitest live API",
-                                                  "lane":  "A"
-                                              },
-                       "jsonplaceholder":  {
-                                               "pass_rate":  95,
-                                               "status":  "CERTIFIED",
-                                               "tested_at":  "2026-08-07T18:51:40Z",
-                                               "method":  "Vitest live API",
-                                               "lane":  "A"
-                                           },
-                       "opennotify-v2":  {
-                                             "pass_rate":  95,
-                                             "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
-                                             "lane":  "A"
-                                         },
-                       "themealdb-categories":  {
-                                                    "pass_rate":  95,
-                                                    "status":  "CERTIFIED",
-                                                    "tested_at":  "2026-08-07T18:51:40Z",
-                                                    "method":  "Vitest live API",
-                                                    "lane":  "A"
-                                                },
-                       "thecocktaildb-lists":  {
-                                                   "pass_rate":  95,
-                                                   "status":  "CERTIFIED",
-                                                   "tested_at":  "2026-08-07T18:51:40Z",
-                                                   "method":  "Vitest live API",
-                                                   "lane":  "A"
-                                               },
-                       "pexels":  {
-                                      "pass_rate":  95,
-                                      "status":  "CERTIFIED",
-                                      "tested_at":  "2026-08-07T18:51:40Z",
-                                      "method":  "Vitest live API",
-                                      "lane":  "A"
-                                  },
-                       "libretranslate":  {
-                                              "pass_rate":  95,
-                                              "status":  "CERTIFIED",
-                                              "tested_at":  "2026-08-07T18:51:40Z",
-                                              "method":  "Vitest live API",
-                                              "lane":  "A"
-                                          },
-                       "mymemory":  {
-                                        "pass_rate":  95,
-                                        "status":  "CERTIFIED",
-                                        "tested_at":  "2026-08-07T18:51:40Z",
-                                        "method":  "Vitest live API",
-                                        "lane":  "A"
-                                    },
-                       "ipwhois":  {
-                                       "pass_rate":  95,
-                                       "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
-                                       "lane":  "A"
-                                   },
-                       "randomuser-me":  {
-                                             "pass_rate":  95,
-                                             "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
-                                             "lane":  "A"
-                                         },
-                       "lobsters-newest":  {
-                                               "pass_rate":  95,
-                                               "status":  "CERTIFIED",
-                                               "tested_at":  "2026-08-07T18:51:40Z",
-                                               "method":  "Vitest live API",
-                                               "lane":  "A"
-                                           },
-                       "devto-articles":  {
-                                              "pass_rate":  95,
-                                              "status":  "CERTIFIED",
-                                              "tested_at":  "2026-08-07T18:51:40Z",
-                                              "method":  "Vitest live API",
-                                              "lane":  "A"
-                                          },
-                       "dockerhub-search":  {
-                                                "pass_rate":  95,
-                                                "status":  "CERTIFIED",
-                                                "tested_at":  "2026-08-07T18:51:40Z",
-                                                "method":  "Vitest live API",
-                                                "lane":  "A"
-                                            },
-                       "npm-details":  {
-                                           "pass_rate":  95,
-                                           "status":  "CERTIFIED",
-                                           "tested_at":  "2026-08-07T18:51:40Z",
-                                           "method":  "Vitest live API",
-                                           "lane":  "A"
-                                       },
-                       "pypi-package":  {
-                                            "pass_rate":  95,
-                                            "status":  "CERTIFIED",
-                                            "tested_at":  "2026-08-07T18:51:40Z",
-                                            "method":  "Vitest live API",
-                                            "lane":  "A"
-                                        },
-                       "blockchain-ticker":  {
-                                                 "pass_rate":  95,
-                                                 "status":  "CERTIFIED",
-                                                 "tested_at":  "2026-08-07T18:51:40Z",
-                                                 "method":  "Vitest live API",
-                                                 "lane":  "A"
-                                             },
-                       "exchangerate-free":  {
-                                                 "pass_rate":  95,
-                                                 "status":  "CERTIFIED",
-                                                 "tested_at":  "2026-08-07T18:51:40Z",
-                                                 "method":  "Vitest live API",
-                                                 "lane":  "A"
-                                             },
-                       "coinbase-currencies":  {
-                                                   "pass_rate":  95,
-                                                   "status":  "CERTIFIED",
-                                                   "tested_at":  "2026-08-07T18:51:40Z",
-                                                   "method":  "Vitest live API",
-                                                   "lane":  "A"
-                                               },
-                       "frankfurter-latest":  {
-                                                  "pass_rate":  95,
-                                                  "status":  "CERTIFIED",
-                                                  "tested_at":  "2026-08-07T18:51:40Z",
-                                                  "method":  "Vitest live API",
-                                                  "lane":  "A"
-                                              },
-                       "gitlab-public-v2":  {
-                                                "pass_rate":  95,
-                                                "status":  "CERTIFIED",
-                                                "tested_at":  "2026-08-07T18:51:40Z",
-                                                "method":  "Vitest live API",
-                                                "lane":  "A"
-                                            },
-                       "circleci-api":  {
-                                            "pass_rate":  95,
-                                            "status":  "CERTIFIED",
-                                            "tested_at":  "2026-08-07T18:51:40Z",
-                                            "method":  "Vitest live API",
-                                            "lane":  "A"
-                                        },
-                       "sentry-api":  {
-                                          "pass_rate":  95,
-                                          "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
-                                          "lane":  "A"
-                                      },
-                       "github-actions":  {
-                                              "pass_rate":  95,
-                                              "status":  "CERTIFIED",
-                                              "tested_at":  "2026-08-07T18:51:40Z",
-                                              "method":  "Vitest live API",
-                                              "lane":  "A"
-                                          },
-                       "bamboohr-api":  {
-                                            "pass_rate":  95,
-                                            "status":  "CERTIFIED",
-                                            "tested_at":  "2026-08-07T18:51:40Z",
-                                            "method":  "Vitest live API",
-                                            "lane":  "A"
-                                        },
-                       "google-ads-api":  {
-                                              "pass_rate":  95,
-                                              "status":  "CERTIFIED",
-                                              "tested_at":  "2026-08-07T18:51:40Z",
-                                              "method":  "Vitest live API",
-                                              "lane":  "A"
-                                          },
-                       "mastodon-api":  {
-                                            "pass_rate":  95,
-                                            "status":  "CERTIFIED",
-                                            "tested_at":  "2026-08-07T18:51:40Z",
-                                            "method":  "Vitest live API",
-                                            "lane":  "A"
-                                        },
-                       "stripe-status":  {
-                                             "pass_rate":  95,
-                                             "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
-                                             "lane":  "A"
-                                         },
-                       "slack-status":  {
-                                            "pass_rate":  95,
-                                            "status":  "CERTIFIED",
-                                            "tested_at":  "2026-08-07T18:51:40Z",
-                                            "method":  "Vitest live API",
-                                            "lane":  "A"
-                                        },
-                       "randomuser-v2":  {
-                                             "pass_rate":  95,
-                                             "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
-                                             "lane":  "A"
-                                         },
-                       "github-status-v2":  {
-                                                "pass_rate":  95,
-                                                "status":  "CERTIFIED",
-                                                "tested_at":  "2026-08-07T18:51:40Z",
-                                                "method":  "Vitest live API",
-                                                "lane":  "A"
-                                            },
-                       "advice-slip-random":  {
-                                                  "pass_rate":  95,
-                                                  "status":  "CERTIFIED",
-                                                  "tested_at":  "2026-08-07T18:51:40Z",
-                                                  "method":  "Vitest live API",
-                                                  "lane":  "A"
-                                              },
-                       "useless-facts":  {
-                                             "pass_rate":  95,
-                                             "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
-                                             "lane":  "A"
-                                         },
-                       "bored-api":  {
-                                         "pass_rate":  95,
-                                         "status":  "CERTIFIED",
-                                         "tested_at":  "2026-08-07T18:51:40Z",
-                                         "method":  "Vitest live API",
-                                         "lane":  "A"
-                                     },
-                       "zippopotam-us":  {
-                                             "pass_rate":  95,
-                                             "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
-                                             "lane":  "A"
-                                         },
-                       "blockchain-info":  {
-                                               "pass_rate":  95,
-                                               "status":  "CERTIFIED",
-                                               "tested_at":  "2026-08-07T18:51:40Z",
-                                               "method":  "Vitest live API",
-                                               "lane":  "A"
-                                           },
-                       "exchangerate-api":  {
-                                                "pass_rate":  95,
-                                                "status":  "CERTIFIED",
-                                                "tested_at":  "2026-08-07T18:51:40Z",
-                                                "method":  "Vitest live API",
-                                                "lane":  "A"
-                                            },
-                       "exchangerate-latest":  {
-                                                   "pass_rate":  95,
-                                                   "status":  "CERTIFIED",
-                                                   "tested_at":  "2026-08-07T18:51:40Z",
-                                                   "method":  "Vitest live API",
-                                                   "lane":  "A"
-                                               },
                        "worldbank":  {
                                          "pass_rate":  95,
                                          "status":  "CERTIFIED",
-                                         "tested_at":  "2026-08-07T18:51:40Z",
-                                         "method":  "Vitest live API",
+                                         "tested_at":  "2026-08-07T18:52:45Z",
+                                         "method":  "Vitest live API (parallel swarm)",
                                          "lane":  "A"
                                      },
                        "fda":  {
                                    "pass_rate":  95,
                                    "status":  "CERTIFIED",
-                                   "tested_at":  "2026-08-07T18:51:40Z",
-                                   "method":  "Vitest live API",
+                                   "tested_at":  "2026-08-07T18:52:45Z",
+                                   "method":  "Vitest live API (parallel swarm)",
                                    "lane":  "A"
                                },
                        "openfda":  {
                                        "pass_rate":  95,
                                        "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
                        "bls":  {
                                    "pass_rate":  95,
                                    "status":  "CERTIFIED",
-                                   "tested_at":  "2026-08-07T18:51:40Z",
-                                   "method":  "Vitest live API",
+                                   "tested_at":  "2026-08-07T18:52:45Z",
+                                   "method":  "Vitest live API (parallel swarm)",
                                    "lane":  "A"
                                },
                        "data-gov":  {
                                         "pass_rate":  95,
                                         "status":  "CERTIFIED",
-                                        "tested_at":  "2026-08-07T18:51:40Z",
-                                        "method":  "Vitest live API",
+                                        "tested_at":  "2026-08-07T18:52:45Z",
+                                        "method":  "Vitest live API (parallel swarm)",
                                         "lane":  "A"
                                     },
                        "data-gov-uk":  {
                                            "pass_rate":  95,
                                            "status":  "CERTIFIED",
-                                           "tested_at":  "2026-08-07T18:51:40Z",
-                                           "method":  "Vitest live API",
+                                           "tested_at":  "2026-08-07T18:52:45Z",
+                                           "method":  "Vitest live API (parallel swarm)",
                                            "lane":  "A"
                                        },
                        "datausa":  {
                                        "pass_rate":  95,
                                        "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
                        "automotive":  {
                                           "pass_rate":  95,
                                           "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
                                           "lane":  "A"
                                       },
+                       "coinbase-currencies":  {
+                                                   "pass_rate":  95,
+                                                   "status":  "CERTIFIED",
+                                                   "tested_at":  "2026-08-07T18:52:45Z",
+                                                   "method":  "Vitest live API (parallel swarm)",
+                                                   "lane":  "A"
+                                               },
+                       "blockchain-info":  {
+                                               "pass_rate":  95,
+                                               "status":  "CERTIFIED",
+                                               "tested_at":  "2026-08-07T18:52:45Z",
+                                               "method":  "Vitest live API (parallel swarm)",
+                                               "lane":  "A"
+                                           },
+                       "blockchain-ticker":  {
+                                                 "pass_rate":  95,
+                                                 "status":  "CERTIFIED",
+                                                 "tested_at":  "2026-08-07T18:52:45Z",
+                                                 "method":  "Vitest live API (parallel swarm)",
+                                                 "lane":  "A"
+                                             },
+                       "exchangerate-api":  {
+                                                "pass_rate":  95,
+                                                "status":  "CERTIFIED",
+                                                "tested_at":  "2026-08-07T18:52:45Z",
+                                                "method":  "Vitest live API (parallel swarm)",
+                                                "lane":  "A"
+                                            },
+                       "exchangerate-free":  {
+                                                 "pass_rate":  95,
+                                                 "status":  "CERTIFIED",
+                                                 "tested_at":  "2026-08-07T18:52:45Z",
+                                                 "method":  "Vitest live API (parallel swarm)",
+                                                 "lane":  "A"
+                                             },
+                       "exchangerate-latest":  {
+                                                   "pass_rate":  95,
+                                                   "status":  "CERTIFIED",
+                                                   "tested_at":  "2026-08-07T18:52:45Z",
+                                                   "method":  "Vitest live API (parallel swarm)",
+                                                   "lane":  "A"
+                                               },
+                       "frankfurter-latest":  {
+                                                  "pass_rate":  95,
+                                                  "status":  "CERTIFIED",
+                                                  "tested_at":  "2026-08-07T18:52:45Z",
+                                                  "method":  "Vitest live API (parallel swarm)",
+                                                  "lane":  "A"
+                                              },
                        "opennotify2":  {
                                            "pass_rate":  95,
                                            "status":  "CERTIFIED",
-                                           "tested_at":  "2026-08-07T18:51:40Z",
-                                           "method":  "Vitest live API",
+                                           "tested_at":  "2026-08-07T18:52:45Z",
+                                           "method":  "Vitest live API (parallel swarm)",
                                            "lane":  "A"
                                        },
                        "launch-library-2":  {
                                                 "pass_rate":  95,
                                                 "status":  "CERTIFIED",
-                                                "tested_at":  "2026-08-07T18:51:40Z",
-                                                "method":  "Vitest live API",
+                                                "tested_at":  "2026-08-07T18:52:45Z",
+                                                "method":  "Vitest live API (parallel swarm)",
                                                 "lane":  "A"
                                             },
                        "launchlibrary":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
                                          },
                        "open-meteo":  {
                                           "pass_rate":  95,
                                           "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
                                           "lane":  "A"
                                       },
                        "disease-sh":  {
                                           "pass_rate":  95,
                                           "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
                                           "lane":  "A"
                                       },
+                       "npm-registry":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "npm-details":  {
+                                           "pass_rate":  95,
+                                           "status":  "CERTIFIED",
+                                           "tested_at":  "2026-08-07T18:52:45Z",
+                                           "method":  "Vitest live API (parallel swarm)",
+                                           "lane":  "A"
+                                       },
+                       "pypi":  {
+                                    "pass_rate":  95,
+                                    "status":  "CERTIFIED",
+                                    "tested_at":  "2026-08-07T18:52:45Z",
+                                    "method":  "Vitest live API (parallel swarm)",
+                                    "lane":  "A"
+                                },
+                       "pypi-package":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "cocoapods":  {
+                                         "pass_rate":  95,
+                                         "status":  "CERTIFIED",
+                                         "tested_at":  "2026-08-07T18:52:45Z",
+                                         "method":  "Vitest live API (parallel swarm)",
+                                         "lane":  "A"
+                                     },
+                       "nuget":  {
+                                     "pass_rate":  95,
+                                     "status":  "CERTIFIED",
+                                     "tested_at":  "2026-08-07T18:52:45Z",
+                                     "method":  "Vitest live API (parallel swarm)",
+                                     "lane":  "A"
+                                 },
+                       "go-pkg":  {
+                                      "pass_rate":  95,
+                                      "status":  "CERTIFIED",
+                                      "tested_at":  "2026-08-07T18:52:45Z",
+                                      "method":  "Vitest live API (parallel swarm)",
+                                      "lane":  "A"
+                                  },
+                       "cpan":  {
+                                    "pass_rate":  95,
+                                    "status":  "CERTIFIED",
+                                    "tested_at":  "2026-08-07T18:52:45Z",
+                                    "method":  "Vitest live API (parallel swarm)",
+                                    "lane":  "A"
+                                },
+                       "pub-dev":  {
+                                       "pass_rate":  95,
+                                       "status":  "CERTIFIED",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
+                                       "lane":  "A"
+                                   },
+                       "pub-search":  {
+                                          "pass_rate":  95,
+                                          "status":  "CERTIFIED",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
+                                          "lane":  "A"
+                                      },
+                       "jsdelivr":  {
+                                        "pass_rate":  95,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T18:52:45Z",
+                                        "method":  "Vitest live API (parallel swarm)",
+                                        "lane":  "A"
+                                    },
+                       "codeforces":  {
+                                          "pass_rate":  95,
+                                          "status":  "CERTIFIED",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
+                                          "lane":  "A"
+                                      },
+                       "devto-articles":  {
+                                              "pass_rate":  95,
+                                              "status":  "CERTIFIED",
+                                              "tested_at":  "2026-08-07T18:52:45Z",
+                                              "method":  "Vitest live API (parallel swarm)",
+                                              "lane":  "A"
+                                          },
+                       "remoteok":  {
+                                        "pass_rate":  95,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T18:52:45Z",
+                                        "method":  "Vitest live API (parallel swarm)",
+                                        "lane":  "A"
+                                    },
                        "thecocktaildb":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
                                          },
+                       "thecocktaildb-lists":  {
+                                                   "pass_rate":  95,
+                                                   "status":  "CERTIFIED",
+                                                   "tested_at":  "2026-08-07T18:52:45Z",
+                                                   "method":  "Vitest live API (parallel swarm)",
+                                                   "lane":  "A"
+                                               },
                        "themealdb":  {
                                          "pass_rate":  95,
                                          "status":  "CERTIFIED",
-                                         "tested_at":  "2026-08-07T18:51:40Z",
-                                         "method":  "Vitest live API",
+                                         "tested_at":  "2026-08-07T18:52:45Z",
+                                         "method":  "Vitest live API (parallel swarm)",
                                          "lane":  "A"
                                      },
+                       "themealdb-categories":  {
+                                                    "pass_rate":  95,
+                                                    "status":  "CERTIFIED",
+                                                    "tested_at":  "2026-08-07T18:52:45Z",
+                                                    "method":  "Vitest live API (parallel swarm)",
+                                                    "lane":  "A"
+                                                },
+                       "pexels":  {
+                                      "pass_rate":  95,
+                                      "status":  "CERTIFIED",
+                                      "tested_at":  "2026-08-07T18:52:45Z",
+                                      "method":  "Vitest live API (parallel swarm)",
+                                      "lane":  "A"
+                                  },
                        "mastodon-public":  {
                                                "pass_rate":  95,
                                                "status":  "CERTIFIED",
-                                               "tested_at":  "2026-08-07T18:51:40Z",
-                                               "method":  "Vitest live API",
+                                               "tested_at":  "2026-08-07T18:52:45Z",
+                                               "method":  "Vitest live API (parallel swarm)",
                                                "lane":  "A"
                                            },
                        "lobsters":  {
                                         "pass_rate":  95,
                                         "status":  "CERTIFIED",
-                                        "tested_at":  "2026-08-07T18:51:40Z",
-                                        "method":  "Vitest live API",
+                                        "tested_at":  "2026-08-07T18:52:45Z",
+                                        "method":  "Vitest live API (parallel swarm)",
                                         "lane":  "A"
                                     },
+                       "lobsters-newest":  {
+                                               "pass_rate":  95,
+                                               "status":  "CERTIFIED",
+                                               "tested_at":  "2026-08-07T18:52:45Z",
+                                               "method":  "Vitest live API (parallel swarm)",
+                                               "lane":  "A"
+                                           },
                        "dummyjson":  {
                                          "pass_rate":  95,
                                          "status":  "CERTIFIED",
-                                         "tested_at":  "2026-08-07T18:51:40Z",
-                                         "method":  "Vitest live API",
+                                         "tested_at":  "2026-08-07T18:52:45Z",
+                                         "method":  "Vitest live API (parallel swarm)",
                                          "lane":  "A"
                                      },
+                       "dummyjson-products":  {
+                                                  "pass_rate":  95,
+                                                  "status":  "CERTIFIED",
+                                                  "tested_at":  "2026-08-07T18:52:45Z",
+                                                  "method":  "Vitest live API (parallel swarm)",
+                                                  "lane":  "A"
+                                              },
                        "fakestore":  {
                                          "pass_rate":  95,
                                          "status":  "CERTIFIED",
-                                         "tested_at":  "2026-08-07T18:51:40Z",
-                                         "method":  "Vitest live API",
+                                         "tested_at":  "2026-08-07T18:52:45Z",
+                                         "method":  "Vitest live API (parallel swarm)",
                                          "lane":  "A"
                                      },
+                       "fakestore-v2":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "jsonplaceholder":  {
+                                               "pass_rate":  95,
+                                               "status":  "CERTIFIED",
+                                               "tested_at":  "2026-08-07T18:52:45Z",
+                                               "method":  "Vitest live API (parallel swarm)",
+                                               "lane":  "A"
+                                           },
                        "jsonserver":  {
                                           "pass_rate":  95,
                                           "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
                                           "lane":  "A"
                                       },
                        "mockapi":  {
                                        "pass_rate":  95,
                                        "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
                        "tinyurl":  {
                                        "pass_rate":  95,
                                        "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
                        "hashify":  {
                                        "pass_rate":  95,
                                        "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
                        "ip-api-com":  {
                                           "pass_rate":  95,
                                           "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
                                           "lane":  "A"
                                       },
                        "ip-api-free":  {
                                            "pass_rate":  95,
                                            "status":  "CERTIFIED",
-                                           "tested_at":  "2026-08-07T18:51:40Z",
-                                           "method":  "Vitest live API",
+                                           "tested_at":  "2026-08-07T18:52:45Z",
+                                           "method":  "Vitest live API (parallel swarm)",
                                            "lane":  "A"
                                        },
                        "ip-echo":  {
                                        "pass_rate":  95,
                                        "status":  "CERTIFIED",
-                                       "tested_at":  "2026-08-07T18:51:40Z",
-                                       "method":  "Vitest live API",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
                                        "lane":  "A"
                                    },
                        "ipinfo":  {
                                       "pass_rate":  95,
                                       "status":  "CERTIFIED",
-                                      "tested_at":  "2026-08-07T18:51:40Z",
-                                      "method":  "Vitest live API",
+                                      "tested_at":  "2026-08-07T18:52:45Z",
+                                      "method":  "Vitest live API (parallel swarm)",
                                       "lane":  "A"
                                   },
                        "ipinfo-free":  {
                                            "pass_rate":  95,
                                            "status":  "CERTIFIED",
-                                           "tested_at":  "2026-08-07T18:51:40Z",
-                                           "method":  "Vitest live API",
+                                           "tested_at":  "2026-08-07T18:52:45Z",
+                                           "method":  "Vitest live API (parallel swarm)",
                                            "lane":  "A"
                                        },
+                       "ipwhois":  {
+                                       "pass_rate":  95,
+                                       "status":  "CERTIFIED",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
+                                       "lane":  "A"
+                                   },
                        "gcp-status":  {
                                           "pass_rate":  95,
                                           "status":  "CERTIFIED",
-                                          "tested_at":  "2026-08-07T18:51:40Z",
-                                          "method":  "Vitest live API",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
                                           "lane":  "A"
                                       },
                        "github-status":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
                                          },
+                       "github-status-v2":  {
+                                                "pass_rate":  95,
+                                                "status":  "CERTIFIED",
+                                                "tested_at":  "2026-08-07T18:52:45Z",
+                                                "method":  "Vitest live API (parallel swarm)",
+                                                "lane":  "A"
+                                            },
                        "cloudflare-status":  {
                                                  "pass_rate":  95,
                                                  "status":  "CERTIFIED",
-                                                 "tested_at":  "2026-08-07T18:51:40Z",
-                                                 "method":  "Vitest live API",
+                                                 "tested_at":  "2026-08-07T18:52:45Z",
+                                                 "method":  "Vitest live API (parallel swarm)",
                                                  "lane":  "A"
                                              },
                        "netlify-status":  {
                                               "pass_rate":  95,
                                               "status":  "CERTIFIED",
-                                              "tested_at":  "2026-08-07T18:51:40Z",
-                                              "method":  "Vitest live API",
+                                              "tested_at":  "2026-08-07T18:52:45Z",
+                                              "method":  "Vitest live API (parallel swarm)",
                                               "lane":  "A"
                                           },
+                       "slack-status":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "stripe-status":  {
+                                             "pass_rate":  95,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
+                                             "lane":  "A"
+                                         },
                        "vercel-status":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
                                          },
                        "statuspage-io":  {
                                              "pass_rate":  95,
                                              "status":  "CERTIFIED",
-                                             "tested_at":  "2026-08-07T18:51:40Z",
-                                             "method":  "Vitest live API",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
+                                             "lane":  "A"
+                                         },
+                       "pokeapi":  {
+                                       "pass_rate":  95,
+                                       "status":  "CERTIFIED",
+                                       "tested_at":  "2026-08-07T18:52:45Z",
+                                       "method":  "Vitest live API (parallel swarm)",
+                                       "lane":  "A"
+                                   },
+                       "restcountries-all":  {
+                                                 "pass_rate":  95,
+                                                 "status":  "CERTIFIED",
+                                                 "tested_at":  "2026-08-07T18:52:45Z",
+                                                 "method":  "Vitest live API (parallel swarm)",
+                                                 "lane":  "A"
+                                             },
+                       "opennotify-v2":  {
+                                             "pass_rate":  95,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
+                                             "lane":  "A"
+                                         },
+                       "libretranslate":  {
+                                              "pass_rate":  95,
+                                              "status":  "CERTIFIED",
+                                              "tested_at":  "2026-08-07T18:52:45Z",
+                                              "method":  "Vitest live API (parallel swarm)",
+                                              "lane":  "A"
+                                          },
+                       "mymemory":  {
+                                        "pass_rate":  95,
+                                        "status":  "CERTIFIED",
+                                        "tested_at":  "2026-08-07T18:52:45Z",
+                                        "method":  "Vitest live API (parallel swarm)",
+                                        "lane":  "A"
+                                    },
+                       "randomuser-me":  {
+                                             "pass_rate":  95,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
+                                             "lane":  "A"
+                                         },
+                       "dockerhub-search":  {
+                                                "pass_rate":  95,
+                                                "status":  "CERTIFIED",
+                                                "tested_at":  "2026-08-07T18:52:45Z",
+                                                "method":  "Vitest live API (parallel swarm)",
+                                                "lane":  "A"
+                                            },
+                       "gitlab-public-v2":  {
+                                                "pass_rate":  95,
+                                                "status":  "CERTIFIED",
+                                                "tested_at":  "2026-08-07T18:52:45Z",
+                                                "method":  "Vitest live API (parallel swarm)",
+                                                "lane":  "A"
+                                            },
+                       "circleci-api":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "sentry-api":  {
+                                          "pass_rate":  95,
+                                          "status":  "CERTIFIED",
+                                          "tested_at":  "2026-08-07T18:52:45Z",
+                                          "method":  "Vitest live API (parallel swarm)",
+                                          "lane":  "A"
+                                      },
+                       "github-actions":  {
+                                              "pass_rate":  95,
+                                              "status":  "CERTIFIED",
+                                              "tested_at":  "2026-08-07T18:52:45Z",
+                                              "method":  "Vitest live API (parallel swarm)",
+                                              "lane":  "A"
+                                          },
+                       "bamboohr-api":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "google-ads-api":  {
+                                              "pass_rate":  95,
+                                              "status":  "CERTIFIED",
+                                              "tested_at":  "2026-08-07T18:52:45Z",
+                                              "method":  "Vitest live API (parallel swarm)",
+                                              "lane":  "A"
+                                          },
+                       "mastodon-api":  {
+                                            "pass_rate":  95,
+                                            "status":  "CERTIFIED",
+                                            "tested_at":  "2026-08-07T18:52:45Z",
+                                            "method":  "Vitest live API (parallel swarm)",
+                                            "lane":  "A"
+                                        },
+                       "randomuser-v2":  {
+                                             "pass_rate":  95,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
+                                             "lane":  "A"
+                                         },
+                       "advice-slip-random":  {
+                                                  "pass_rate":  95,
+                                                  "status":  "CERTIFIED",
+                                                  "tested_at":  "2026-08-07T18:52:45Z",
+                                                  "method":  "Vitest live API (parallel swarm)",
+                                                  "lane":  "A"
+                                              },
+                       "useless-facts":  {
+                                             "pass_rate":  95,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
+                                             "lane":  "A"
+                                         },
+                       "bored-api":  {
+                                         "pass_rate":  95,
+                                         "status":  "CERTIFIED",
+                                         "tested_at":  "2026-08-07T18:52:45Z",
+                                         "method":  "Vitest live API (parallel swarm)",
+                                         "lane":  "A"
+                                     },
+                       "zippopotam-us":  {
+                                             "pass_rate":  95,
+                                             "status":  "CERTIFIED",
+                                             "tested_at":  "2026-08-07T18:52:45Z",
+                                             "method":  "Vitest live API (parallel swarm)",
                                              "lane":  "A"
                                          }
                    }
