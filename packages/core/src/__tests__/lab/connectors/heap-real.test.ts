@@ -1,0 +1,20 @@
+// Heap API — Lab Test Suite
+import { createConnectorTests, ConnectorTestConfig } from '../runners/connector.runner';
+import '../../../connectors/heap-real';
+
+const config: ConnectorTestConfig = {
+  connectorId: 'test-heap-real',
+  connectorType: 'source',
+  engine: 'heap-real',
+  config: { host: 'https://heapanalytics.com/api' },
+  testTables: ['events', 'users', 'properties'],
+  skipCDC: true,
+  skipBenchmark: true,
+  maxConnectionLatencyMs: 15000,
+  minExtractThroughput: 5,
+};
+
+const runner = createConnectorTests(config);
+runner.runUnitTests();
+runner.runIntegrationTests();
+runner.runE2ETests();
