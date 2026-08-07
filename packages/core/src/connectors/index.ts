@@ -1599,3 +1599,13 @@ import './twitter-real';
 import './linkedin-real';
 import './reddit-real';
 import './mastodon-real';
+
+// Remaining Top 100 — Real API Connectors
+import './linkedin-ads-real';
+import './tiktok-ads-real';
+import './pinterest-ads-real';
+import './snapchat-ads-real';
+import './google-sheets-real';
+import './airtable-real';
+import './confluence-real';
+import './github-actions-real';
