@@ -1,7 +1,9 @@
 import { query } from '@/lib/db';
+import { headers } from 'next/headers';
 import LeaderboardClient from './LeaderboardClient';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function LeaderboardPage() {
   let entries: any[] = [];
