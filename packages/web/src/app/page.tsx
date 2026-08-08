@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { Zap, RefreshCw, Cpu, Layers, Shield, BarChart3, Lock, Database, Cloud, Eye, Grid3X3, Tag } from 'lucide-react';
 import MiniGlobe from '@/components/MiniGlobe';
 import { PulsynLogoFull } from '@/components/PulsynLogo';
+import ScrollReveal from '@/components/ScrollReveal';
 
 
 
@@ -210,6 +211,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works — 3 Steps */}
+      <ScrollReveal>
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Deploy a pipeline in 60 seconds</h2>
@@ -230,8 +232,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* MCP Showcase — AI Agents Control Pipelines */}
+      <ScrollReveal>
       <section className="py-20 px-6 bg-white/[0.02]">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -292,8 +296,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* Comparison Table — Pulsyn vs Competitors */}
+      <ScrollReveal>
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Why teams switch to Pulsyn</h2>
@@ -334,6 +340,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* Problem / Solution */}
       <section className="py-24 px-6">
