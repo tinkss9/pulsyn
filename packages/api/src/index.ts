@@ -13,6 +13,7 @@ import { billingRoutes } from './routes/billing';
 import { webhookRoutes } from './routes/webhooks';
 import { benchmarkRoutes } from './routes/benchmarks';
 import { cdcRoutes } from './routes/cdc';
+import { competitionRoutes } from './routes/competition';
 import { openApiSpec } from './openapi';
 import { initDatabase } from './db';
 import { authenticateApiKey, rateLimitByPlan } from './middleware/auth';
@@ -32,6 +33,7 @@ app.use(express.json());
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/competition', competitionRoutes);
 
 // Protected routes (require API key)
 app.use('/api/pipelines', authenticateApiKey, rateLimitByPlan, pipelineRoutes);

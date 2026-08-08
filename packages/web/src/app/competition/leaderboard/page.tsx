@@ -1,59 +1,108 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import ScrollReveal from '@/components/ScrollReveal';
 import { 
-  Trophy, Search, Filter, ChevronDown, ChevronUp, 
-  Globe, TrendingUp, Clock, RefreshCw, Database,
-  ArrowLeft, Download, BarChart3
+  Trophy, Search, ChevronDown, ChevronUp, 
+  Clock, RefreshCw, ArrowLeft
 } from 'lucide-react';
 
 interface LeaderboardEntry {
   rank: number;
+  id: string;
   name: string;
   rowsPerSec: number;
   score: number;
   country: string;
   phase: string;
   week: number;
-  dataIntegrity: number;
-  checkpointRecovery: number;
-  maskingEfficiency: number;
+  metrics: {
+    dataIntegrity: number;
+    checkpointRecovery: number;
+    maskingEfficiency: number;
+  };
+  latencyP99?: number;
+  errorRate?: number;
+  sourceEngine?: string;
+  targetEngine?: string;
+  totalRows?: number;
+  verified?: boolean;
   lastRun: string;
 }
 
-const MOCK_DATA: LeaderboardEntry[] = Array.from({ length: 100 }, (_, i) => ({
-  rank: i + 1,
-  name: `Competitor_${(1000 + i).toString().slice(1)}`,
-  rowsPerSec: Math.round(142567 - (i * 1200) + (Math.random() * 500)),
-  score: Math.round(9847 - (i * 85) + (Math.random() * 30)),
-  country: ['US', 'DE', 'UK', 'JP', 'CA', 'AU', 'FR', 'SG', 'BR', 'IN', 'KR', 'NL', 'SE', 'CH', 'IL'][i % 15],
-  phase: i < 400 ? 'Qualifiers' : 'Semifinals',
-  week: Math.floor(i / 100) + 1,
-  dataIntegrity: Math.round(99.9 - (i * 0.001)),
-  checkpointRecovery: Math.round(98 - (i * 0.05)),
-  maskingEfficiency: Math.round(95 - (i * 0.1)),
-  lastRun: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-}));
+interface LeaderboardResponse {
+  data: LeaderboardEntry[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+  meta: {
+    updatedAt: string;
+    week: number;
+    phase: string;
+    totalCompetitors: number;
+    peakRowsPerSec: number;
+    totalCountries: number;
+    totalRowsReplicated: number;
+  };
+}
 
 const COUNTRIES: Record<string, string> = {
   'US': '🇺🇸', 'DE': '🇩🇪', 'UK': '🇬🇧', 'JP': '🇯🇵', 'CA': '🇨🇦',
   'AU': '🇦🇺', 'FR': '🇫🇷', 'SG': '🇸🇬', 'BR': '🇧🇷', 'IN': '🇮🇳',
   'KR': '🇰🇷', 'NL': '🇳🇱', 'SE': '🇸🇪', 'CH': '🇨🇭', 'IL': '🇮🇱',
+  'NZ': '🇳🇿', 'CN': '🇨🇳', 'ES': '🇪🇸', 'IT': '🇮🇹', 'MX': '🇲🇽',
 };
 
+function formatBigNumber(n: number): string {
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
 export default function LeaderboardPage() {
-  const [data, setData] = useState<LeaderboardEntry[]>(MOCK_DATA);
+  const [data, setData] = useState<LeaderboardEntry[]>([]);
+  const [meta, setMeta] = useState<LeaderboardResponse['meta'] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [sortField, setSortField] = useState<keyof LeaderboardEntry>('rank');
+  const [sortField, setSortField] = useState<string>('rank');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [filterCountry, setFilterCountry] = useState<string>('');
-  const [filterPhase, setFilterPhase] = useState<string>('');
+  const [filterCountry, setFilterCountry] = useState('');
+  const [filterPhase, setFilterPhase] = useState('');
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
-  const handleSort = (field: keyof LeaderboardEntry) => {
+  const fetchLeaderboard = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      params.set('limit', '100');
+      if (filterCountry) params.set('country', filterCountry);
+      if (filterPhase) params.set('phase', filterPhase);
+      if (search) params.set('search', search);
+
+      const res = await fetch(`/api/competition/leaderboard?${params}`);
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      const json: LeaderboardResponse = await res.json();
+
+      setData(json.data || []);
+      setMeta(json.meta || null);
+      setLastRefresh(new Date());
+    } catch (err: any) {
+      console.error('Failed to fetch leaderboard:', err);
+      setError(err.message || 'Failed to load leaderboard');
+    } finally {
+      setLoading(false);
+    }
+  }, [filterCountry, filterPhase, search]);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
+
+  const handleSort = (field: string) => {
     if (sortField === field) {
       setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
     } else {
@@ -62,30 +111,21 @@ export default function LeaderboardPage() {
     }
   };
 
-  const filteredData = data
-    .filter(entry => 
-      entry.name.toLowerCase().includes(search.toLowerCase()) &&
-      (filterCountry === '' || entry.country === filterCountry) &&
-      (filterPhase === '' || entry.phase === filterPhase)
-    )
-    .sort((a, b) => {
-      const aVal = a[sortField];
-      const bVal = b[sortField];
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
-      }
-      return sortDir === 'asc' 
-        ? String(aVal).localeCompare(String(bVal))
-        : String(bVal).localeCompare(String(aVal));
-    });
-
-  const uniqueCountries = Array.from(new Set(data.map(d => d.country))).sort();
-  const uniquePhases = Array.from(new Set(data.map(d => d.phase)));
+  const sortedData = [...data].sort((a, b) => {
+    let aVal: any = a[sortField as keyof LeaderboardEntry];
+    let bVal: any = b[sortField as keyof LeaderboardEntry];
+    if (sortField === 'dataIntegrity') { aVal = a.metrics.dataIntegrity; bVal = b.metrics.dataIntegrity; }
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+    }
+    return sortDir === 'asc'
+      ? String(aVal || '').localeCompare(String(bVal || ''))
+      : String(bVal || '').localeCompare(String(aVal || ''));
+  });
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <Header />
-      
       <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           {/* Header */}
@@ -95,46 +135,46 @@ export default function LeaderboardPage() {
                 <ArrowLeft className="w-4 h-4" /> Back to Competition
               </Link>
               <h1 className="text-3xl font-bold">Leaderboard</h1>
-              <p className="text-gray-400">Week 2 Qualifiers — Season 1</p>
+              <p className="text-gray-400">Week {meta?.week || '—'} Qualifiers — Season 1</p>
             </div>
-            
             <div className="flex items-center gap-3">
               <div className="text-sm text-gray-500 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 Updated {lastRefresh.toLocaleTimeString()}
               </div>
-              <button 
-                onClick={() => setLastRefresh(new Date())}
-                className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm flex items-center gap-2 transition-colors"
+              <button
+                onClick={() => fetchLeaderboard()}
+                disabled={loading}
+                data-testid="refresh-btn"
+                className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm flex items-center gap-2 transition-colors disabled:opacity-50"
               >
-                <RefreshCw className="w-4 h-4" /> Refresh
-              </button>
-              <button className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm flex items-center gap-2 transition-colors">
-                <Download className="w-4 h-4" /> Export
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
               </button>
             </div>
           </div>
-          
+
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-              <div className="text-sm text-gray-500 mb-1">Total Competitors</div>
-              <div className="text-2xl font-bold">2,847</div>
+          <ScrollReveal>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4" data-testid="stat-total-competitors">
+                <div className="text-sm text-gray-500 mb-1">Total Competitors</div>
+                <div className="text-2xl font-bold">{meta ? formatBigNumber(meta.totalCompetitors) : '—'}</div>
+              </div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4" data-testid="stat-peak-rps">
+                <div className="text-sm text-gray-500 mb-1">Peak Rows/sec</div>
+                <div className="text-2xl font-bold text-cyan-400">{meta ? formatBigNumber(meta.peakRowsPerSec) : '—'}</div>
+              </div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4" data-testid="stat-countries">
+                <div className="text-sm text-gray-500 mb-1">Countries</div>
+                <div className="text-2xl font-bold">{meta ? meta.totalCountries : '—'}</div>
+              </div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4" data-testid="stat-total-rows">
+                <div className="text-sm text-gray-500 mb-1">Total Rows Replicated</div>
+                <div className="text-2xl font-bold text-amber-400">{meta ? formatBigNumber(meta.totalRowsReplicated) : '—'}</div>
+              </div>
             </div>
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-              <div className="text-sm text-gray-500 mb-1">Peak Rows/sec</div>
-              <div className="text-2xl font-bold text-cyan-400">142,567</div>
-            </div>
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-              <div className="text-sm text-gray-500 mb-1">Countries</div>
-              <div className="text-2xl font-bold">64</div>
-            </div>
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-              <div className="text-sm text-gray-500 mb-1">Total Rows Replicated</div>
-              <div className="text-2xl font-bold text-amber-400">12.4B</div>
-            </div>
-          </div>
-          
+          </ScrollReveal>
+
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-3 mb-6">
             <div className="relative flex-1">
@@ -144,167 +184,125 @@ export default function LeaderboardPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search competitors..."
+                data-testid="leaderboard-search"
                 className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-500"
               />
             </div>
-            
             <select
               value={filterCountry}
               onChange={(e) => setFilterCountry(e.target.value)}
+              data-testid="filter-country"
               className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-300 focus:outline-none focus:border-cyan-500"
             >
               <option value="">All Countries</option>
-              {uniqueCountries.map(c => (
-                <option key={c} value={c}>{COUNTRIES[c]} {c}</option>
+              {Object.entries(COUNTRIES).map(([code, flag]) => (
+                <option key={code} value={code}>{flag} {code}</option>
               ))}
             </select>
-            
             <select
               value={filterPhase}
               onChange={(e) => setFilterPhase(e.target.value)}
+              data-testid="filter-phase"
               className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-300 focus:outline-none focus:border-cyan-500"
             >
               <option value="">All Phases</option>
-              {uniquePhases.map(p => (
-                <option key={p} value={p}>{p}</option>
-              ))}
+              <option value="qualifiers">Qualifiers</option>
             </select>
           </div>
-          
+
+          {/* Error */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6 text-red-400 text-sm" data-testid="error-banner">
+              {error}
+            </div>
+          )}
+
+          {/* Loading */}
+          {loading && data.length === 0 && (
+            <div className="text-center py-20 text-gray-500" data-testid="loading-state">
+              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
+              Loading leaderboard...
+            </div>
+          )}
+
+          {/* Empty */}
+          {!loading && data.length === 0 && !error && (
+            <div className="text-center py-20 text-gray-500" data-testid="empty-state">
+              <Trophy className="w-12 h-12 mx-auto mb-4 opacity-30" />
+              <p className="text-lg mb-2">No competitors yet</p>
+            </div>
+          )}
+
           {/* Table */}
-          <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/5">
-                    <th className="text-left px-6 py-3 text-xs text-gray-500 uppercase font-medium">
-                      <button onClick={() => handleSort('rank')} className="flex items-center gap-1 hover:text-white">
-                        Rank {sortField === 'rank' && (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                      </button>
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs text-gray-500 uppercase font-medium">
-                      <button onClick={() => handleSort('name')} className="flex items-center gap-1 hover:text-white">
-                        Competitor {sortField === 'name' && (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                      </button>
-                    </th>
-                    <th className="text-right px-6 py-3 text-xs text-gray-500 uppercase font-medium">
-                      <button onClick={() => handleSort('rowsPerSec')} className="flex items-center gap-1 hover:text-white ml-auto">
-                        Rows/sec {sortField === 'rowsPerSec' && (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                      </button>
-                    </th>
-                    <th className="text-right px-6 py-3 text-xs text-gray-500 uppercase font-medium">
-                      <button onClick={() => handleSort('score')} className="flex items-center gap-1 hover:text-white ml-auto">
-                        Score {sortField === 'score' && (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                      </button>
-                    </th>
-                    <th className="text-center px-6 py-3 text-xs text-gray-500 uppercase font-medium">
-                      <button onClick={() => handleSort('country')} className="flex items-center gap-1 hover:text-white mx-auto">
-                        Country {sortField === 'country' && (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                      </button>
-                    </th>
-                    <th className="text-center px-6 py-3 text-xs text-gray-500 uppercase font-medium">Phase</th>
-                    <th className="w-10"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData.slice(0, 50).map((entry) => (
-                    <>
-                      <tr 
-                        key={entry.rank}
-                        className={`border-b border-white/5 hover:bg-white/[0.02] cursor-pointer transition-colors ${
-                          entry.rank <= 3 ? 'bg-white/[0.02]' : ''
-                        }`}
-                        onClick={() => setExpandedRow(expandedRow === entry.rank ? null : entry.rank)}
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {entry.rank === 1 && <span>🏆</span>}
-                            {entry.rank === 2 && <span>🥈</span>}
-                            {entry.rank === 3 && <span>🥉</span>}
-                            <span className={`font-mono ${entry.rank <= 3 ? 'font-bold' : 'text-gray-400'}`}>
-                              #{entry.rank}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 font-medium">{entry.name}</td>
-                        <td className="px-6 py-4 text-right font-mono text-cyan-400">
-                          {entry.rowsPerSec.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 text-right font-mono text-amber-400">
-                          {entry.score.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          {COUNTRIES[entry.country]} {entry.country}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            entry.phase === 'Qualifiers' 
-                              ? 'bg-cyan-500/10 text-cyan-400' 
-                              : 'bg-purple-500/10 text-purple-400'
-                          }`}>
-                            {entry.phase}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          {expandedRow === entry.rank ? (
-                            <ChevronUp className="w-4 h-4 text-gray-500" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4 text-gray-500" />
-                          )}
-                        </td>
+          {data.length > 0 && (
+            <ScrollReveal>
+              <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full" data-testid="leaderboard-table">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        {[
+                          { key: 'rank', label: 'Rank' },
+                          { key: 'name', label: 'Competitor' },
+                          { key: 'rowsPerSec', label: 'Rows/sec', right: true },
+                          { key: 'score', label: 'Score', right: true },
+                          { key: 'country', label: 'Country', center: true },
+                          { key: 'phase', label: 'Phase', center: true },
+                        ].map(col => (
+                          <th key={col.key} className={`${col.right ? 'text-right' : col.center ? 'text-center' : 'text-left'} px-6 py-3 text-xs text-gray-500 uppercase font-medium`}>
+                            <button onClick={() => handleSort(col.key)} className={`flex items-center gap-1 hover:text-white ${col.right ? 'ml-auto' : col.center ? 'mx-auto' : ''}`}>
+                              {col.label}
+                              {sortField === col.key && (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
+                            </button>
+                          </th>
+                        ))}
+                        <th className="w-10"></th>
                       </tr>
-                      
-                      {expandedRow === entry.rank && (
-                        <tr key={`${entry.rank}-expanded`} className="bg-white/[0.01]">
-                          <td colSpan={7} className="px-6 py-6">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                              <div>
-                                <div className="text-xs text-gray-500 mb-1">Data Integrity</div>
-                                <div className="text-lg font-mono text-green-400">{entry.dataIntegrity}%</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-500 mb-1">Checkpoint Recovery</div>
-                                <div className="text-lg font-mono text-purple-400">{entry.checkpointRecovery}%</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-500 mb-1">Masking Efficiency</div>
-                                <div className="text-lg font-mono text-amber-400">{entry.maskingEfficiency}%</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-500 mb-1">Last Run</div>
-                                <div className="text-sm text-gray-300">{new Date(entry.lastRun).toLocaleString()}</div>
-                              </div>
+                    </thead>
+                    <tbody>
+                      {sortedData.map((entry) => (
+                        <tr
+                          key={entry.id || entry.rank}
+                          data-testid={`row-${entry.rank}`}
+                          className={`border-b border-white/5 hover:bg-white/[0.02] cursor-pointer transition-colors ${entry.rank <= 3 ? 'bg-white/[0.02]' : ''}`}
+                          onClick={() => setExpandedRow(expandedRow === entry.rank ? null : entry.rank)}
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              {entry.rank === 1 && <span>🏆</span>}
+                              {entry.rank === 2 && <span>🥈</span>}
+                              {entry.rank === 3 && <span>🥉</span>}
+                              <span className={`font-mono ${entry.rank <= 3 ? 'font-bold' : 'text-gray-400'}`}>#{entry.rank}</span>
                             </div>
                           </td>
+                          <td className="px-6 py-4 font-medium">
+                            {entry.name}
+                            {entry.verified && <span className="ml-2 text-xs text-green-400">✓</span>}
+                          </td>
+                          <td className="px-6 py-4 text-right font-mono text-cyan-400">{entry.rowsPerSec.toLocaleString()}</td>
+                          <td className="px-6 py-4 text-right font-mono text-amber-400">{entry.score.toLocaleString()}</td>
+                          <td className="px-6 py-4 text-center">{COUNTRIES[entry.country] || '🌐'} {entry.country || '—'}</td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="text-xs px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-400">{entry.phase}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {expandedRow === entry.rank ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
+                          </td>
                         </tr>
-                      )}
-                    </>
-                  ))}
-                </tbody>
-              </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ScrollReveal>
+          )}
+
+          {/* Count */}
+          {meta && (
+            <div className="text-sm text-gray-500 mt-6">
+              Showing {data.length} of {meta.totalCompetitors} competitors
             </div>
-          </div>
-          
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-500">
-              Showing 1-50 of {filteredData.length} competitors
-            </div>
-            <div className="flex gap-2">
-              <button className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                Previous
-              </button>
-              <button className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-2 text-sm text-cyan-400">
-                1
-              </button>
-              <button className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                2
-              </button>
-              <button className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                Next
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
