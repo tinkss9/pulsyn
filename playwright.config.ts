@@ -1,26 +1,17 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './test-suite',
+  testDir: './packages/web/e2e',
   timeout: 30000,
-  expect: { timeout: 10000 },
-  fullyParallel: false,
   retries: 1,
-  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'https://pulsynai.com',
+    baseURL: process.env.BASE_URL || 'https://pulsyn-oitikfy1b-1inai.vercel.app',
     headless: false,
     viewport: { width: 1280, height: 720 },
-    actionTimeout: 10000,
-    ignoreHTTPSErrors: true,
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    screenshot: 'on',
+    trace: 'on-first-retry',
   },
   projects: [
-    {
-      name: 'chromium',
-      use: { browserName: 'chromium' },
-    },
+    { name: 'chromium', use: { browserName: 'chromium' } },
   ],
-  outputDir: './test-results',
 });
