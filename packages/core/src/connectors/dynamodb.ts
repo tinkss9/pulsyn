@@ -1,10 +1,11 @@
 // @ts-nocheck
 import {
   DynamoDBClient, ScanCommand, DescribeTableCommand, ListTablesCommand,
-  GetShardIteratorCommand, GetRecordsCommand, DescribeStreamCommand,
-  ListStreamsCommand,
 } from '@aws-sdk/client-dynamodb';
-import { DynamoDBStreamsClient } from '@aws-sdk/client-dynamodb-streams';
+import {
+  DynamoDBStreamsClient, GetShardIteratorCommand, GetRecordsCommand,
+  DescribeStreamCommand, ListStreamsCommand,
+} from '@aws-sdk/client-dynamodb-streams';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import { BaseConnector } from './base';
 import { registerSource } from './registry';
@@ -192,4 +193,3 @@ export class DynamoDBConnector extends BaseConnector {
     return schema.primaryKeys[0] || 'pk';
   }
 }
-
