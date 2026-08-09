@@ -8,6 +8,12 @@ import { Zap, RefreshCw, Cpu, Layers, Shield, BarChart3, Lock, Database, Cloud, 
 import MiniGlobe from '@/components/MiniGlobe';
 import { PulsynLogoFull } from '@/components/PulsynLogo';
 import ScrollReveal from '@/components/ScrollReveal';
+import AnimatedStats from '@/components/AnimatedStats';
+import AnimatedFeatureCard from '@/components/AnimatedFeatureCard';
+import AnimatedHowItWorks from '@/components/AnimatedHowItWorks';
+import AnimatedComparisonTable from '@/components/AnimatedComparisonTable';
+import AnimatedProblemSolution from '@/components/AnimatedProblemSolution';
+import AnimatedHero from '@/components/AnimatedHero';
 
 
 
@@ -133,46 +139,7 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero — Globe is fixed background, text floats on top */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_50%)]" />
-        {/* Dark vignette — suppresses globe behind text */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,8,12,0.7) 0%, rgba(8,8,12,0.3) 50%, transparent 100%)'
-        }} />
-        {/* Top and bottom fade */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/80 via-transparent to-[#0a0a0f]/80 pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-cyan-950/60 border border-cyan-800/50 rounded-full px-4 py-1.5 mb-8">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-            </span>
-            <span className="text-cyan-200 text-sm font-medium">Growing connector catalog</span>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1]" style={{ textShadow: '0 0 60px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.4)' }}>
-            <span className="text-white">Real-time data.</span>
-            <br />
-            <span className="text-white" style={{ textShadow: '0 0 40px rgba(6,182,212,0.4), 0 2px 8px rgba(0,0,0,0.8)' }}>Zero latency.</span>
-          </h1>
-
-          <p className="text-xl text-white/80 max-w-2xl mx-auto mb-4 leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-            Real-time CDC. AI-powered schema mapping. Starting free.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Link href="/signup" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3.5 rounded-xl text-lg font-semibold transition-all shadow-lg shadow-cyan-500/20">
-              Start Free →
-            </Link>
-            <a href="/demo" className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3.5 rounded-xl text-lg font-medium transition-all">
-              Try Demo
-            </a>
-          </div>
-
-          <p className="text-gray-400 text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>No credit card · Free forever · Growing catalog</p>
-        </div>
-      </section>
+      <AnimatedHero />
 
       {/* Hero Video */}
       <section className="py-16 px-6">
@@ -194,44 +161,24 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="py-12 px-6 border-y border-white/5">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[
-            { value: '1,068', label: 'Connector modules' },
-            { value: '<1s', label: 'CDC Latency' },
-            { value: 'In progress', label: 'Certification' },
-            { value: '10x', label: 'Cheaper than Fivetran' },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">{stat.value}</div>
-              <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <AnimatedStats
+        stats={[
+          { value: 1068, label: 'Connector modules' },
+          { value: '<1s', label: 'CDC Latency' },
+          { value: 'In progress', label: 'Certification' },
+          { value: '10x', label: 'Cheaper than Fivetran' },
+        ]}
+      />
 
       {/* How It Works — 3 Steps */}
       <ScrollReveal>
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Deploy a pipeline in 60 seconds</h2>
-          <p className="text-gray-400 text-lg mb-12 text-center max-w-2xl mx-auto">No Kafka. No DevOps. No code. Just connect, map, and replicate.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: '1', title: 'Connect', desc: 'Pick your source and target from our connector catalog. Test connection instantly.', icon: '🔌' },
-              { step: '2', title: 'Map', desc: 'AI auto-maps schemas. Resolve conflicts with one click. Add masking rules.', icon: '🧠' },
-              { step: '3', title: 'Replicate', desc: 'Start CDC. Data flows in real-time. Checkpoint recovery if anything fails.', icon: '⚡' },
-            ].map((s) => (
-              <div key={s.step} className="text-center">
-                <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4 text-3xl">{s.icon}</div>
-                <div className="text-cyan-400 text-sm font-mono mb-2">Step {s.step}</div>
-                <h3 className="text-xl font-semibold text-white mb-2">{s.title}</h3>
-                <p className="text-gray-400 text-sm">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <AnimatedHowItWorks
+        steps={[
+          { step: '1', title: 'Connect', desc: 'Pick your source and target from our connector catalog. Test connection instantly.', icon: '🔌' },
+          { step: '2', title: 'Map', desc: 'AI auto-maps schemas. Resolve conflicts with one click. Add masking rules.', icon: '🧠' },
+          { step: '3', title: 'Replicate', desc: 'Start CDC. Data flows in real-time. Checkpoint recovery if anything fails.', icon: '⚡' },
+        ]}
+      />
       </ScrollReveal>
 
       {/* MCP Showcase — AI Agents Control Pipelines */}
@@ -300,87 +247,36 @@ export default function LandingPage() {
 
       {/* Comparison Table — Pulsyn vs Competitors */}
       <ScrollReveal>
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Why teams switch to Pulsyn</h2>
-          <p className="text-gray-400 text-lg mb-12 text-center">Honest comparison. No cherry-picking.</p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 text-gray-400 font-medium">Feature</th>
-                  <th className="text-center py-3 text-cyan-400 font-semibold">Pulsyn</th>
-                  <th className="text-center py-3 text-gray-400 font-medium">Fivetran</th>
-                  <th className="text-center py-3 text-gray-400 font-medium">Airbyte</th>
-                  <th className="text-center py-3 text-gray-400 font-medium">Debezium</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { feature: 'Connectors', pulsyn: '763', fivetran: '700+', airbyte: '600+', debezium: '~50' },
-                  { feature: 'CDC Latency', pulsyn: '<1 second', fivetran: '1-15 min', airbyte: '15 min', debezium: 'Sub-second' },
-                  { feature: 'Kafka Required', pulsyn: 'No', fivetran: 'No', airbyte: 'No', debezium: 'Yes' },
-                  { feature: 'AI Agent (MCP)', pulsyn: '26 tools', fivetran: 'None', airbyte: 'None', debezium: 'None' },
-                  { feature: 'In-flight Masking', pulsyn: 'FPE + hash', fivetran: 'Hash only', airbyte: 'Hash only', debezium: 'None' },
-                  { feature: 'Starting Price', pulsyn: 'Free', fivetran: '~$550/mo', airbyte: 'Free (self)', debezium: 'Free (self)' },
-                  { feature: 'Pro Plan', pulsyn: '$499/mo', fivetran: '~$1,500/mo', airbyte: '$299/mo', debezium: 'Free (self)' },
-                  { feature: 'Business Plan', pulsyn: '$3,500/mo', fivetran: '$12K+/yr ELA', airbyte: 'Custom', debezium: 'Infra cost' },
-                  { feature: 'At 10M rows/day', pulsyn: '$3,500/mo', fivetran: '$15,000+/mo', airbyte: 'Custom', debezium: 'Infra cost' },
-                ].map((row) => (
-                  <tr key={row.feature} className="border-b border-white/5">
-                    <td className="py-3 text-gray-300">{row.feature}</td>
-                    <td className="py-3 text-center text-cyan-400 font-semibold">{row.pulsyn}</td>
-                    <td className="py-3 text-center text-gray-400">{row.fivetran}</td>
-                    <td className="py-3 text-center text-gray-400">{row.airbyte}</td>
-                    <td className="py-3 text-center text-gray-400">{row.debezium}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      <AnimatedComparisonTable
+        rows={[
+          { feature: 'Connectors', pulsyn: '763', fivetran: '700+', airbyte: '600+', debezium: '~50' },
+          { feature: 'CDC Latency', pulsyn: '<1 second', fivetran: '1-15 min', airbyte: '15 min', debezium: 'Sub-second' },
+          { feature: 'Kafka Required', pulsyn: 'No', fivetran: 'No', airbyte: 'No', debezium: 'Yes' },
+          { feature: 'AI Agent (MCP)', pulsyn: '26 tools', fivetran: 'None', airbyte: 'None', debezium: 'None' },
+          { feature: 'In-flight Masking', pulsyn: 'FPE + hash', fivetran: 'Hash only', airbyte: 'Hash only', debezium: 'None' },
+          { feature: 'Starting Price', pulsyn: 'Free', fivetran: '~$550/mo', airbyte: 'Free (self)', debezium: 'Free (self)' },
+          { feature: 'Pro Plan', pulsyn: '$499/mo', fivetran: '~$1,500/mo', airbyte: '$299/mo', debezium: 'Free (self)' },
+          { feature: 'Business Plan', pulsyn: '$3,500/mo', fivetran: '$12K+/yr ELA', airbyte: 'Custom', debezium: 'Infra cost' },
+          { feature: 'At 10M rows/day', pulsyn: '$3,500/mo', fivetran: '$15,000+/mo', airbyte: 'Custom', debezium: 'Infra cost' },
+        ]}
+      />
       </ScrollReveal>
 
       {/* Problem / Solution */}
-      <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6 text-white">Your data is 15 minutes old.<br/><span className="text-gray-500">Your competitors&apos; isn&apos;t.</span></h2>
-              <div className="space-y-4">
-                {[
-                  { problem: 'Traditional ETL tools sync every 15+ minutes', icon: '⏰' },
-                  { problem: 'Batch-first architectures can\'t deliver real-time', icon: '📦' },
-                  { problem: 'Self-hosted CDC needs Kafka (5+ servers to manage)', icon: '🔥' },
-                  { problem: 'Enterprise solutions cost $5,000+/month', icon: '💰' },
-                ].map((item) => (
-                  <div key={item.problem} className="flex items-center gap-3 bg-red-950/20 border border-red-900/30 rounded-lg px-4 py-3">
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="text-gray-300 text-sm">{item.problem}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold mb-6 text-white">Pulsyn fixes all four.</h2>
-              <div className="space-y-4">
-                {[
-                  { solution: 'Real-time log-based CDC, sub-second latency', icon: '⚡' },
-                  { solution: 'No Kafka dependency — single binary, zero ops', icon: '🎯' },
-                  { solution: '763 connectors, starting free', icon: '💎' },
-                  { solution: 'MCP server for AI agents — first in market', icon: '🤖' },
-                ].map((item) => (
-                  <div key={item.solution} className="flex items-center gap-3 bg-green-950/20 border border-green-900/30 rounded-lg px-4 py-3">
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="text-gray-300 text-sm">{item.solution}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AnimatedProblemSolution
+        problems={[
+          { text: 'Traditional ETL tools sync every 15+ minutes', icon: '⏰' },
+          { text: 'Batch-first architectures can\'t deliver real-time', icon: '📦' },
+          { text: 'Self-hosted CDC needs Kafka (5+ servers to manage)', icon: '🔥' },
+          { text: 'Enterprise solutions cost $5,000+/month', icon: '💰' },
+        ]}
+        solutions={[
+          { text: 'Real-time log-based CDC, sub-second latency', icon: '⚡' },
+          { text: 'No Kafka dependency — single binary, zero ops', icon: '🎯' },
+          { text: '763 connectors, starting free', icon: '💎' },
+          { text: 'MCP server for AI agents — first in market', icon: '🤖' },
+        ]}
+      />
 
       {/* Features */}
       <section id="features" className="py-24 px-6 bg-white/[0.02]">
@@ -403,14 +299,14 @@ export default function LandingPage() {
               { icon: Eye, title: 'Real-time Monitoring', desc: 'Pipeline health, latency, throughput, errors. Grafana integration.' },
               { icon: Grid3X3, title: 'Data Mesh', desc: 'Multi-tenant, governance, compliance. Enterprise-grade data mesh.' },
               { icon: Tag, title: 'Affordable', desc: 'Starting free. Pro at $499/mo. Enterprise-grade features at startup prices.' },
-            ].map((f) => (
-              <div key={f.title} className="group bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 hover:bg-white/[0.06] hover:border-cyan-500/30 transition-all">
-                <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-3">
-                  <f.icon className="w-5 h-5 text-cyan-400" />
-                </div>
-                <h3 className="text-base font-semibold mb-2 text-white">{f.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
-              </div>
+            ].map((f, i) => (
+              <AnimatedFeatureCard
+                key={f.title}
+                icon={f.icon}
+                title={f.title}
+                description={f.desc}
+                index={i}
+              />
             ))}
           </div>
         </div>
