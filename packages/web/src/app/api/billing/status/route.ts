@@ -1,15 +1,32 @@
 // Billing Status API — Check organization's current subscription
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import crypto from 'crypto';
 
 export async function GET(request: NextRequest) {
-  const orgId = request.nextUrl.searchParams.get('orgId');
+  // Get API key from header
+  const authHeader = request.headers.get('authorization');
+  const bearerKey = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const apiKey = request.headers.get('x-api-key') || bearerKey;
 
-  if (!orgId) {
-    return NextResponse.json({ error: 'Missing orgId' }, { status: 400 });
+  if (!apiKey) {
+    return NextResponse.json({ error: 'API key required' }, { status: 401 });
   }
 
   try {
+    // Look up organization by API key (ownership verification)
+    const keyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
+    const keyResult = await query(
+      `SELECT organization_id FROM api_keys WHERE key_hash = $1 AND is_active = true`,
+      [keyHash]
+    );
+
+    if (keyResult.rowCount === 0) {
+      return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+    }
+
+    const orgId = keyResult.rows[0].organization_id;
+
     // Get organization
     const orgResult = await query('SELECT id, name, email, plan_id FROM organizations WHERE id = $1', [orgId]);
     if (orgResult.rowCount === 0) {

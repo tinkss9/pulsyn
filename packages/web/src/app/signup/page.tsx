@@ -106,6 +106,18 @@ export default function SignupPage() {
               </div>
             )}
 
+            {/* Honeypot field — hidden from humans, catches bots */}
+            <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+              <label htmlFor="website">Website</label>
+              <input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Full Name
