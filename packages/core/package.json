@@ -8,7 +8,9 @@
   "exports": {
     ".": "./dist/index.js",
     "./connectors": "./dist/connectors/index.js",
-    "./connectors/*": "./dist/connectors/*.js"
+    "./connectors/*": "./dist/connectors/*.js",
+    "./competition": "./dist/competition/index.js",
+    "./competition/*": "./dist/competition/*.js"
   },
   "scripts": {
     "build": "tsc",

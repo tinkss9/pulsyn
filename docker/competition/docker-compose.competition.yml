@@ -1,0 +1,293 @@
+# Pulsyn Replication Race — Competition Infrastructure
+# Each competitor runs in an isolated network with dedicated source and target databases.
+# Resource limits: 2 CPU cores, 4GB memory per competitor container.
+
+version: "3.8"
+
+x-competitor-base: &competitor-base
+  build:
+    context: ../..
+    dockerfile: docker/competition/Dockerfile
+  restart: "no"
+  deploy:
+    resources:
+      limits:
+        cpus: "2.0"
+        memory: 4G
+      reservations:
+        cpus: "0.5"
+        memory: 512M
+  volumes:
+    - competition-results:/results
+
+x-postgres-source: &postgres-source
+  image: postgres:16-alpine
+  restart: "no"
+  deploy:
+    resources:
+      limits:
+        cpus: "1.0"
+        memory: 1G
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+    interval: 5s
+    timeout: 3s
+    retries: 10
+
+x-postgres-target: &postgres-target
+  image: postgres:16-alpine
+  restart: "no"
+  deploy:
+    resources:
+      limits:
+        cpus: "1.0"
+        memory: 1G
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+    interval: 5s
+    timeout: 3s
+    retries: 10
+
+services:
+  # ---------------------------------------------------------------------------
+  # Competitor 1
+  # ---------------------------------------------------------------------------
+  competitor-1-source:
+    <<: *postgres-source
+    networks:
+      - competitor-1-net
+    environment:
+      POSTGRES_DB: comp1_source
+      POSTGRES_USER: comp1
+      POSTGRES_PASSWORD: comp1_pass
+    volumes:
+      - comp1-source-data:/var/lib/postgresql/data
+
+  competitor-1-target:
+    <<: *postgres-target
+    networks:
+      - competitor-1-net
+    environment:
+      POSTGRES_DB: comp1_target
+      POSTGRES_USER: comp1
+      POSTGRES_PASSWORD: comp1_pass
+    volumes:
+      - comp1-target-data:/var/lib/postgresql/data
+
+  competitor-1-runner:
+    <<: *competitor-base
+    networks:
+      - competitor-1-net
+    depends_on:
+      competitor-1-source:
+        condition: service_healthy
+      competitor-1-target:
+        condition: service_healthy
+    environment:
+      COMPETITION_RUN_ID: "${RUN_ID:-run-1}"
+      COMPETITION_COMPETITOR_ID: "competitor-1"
+      COMPETITION_SOURCE_HOST: competitor-1-source
+      COMPETITION_SOURCE_PORT: "5432"
+      COMPETITION_SOURCE_DB: comp1_source
+      COMPETITION_SOURCE_USER: comp1
+      COMPETITION_SOURCE_PASSWORD: comp1_pass
+      COMPETITION_TARGET_HOST: competitor-1-target
+      COMPETITION_TARGET_PORT: "5432"
+      COMPETITION_TARGET_DB: comp1_target
+      COMPETITION_TARGET_USER: comp1
+      COMPETITION_TARGET_PASSWORD: comp1_pass
+      COMPETITION_TARGET_ENGINE: postgresql
+      COMPETITION_DURATION_SECONDS: "${DURATION:-300}"
+      COMPETITION_BATCH_SIZE: "${BATCH_SIZE:-1000}"
+      COMPETITION_TOTAL_ROWS: "${TOTAL_ROWS:-100000}"
+      COMPETITION_RESULTS_DIR: /results/competitor-1
+
+  # ---------------------------------------------------------------------------
+  # Competitor 2
+  # ---------------------------------------------------------------------------
+  competitor-2-source:
+    <<: *postgres-source
+    networks:
+      - competitor-2-net
+    environment:
+      POSTGRES_DB: comp2_source
+      POSTGRES_USER: comp2
+      POSTGRES_PASSWORD: comp2_pass
+    volumes:
+      - comp2-source-data:/var/lib/postgresql/data
+
+  competitor-2-target:
+    <<: *postgres-target
+    networks:
+      - competitor-2-net
+    environment:
+      POSTGRES_DB: comp2_target
+      POSTGRES_USER: comp2
+      POSTGRES_PASSWORD: comp2_pass
+    volumes:
+      - comp2-target-data:/var/lib/postgresql/data
+
+  competitor-2-runner:
+    <<: *competitor-base
+    networks:
+      - competitor-2-net
+    depends_on:
+      competitor-2-source:
+        condition: service_healthy
+      competitor-2-target:
+        condition: service_healthy
+    environment:
+      COMPETITION_RUN_ID: "${RUN_ID:-run-1}"
+      COMPETITION_COMPETITOR_ID: "competitor-2"
+      COMPETITION_SOURCE_HOST: competitor-2-source
+      COMPETITION_SOURCE_PORT: "5432"
+      COMPETITION_SOURCE_DB: comp2_source
+      COMPETITION_SOURCE_USER: comp2
+      COMPETITION_SOURCE_PASSWORD: comp2_pass
+      COMPETITION_TARGET_HOST: competitor-2-target
+      COMPETITION_TARGET_PORT: "5432"
+      COMPETITION_TARGET_DB: comp2_target
+      COMPETITION_TARGET_USER: comp2
+      COMPETITION_TARGET_PASSWORD: comp2_pass
+      COMPETITION_TARGET_ENGINE: postgresql
+      COMPETITION_DURATION_SECONDS: "${DURATION:-300}"
+      COMPETITION_BATCH_SIZE: "${BATCH_SIZE:-1000}"
+      COMPETITION_TOTAL_ROWS: "${TOTAL_ROWS:-100000}"
+      COMPETITION_RESULTS_DIR: /results/competitor-2
+
+  # ---------------------------------------------------------------------------
+  # Competitor 3
+  # ---------------------------------------------------------------------------
+  competitor-3-source:
+    <<: *postgres-source
+    networks:
+      - competitor-3-net
+    environment:
+      POSTGRES_DB: comp3_source
+      POSTGRES_USER: comp3
+      POSTGRES_PASSWORD: comp3_pass
+    volumes:
+      - comp3-source-data:/var/lib/postgresql/data
+
+  competitor-3-target:
+    <<: *postgres-target
+    networks:
+      - competitor-3-net
+    environment:
+      POSTGRES_DB: comp3_target
+      POSTGRES_USER: comp3
+      POSTGRES_PASSWORD: comp3_pass
+    volumes:
+      - comp3-target-data:/var/lib/postgresql/data
+
+  competitor-3-runner:
+    <<: *competitor-base
+    networks:
+      - competitor-3-net
+    depends_on:
+      competitor-3-source:
+        condition: service_healthy
+      competitor-3-target:
+        condition: service_healthy
+    environment:
+      COMPETITION_RUN_ID: "${RUN_ID:-run-1}"
+      COMPETITION_COMPETITOR_ID: "competitor-3"
+      COMPETITION_SOURCE_HOST: competitor-3-source
+      COMPETITION_SOURCE_PORT: "5432"
+      COMPETITION_SOURCE_DB: comp3_source
+      COMPETITION_SOURCE_USER: comp3
+      COMPETITION_SOURCE_PASSWORD: comp3_pass
+      COMPETITION_TARGET_HOST: competitor-3-target
+      COMPETITION_TARGET_PORT: "5432"
+      COMPETITION_TARGET_DB: comp3_target
+      COMPETITION_TARGET_USER: comp3
+      COMPETITION_TARGET_PASSWORD: comp3_pass
+      COMPETITION_TARGET_ENGINE: postgresql
+      COMPETITION_DURATION_SECONDS: "${DURATION:-300}"
+      COMPETITION_BATCH_SIZE: "${BATCH_SIZE:-1000}"
+      COMPETITION_TOTAL_ROWS: "${TOTAL_ROWS:-100000}"
+      COMPETITION_RESULTS_DIR: /results/competitor-3
+
+  # ---------------------------------------------------------------------------
+  # Competitor 4
+  # ---------------------------------------------------------------------------
+  competitor-4-source:
+    <<: *postgres-source
+    networks:
+      - competitor-4-net
+    environment:
+      POSTGRES_DB: comp4_source
+      POSTGRES_USER: comp4
+      POSTGRES_PASSWORD: comp4_pass
+    volumes:
+      - comp4-source-data:/var/lib/postgresql/data
+
+  competitor-4-target:
+    <<: *postgres-target
+    networks:
+      - competitor-4-net
+    environment:
+      POSTGRES_DB: comp4_target
+      POSTGRES_USER: comp4
+      POSTGRES_PASSWORD: comp4_pass
+    volumes:
+      - comp4-target-data:/var/lib/postgresql/data
+
+  competitor-4-runner:
+    <<: *competitor-base
+    networks:
+      - competitor-4-net
+    depends_on:
+      competitor-4-source:
+        condition: service_healthy
+      competitor-4-target:
+        condition: service_healthy
+    environment:
+      COMPETITION_RUN_ID: "${RUN_ID:-run-1}"
+      COMPETITION_COMPETITOR_ID: "competitor-4"
+      COMPETITION_SOURCE_HOST: competitor-4-source
+      COMPETITION_SOURCE_PORT: "5432"
+      COMPETITION_SOURCE_DB: comp4_source
+      COMPETITION_SOURCE_USER: comp4
+      COMPETITION_SOURCE_PASSWORD: comp4_pass
+      COMPETITION_TARGET_HOST: competitor-4-target
+      COMPETITION_TARGET_PORT: "5432"
+      COMPETITION_TARGET_DB: comp4_target
+      COMPETITION_TARGET_USER: comp4
+      COMPETITION_TARGET_PASSWORD: comp4_pass
+      COMPETITION_TARGET_ENGINE: postgresql
+      COMPETITION_DURATION_SECONDS: "${DURATION:-300}"
+      COMPETITION_BATCH_SIZE: "${BATCH_SIZE:-1000}"
+      COMPETITION_TOTAL_ROWS: "${TOTAL_ROWS:-100000}"
+      COMPETITION_RESULTS_DIR: /results/competitor-4
+
+# ---------------------------------------------------------------------------
+# Network isolation — each competitor cannot see any other competitor
+# ---------------------------------------------------------------------------
+networks:
+  competitor-1-net:
+    driver: bridge
+    internal: true
+  competitor-2-net:
+    driver: bridge
+    internal: true
+  competitor-3-net:
+    driver: bridge
+    internal: true
+  competitor-4-net:
+    driver: bridge
+    internal: true
+
+# ---------------------------------------------------------------------------
+# Volumes
+# ---------------------------------------------------------------------------
+volumes:
+  competition-results:
+  comp1-source-data:
+  comp1-target-data:
+  comp2-source-data:
+  comp2-target-data:
+  comp3-source-data:
+  comp3-target-data:
+  comp4-source-data:
+  comp4-target-data:
