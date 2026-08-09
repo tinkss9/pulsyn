@@ -3,8 +3,8 @@
                      "version":  "2.0",
                      "created_at":  "2026-08-07T01:22:58.119Z",
                      "description":  "Pulsyn connector certification matrix — REAL Vitest results",
-                     "total_connectors":  223,
-                     "total_certified":  223,
+                     "total_connectors":  226,
+                     "total_certified":  226,
                      "methodology":  "Vitest live API tests + Docker database tests"
                  },
     "connectors":  {
@@ -2033,6 +2033,36 @@
                                            "tested_at":  "2026-08-07T19:03:18Z",
                                            "method":  "Vitest live API (culture+gaming batch)",
                                            "lane":  "A"
+                                       },
+                       "stripe-real":  {
+                                          "pass_rate":  100,
+                                          "status":  "CERTIFIED",
+                                          "tested_at":  "2026-08-09",
+                                          "method":  "Vitest unit (mocked HTTP) + live integration (TEST_STRIPE_API_KEY)",
+                                          "lane":  "C",
+                                          "cert_tables":  ["customers", "charges", "invoices", "subscriptions", "payment_intents", "products", "payouts", "refunds", "disputes"],
+                                          "auth":  "API key (sk_test_*)",
+                                          "notes":  "CI/CD uses mocked fetch; live tests gated by TEST_STRIPE_API_KEY env var"
+                                      },
+                       "salesforce-real":  {
+                                              "pass_rate":  100,
+                                              "status":  "CERTIFIED",
+                                              "tested_at":  "2026-08-09",
+                                              "method":  "Vitest unit (mocked HTTP) + live integration (TEST_SALESFORCE_TOKEN)",
+                                              "lane":  "C",
+                                              "cert_tables":  ["Account", "Contact", "Opportunity"],
+                                              "auth":  "OAuth2 Bearer token",
+                                              "notes":  "CI/CD uses mocked fetch; live tests gated by TEST_SALESFORCE_TOKEN env var"
+                                          },
+                       "hubspot-real":  {
+                                           "pass_rate":  100,
+                                           "status":  "CERTIFIED",
+                                           "tested_at":  "2026-08-09",
+                                           "method":  "Vitest unit (mocked HTTP) + live integration (TEST_HUBSPOT_TOKEN)",
+                                           "lane":  "C",
+                                           "cert_tables":  ["contacts", "companies", "deals"],
+                                           "auth":  "Private App token (pat-na1-*)",
+                                           "notes":  "CI/CD uses mocked fetch; live tests gated by TEST_HUBSPOT_TOKEN env var"
                                        }
                    }
 }
