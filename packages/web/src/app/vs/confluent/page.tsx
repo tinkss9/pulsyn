@@ -77,7 +77,7 @@ export default function ConfluentComparison() {
               </div>
               <div className="text-center bg-pulsyn-950/30 border border-pulsyn-800 rounded-xl py-6">
                 <div className="text-sm text-pulsyn-400 mb-2">Pulsyn Pro</div>
-                <div className="text-3xl font-bold text-pulsyn-400">$300</div>
+                <div className="text-3xl font-bold text-pulsyn-400">$499</div>
                 <div className="text-gray-400">/month</div>
                 <div className="text-sm text-green-400 mt-2">flat rate, no usage fees</div>
               </div>

@@ -9,10 +9,11 @@ export function ComparisonDisclaimer() {
             Transparency Notice
           </p>
           <p className="text-yellow-300/80 text-sm leading-relaxed">
-            Pulsyn is currently in <strong>pre-production</strong>. Our core CDC engine works and has 145 passing tests,
-            but we have not yet completed production benchmarking against the competitors listed below.
-            The comparisons are based on publicly documented features and pricing, not live head-to-head tests.
-            We&apos;re committed to honest marketing — if something changes, we&apos;ll update this page.
+            Pulsyn is currently in <strong>pre-production</strong>. We have 52 connectors: 
+            4 certified (integration tested), 8 verified (real drivers, pending tests), 
+            and 40 preview (real API endpoints, community tested). 
+            Comparisons are based on publicly documented features and pricing, not live head-to-head tests. 
+            We&apos;re committed to honest marketing — see <a href="/certification" className="underline hover:text-yellow-200">/certification</a> for details.
           </p>
         </div>
       </div>

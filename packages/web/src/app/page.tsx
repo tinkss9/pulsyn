@@ -40,27 +40,27 @@ function AIChat() {
       const lower = userMsg.toLowerCase();
 
       if (lower.includes('connector') || lower.includes('how many')) {
-        response = 'Pulsyn is building a broad connector catalog covering databases, warehouses, SaaS, payments, CRM, analytics, healthcare, fintech, education, government, logistics, travel, and more. Connector certification is in progress; verified results will be published as testing completes.';
+        response = 'Pulsyn has 52 connectors: 12 database connectors (PostgreSQL, MySQL, MongoDB, Redis, SQL Server, DynamoDB, Kafka, CosmosDB, S3, Supabase, Snowflake, BigQuery) and 40 SaaS connectors (Stripe, Salesforce, HubSpot, GitHub, Slack, Jira, and more). 4 are fully certified, 8 are verified, and 40 are in preview.';
       } else if (lower.includes('price') || lower.includes('cost') || lower.includes('how much')) {
-        response = 'Pulsyn starts free (3 pipelines, 1K rows/day). Starter is $99/mo, Pro is $499/mo, Business is $1,999/mo, and Enterprise starts at $9,999/mo. We offer enterprise-grade features at startup-friendly prices.';
+        response = 'Pulsyn has 4 tiers: Community (free, 3 pipelines, 50K rows/day), Pro ($499/mo, unlimited pipelines, 5M rows/day), Business ($3,500/mo, 100M rows/day, SSO), and Enterprise (custom). All paid plans include a 14-day free trial.';
       } else if (lower.includes('fast') || lower.includes('latency') || lower.includes('real-time')) {
         response = 'Pulsyn delivers <1 second CDC latency — true real-time. Our log-based CDC engine captures changes as they happen, not on a schedule. Traditional ETL tools sync every 15+ minutes.';
       } else if (lower.includes('setup') || lower.includes('start') || lower.includes('begin')) {
-        response = 'Getting started is easy: 1) Sign up free at pulsynai.com/signup, 2) Connect your source (PostgreSQL, MySQL, MongoDB, etc.), 3) Connect your target (Snowflake, BigQuery, etc.), 4) Create a pipeline. Most users are replicating data in under 5 minutes.';
+        response = 'Getting started: 1) Sign up free at pulsynai.com/signup, 2) Connect your source (PostgreSQL, MySQL, MongoDB, etc.), 3) Connect your target (Snowflake, BigQuery, etc.), 4) Create a pipeline. Try our demo at /demo first.';
       } else if (lower.includes('compare') || lower.includes('alternative') || lower.includes('vs')) {
-        response = 'We have comparison pages at /vs/fivetran, /vs/airbyte, /vs/confluent, and /vs/debezium. Each shows honest, feature-by-feature comparisons. We also have a market comparison at /docs/MARKET_COMPARISON_FACTUAL_REVIEW.md.';
+        response = 'We have comparison pages at /vs/fivetran, /vs/airbyte, /vs/confluent, and /vs/debezium. Each shows honest, feature-by-feature comparisons. We\'re pre-production but our core CDC engine works.';
       } else if (lower.includes('mcp') || lower.includes('ai agent') || lower.includes('claude')) {
-        response = 'Pulsyn has 26 MCP tools for AI agent integration. You can control pipelines from Claude, Cursor, or any MCP-compatible agent. Tools include: connect, discover, map, sync, monitor, transform, validate, and certify. First CDC platform with MCP support.';
+        response = 'Pulsyn has 26 MCP tools for AI agent integration. You can control pipelines from Claude, Cursor, or any MCP-compatible agent. Tools include: connect, discover, map, sync, monitor, transform, validate, and certify.';
       } else if (lower.includes('self-host') || lower.includes('on-prem') || lower.includes('deploy')) {
-        response = 'Yes! Pulsyn supports self-hosted deployment. Run it on your own infrastructure for compliance requirements. We support Docker, Kubernetes, and bare metal. Enterprise plans include on-premises support with dedicated engineers.';
+        response = 'Pulsyn supports self-hosted deployment via Docker. Run it on your own infrastructure for compliance requirements. Enterprise plans include on-premises support.';
       } else if (lower.includes('stripe') || lower.includes('payment') || lower.includes('billing')) {
-        response = 'We support Stripe, PayPal, Braintree, Adyen, Square, and 6 more payment connectors. Real-time CDC for payment data means you can detect fraud, reconcile transactions, and monitor subscriptions as they happen.';
+        response = 'We have a Stripe connector (Preview status) that syncs customers, charges, invoices, and subscriptions. It uses the real Stripe API with bearer auth. Try it with your Stripe API key.';
       } else if (lower.includes('healthcare') || lower.includes('hipaa') || lower.includes('medical')) {
-        response = 'We have 8 healthcare connectors: Epic, Cerner, Athenahealth, eClinicalWorks, NextGen, MEDITECH, Practice Fusion, and drchrono. All support FHIR endpoints. Self-hosted deployment available for HIPAA compliance.';
+        response = 'We don\'t have healthcare connectors yet. Our current focus is databases and core SaaS platforms. Check /certification for the full connector list.';
       } else if (lower.includes('test') || lower.includes('demo') || lower.includes('try')) {
-        response = 'Try our demo at pulsynai.com/demo — no signup required. We have 5 demo connectors (PostgreSQL, MySQL, Stripe, Shopify, HubSpot) with simulated data. See real-time metrics, data flow, and pipeline health. *Demo data is simulated.*';
+        response = 'Try our demo at /demo — no signup required. It uses simulated data to show how Pulsyn works. For real connectors, sign up and connect your own databases.';
       } else {
-        response = 'I can help with: connector selection, pricing, setup guides, AI agent integration (MCP), self-hosted deployment, and specific industry use cases. For competitor comparisons, visit our /vs/ pages. What would you like to know?';
+        response = 'I can help with: connector selection, pricing, setup guides, AI agent integration (MCP), self-hosted deployment, and competitor comparisons. What would you like to know?';
       }
 
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
@@ -117,18 +117,12 @@ function AIChat() {
 // Main Landing Page
 export default function LandingPage() {
   const connectorCategories = [
-    { name: 'Databases', count: 25, items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'DynamoDB', 'Cassandra', 'ClickHouse', 'Oracle', 'SQL Server', 'MariaDB', 'CockroachDB', 'Neo4j', 'DuckDB', 'SQLite', 'SingleStore', 'TimescaleDB', 'Spanner', 'CosmosDB', 'InfluxDB', 'ScyllaDB', 'TiDB', 'YugabyteDB', 'Materialize', 'StarRocks', 'Doris'] },
-    { name: 'Warehouses', count: 8, items: ['Snowflake', 'BigQuery', 'Redshift', 'Databricks', 'Synapse', 'Firebolt', 'MotherDuck', 'ClickHouse'] },
-    { name: 'SaaS', count: 45, items: ['Salesforce', 'HubSpot', 'Shopify', 'Stripe', 'Slack', 'GitHub', 'Jira', 'Notion', 'Airtable', 'Zendesk', 'Intercom', 'Segment', 'Linear', 'Twilio', 'SendGrid'] },
-    { name: 'Analytics', count: 12, items: ['Amplitude', 'Mixpanel', 'PostHog', 'Google Analytics', 'Heap', 'FullStory', 'Pendo', 'Hotjar', 'Crazy Egg', 'Mouseflow', 'SessionCam', 'Adobe Analytics'] },
-    { name: 'Payments', count: 15, items: ['Stripe', 'PayPal', 'Braintree', 'Adyen', 'Square', 'Chargebee', 'Recurly', 'Paddle', 'Klarna', 'Affirm', 'Afterpay', 'Checkout.com', 'Nuvei', 'Worldpay', 'Rapyd'] },
-    { name: 'CRM', count: 12, items: ['Salesforce', 'HubSpot', 'Pipedrive', 'Zoho CRM', 'Freshsales', 'Monday CRM', 'Apollo', 'Outreach', 'Salesloft', 'Gong', 'Chorus', 'Clari'] },
-    { name: 'Healthcare', count: 8, items: ['Epic', 'Cerner', 'Athenahealth', 'eClinicalWorks', 'NextGen', 'MEDITECH', 'Practice Fusion', 'drchrono'] },
-    { name: 'Fintech', count: 8, items: ['Plaid', 'Yodlee', 'Finicity', 'Dwolla', 'Marqeta', 'Brex', 'Ramp', 'Mercury'] },
-    { name: 'Education', count: 8, items: ['Canvas', 'Blackboard', 'Moodle', 'Google Classroom', 'PowerSchool', 'Clever', 'Ellucian', 'Turnitin'] },
-    { name: 'Government', count: 8, items: ['Salesforce Gov', 'Oracle Gov', 'SAP Gov', 'Deltek', 'Tyler Tech', 'OpenGov', 'CivicPlus', 'Esri'] },
-    { name: 'Logistics', count: 8, items: ['ShipBob', 'ShipStation', 'EasyPost', 'Shippo', 'Flexport', 'Convoy', 'Uber Freight', 'FourKites'] },
-    { name: 'Travel', count: 6, items: ['Airbnb', 'Booking.com', 'Expedia', 'TripAdvisor', 'Amadeus', 'Sabre'] },
+    { name: 'Databases', count: 10, items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'SQL Server', 'DynamoDB', 'Kafka', 'CosmosDB', 'S3', 'Supabase'], status: 'Certified / Verified' },
+    { name: 'Warehouses', count: 3, items: ['Snowflake', 'BigQuery', 'ClickHouse'], status: 'Verified' },
+    { name: 'SaaS', count: 30, items: ['Stripe', 'Salesforce', 'HubSpot', 'GitHub', 'Slack', 'Jira', 'Notion', 'Twilio', 'SendGrid', 'Intercom', 'Linear', 'Figma', 'Calendly', 'Zoom', 'Dropbox', 'Google Drive', 'Google Sheets', 'OneDrive', 'Mailchimp', 'Chargebee', 'PagerDuty', 'Datadog', 'NewRelic', 'Grafana', 'Cloudflare', 'Vercel', 'Netlify', 'WordPress', 'Microsoft Teams', 'Webflow'], status: 'Preview' },
+    { name: 'Analytics', count: 5, items: ['Amplitude', 'Mixpanel', 'PostHog', 'Google Analytics', 'Metabase'], status: 'Preview' },
+    { name: 'Payments', count: 2, items: ['Stripe', 'Chargebee'], status: 'Preview' },
+    { name: 'CRM', count: 3, items: ['Salesforce', 'HubSpot', 'ActiveCampaign'], status: 'Preview' },
   ];
 
   return (
@@ -163,10 +157,10 @@ export default function LandingPage() {
       {/* Stats Bar */}
       <AnimatedStats
         stats={[
-          { value: 1068, label: 'Connector modules' },
+          { value: 52, label: 'Connectors' },
           { value: '<1s', label: 'CDC Latency' },
-          { value: 'In progress', label: 'Certification' },
-          { value: '10x', label: 'Cheaper than Fivetran' },
+          { value: 4, label: 'Certified' },
+          { value: 26, label: 'MCP Tools' },
         ]}
       />
 
@@ -249,7 +243,7 @@ export default function LandingPage() {
       <ScrollReveal>
       <AnimatedComparisonTable
         rows={[
-          { feature: 'Connectors', pulsyn: '763', fivetran: '700+', airbyte: '600+', debezium: '~50' },
+          { feature: 'Connectors', pulsyn: '52 (growing)', fivetran: '700+', airbyte: '600+', debezium: '~50' },
           { feature: 'CDC Latency', pulsyn: '<1 second', fivetran: '1-15 min', airbyte: '15 min', debezium: 'Sub-second' },
           { feature: 'Kafka Required', pulsyn: 'No', fivetran: 'No', airbyte: 'No', debezium: 'Yes' },
           { feature: 'AI Agent (MCP)', pulsyn: '26 tools', fivetran: 'None', airbyte: 'None', debezium: 'None' },
@@ -439,7 +433,7 @@ export default function LandingPage() {
               </div>
               <span className="text-lg font-bold text-white">Pulsyn</span>
             </div>
-            <p className="text-gray-500 text-sm">Real-time CDC without Kafka. 763 connectors. AI-powered.</p>
+            <p className="text-gray-500 text-sm">Real-time CDC without Kafka. 52 connectors. AI-powered.</p>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">Product</h4>
