@@ -388,8 +388,13 @@ export class ConnectorTestRunner {
             if (events.length > 0) {
               const row = events[0].after;
               expect(row).toBeDefined();
-              // Check that we got some data
-              expect(Object.keys(row!).length).toBeGreaterThan(0);
+              // Check that we got some data (row may be object or primitive)
+              if (typeof row === 'object' && row !== null) {
+                expect(Object.keys(row).length).toBeGreaterThan(0);
+              } else {
+                // Primitive value (e.g., number ID from hackernews)
+                expect(row).toBeDefined();
+              }
             }
           }
         });

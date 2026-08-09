@@ -284,9 +284,14 @@ export abstract class SaaSConnector extends BaseConnector {
       const data = await res.json() as any;
 
       // Extract items from various response shapes
-      const items = Array.isArray(data)
+      let items = Array.isArray(data)
         ? data
         : data.data || data.results || data.items || data.records || data.entries || [];
+
+      // Wrap single objects in array (e.g., coinbase exchange_rates returns { currency, rates })
+      if (!Array.isArray(items)) {
+        items = typeof items === 'object' && items !== null ? [items] : [];
+      }
 
       if (items.length === 0) break;
       yield items;
