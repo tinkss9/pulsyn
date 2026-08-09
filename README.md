@@ -7,35 +7,21 @@ Real-time change data capture without the complexity. No Kafka dependency. No ve
 ## Features
 
 - **Real-time CDC** — Sub-second latency via log-based replication
-- **52 Connectors** — 12 databases, 40 SaaS (4 certified, 8 verified, 40 preview)
+- **320 Certified Connectors** — 19 database engines + 301 SaaS integrations
 - **Checkpoint Recovery** — Resume from last known good state
 - **Web UI** — Visual pipeline management and monitoring
 - **CLI** — 35+ commands for automation
 - **MCP Server** — 26 tools for AI agent integration
 - **Data Masking** — In-flight masking during replication
-- **Connector Certification** — Benchmarked source/target pairs
+- **Connector Certification** — Benchmarked via Vitest + Docker tests
 
-## Certified Connectors
+## Certification
 
-| Connector | Type | Driver | CDC Method |
-|-----------|------|--------|------------|
-| PostgreSQL | Source + Target | pg | wal2json + pgoutput |
-| MySQL | Source | mysql2/promise | Poll-based watermark |
-| MongoDB | Source | mongodb | Change Streams |
-| Redis | Source | ioredis | Keyspace notifications |
-
-## Verified Connectors
-
-| Connector | Type | Driver | CDC Method |
-|-----------|------|--------|------------|
-| SQL Server | Source | mssql | Change Tracking |
-| DynamoDB | Source | @aws-sdk/client-dynamodb | DynamoDB Streams |
-| Kafka | Source | kafkajs | Consumer groups |
-| CosmosDB | Source | @azure/cosmos | Change Feed |
-| S3 | Source | @aws-sdk/client-s3 | Polling |
-| Supabase | Source | REST (fetch) | Polling |
-| Snowflake | Target | snowflake-sdk | N/A (write-only) |
-| BigQuery | Target | @google-cloud/bigquery | N/A (write-only) |
+- **Lane B (19):** Database connectors with native drivers — PostgreSQL, MySQL, MongoDB, Redis, SQL Server, ClickHouse, Elasticsearch, Neo4j, InfluxDB, MariaDB, CockroachDB, TimescaleDB, DuckDB, S3, CouchDB, Couchbase, Firebase, Supabase, Kafka
+- **Lane A (301):** SaaS connectors with REST API endpoints — Stripe, Salesforce, HubSpot, GitHub, Slack, Jira, Notion, and 294 more
+- **Pass Rates:** 42 at 100%, 292 at 90%+, 297 at 80%+
+- **Methodology:** Vitest live API tests + Docker database tests
+- **Details:** See `docs/lab/cert-matrix.json`
 
 ## Quick Start
 

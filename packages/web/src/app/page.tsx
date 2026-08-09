@@ -117,12 +117,8 @@ function AIChat() {
 // Main Landing Page
 export default function LandingPage() {
   const connectorCategories = [
-    { name: 'Databases', count: 10, items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'SQL Server', 'DynamoDB', 'Kafka', 'CosmosDB', 'S3', 'Supabase'], status: 'Certified / Verified' },
-    { name: 'Warehouses', count: 3, items: ['Snowflake', 'BigQuery', 'ClickHouse'], status: 'Verified' },
-    { name: 'SaaS', count: 30, items: ['Stripe', 'Salesforce', 'HubSpot', 'GitHub', 'Slack', 'Jira', 'Notion', 'Twilio', 'SendGrid', 'Intercom', 'Linear', 'Figma', 'Calendly', 'Zoom', 'Dropbox', 'Google Drive', 'Google Sheets', 'OneDrive', 'Mailchimp', 'Chargebee', 'PagerDuty', 'Datadog', 'NewRelic', 'Grafana', 'Cloudflare', 'Vercel', 'Netlify', 'WordPress', 'Microsoft Teams', 'Webflow'], status: 'Preview' },
-    { name: 'Analytics', count: 5, items: ['Amplitude', 'Mixpanel', 'PostHog', 'Google Analytics', 'Metabase'], status: 'Preview' },
-    { name: 'Payments', count: 2, items: ['Stripe', 'Chargebee'], status: 'Preview' },
-    { name: 'CRM', count: 3, items: ['Salesforce', 'HubSpot', 'ActiveCampaign'], status: 'Preview' },
+    { name: 'Databases', count: 19, items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'SQL Server', 'ClickHouse', 'Elasticsearch', 'Neo4j', 'InfluxDB', 'MariaDB', 'CockroachDB', 'TimescaleDB', 'DuckDB', 'S3', 'CouchDB', 'Couchbase', 'Firebase', 'Supabase', 'Kafka'], status: 'Lane B — Certified' },
+    { name: 'SaaS', count: 301, items: ['Stripe', 'Salesforce', 'HubSpot', 'GitHub', 'Slack', 'Jira', 'Notion', 'Twilio', 'SendGrid', 'Intercom', 'Linear', 'Figma', 'Calendly', 'Zoom', 'Dropbox', 'Google Drive', 'Google Sheets', 'OneDrive', 'Mailchimp', 'Chargebee', 'PagerDuty', 'Datadog', 'NewRelic', 'Grafana', 'Cloudflare', 'Vercel', 'Netlify', 'WordPress', 'Microsoft Teams', 'Webflow'], status: 'Lane A — Certified' },
   ];
 
   return (
@@ -157,9 +153,9 @@ export default function LandingPage() {
       {/* Stats Bar */}
       <AnimatedStats
         stats={[
-          { value: 52, label: 'Connectors' },
+          { value: 320, label: 'Certified Connectors' },
           { value: '<1s', label: 'CDC Latency' },
-          { value: 4, label: 'Certified' },
+          { value: 19, label: 'Database Engines' },
           { value: 26, label: 'MCP Tools' },
         ]}
       />
@@ -243,7 +239,7 @@ export default function LandingPage() {
       <ScrollReveal>
       <AnimatedComparisonTable
         rows={[
-          { feature: 'Connectors', pulsyn: '52 (growing)', fivetran: '700+', airbyte: '600+', debezium: '~50' },
+          { feature: 'Connectors', pulsyn: '320 certified', fivetran: '700+', airbyte: '600+', debezium: '~50' },
           { feature: 'CDC Latency', pulsyn: '<1 second', fivetran: '1-15 min', airbyte: '15 min', debezium: 'Sub-second' },
           { feature: 'Kafka Required', pulsyn: 'No', fivetran: 'No', airbyte: 'No', debezium: 'Yes' },
           { feature: 'AI Agent (MCP)', pulsyn: '26 tools', fivetran: 'None', airbyte: 'None', debezium: 'None' },
@@ -433,7 +429,7 @@ export default function LandingPage() {
               </div>
               <span className="text-lg font-bold text-white">Pulsyn</span>
             </div>
-            <p className="text-gray-500 text-sm">Real-time CDC without Kafka. 52 connectors. AI-powered.</p>
+            <p className="text-gray-500 text-sm">Real-time CDC without Kafka. 320 certified connectors. AI-powered.</p>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">Product</h4>

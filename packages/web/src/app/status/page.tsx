@@ -38,19 +38,24 @@ export default function StatusPage() {
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Certified</span>
-                  <span className="text-green-400 font-semibold">4 connectors</span>
+                  <span className="text-gray-300">Total Certified</span>
+                  <span className="text-green-400 font-semibold">320 connectors</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Verified</span>
-                  <span className="text-blue-400 font-semibold">8 connectors</span>
+                  <span className="text-gray-300">Lane B (Databases)</span>
+                  <span className="text-cyan-400 font-semibold">19 connectors</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Preview</span>
-                  <span className="text-purple-400 font-semibold">40 connectors</span>
+                  <span className="text-gray-300">Lane A (SaaS)</span>
+                  <span className="text-blue-400 font-semibold">301 connectors</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">90%+ Pass Rate</span>
+                  <span className="text-purple-400 font-semibold">292 connectors</span>
                 </div>
               </div>
               <p className="text-sm text-gray-500 mt-4">
+                Methodology: Vitest live API tests + Docker database tests<br/>
                 See <a href="/certification" className="underline hover:text-gray-400">/certification</a> for full details.
               </p>
             </div>
