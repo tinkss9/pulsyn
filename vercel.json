@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npx turbo build --filter=@pulsyn/web...",
+  "buildCommand": "npm run build -w packages/web",
   "outputDirectory": "packages/web/.next",
   "installCommand": "npm ci"
 }
