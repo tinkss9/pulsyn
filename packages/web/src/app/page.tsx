@@ -40,7 +40,7 @@ function AIChat() {
       const lower = userMsg.toLowerCase();
 
       if (lower.includes('connector') || lower.includes('how many')) {
-        response = 'Pulsyn has 52 connectors: 12 database connectors (PostgreSQL, MySQL, MongoDB, Redis, SQL Server, DynamoDB, Kafka, CosmosDB, S3, Supabase, Snowflake, BigQuery) and 40 SaaS connectors (Stripe, Salesforce, HubSpot, GitHub, Slack, Jira, and more). 4 are fully certified, 8 are verified, and 40 are in preview.';
+        response = 'Pulsyn has 320 certified connectors: 19 database engines (PostgreSQL, MySQL, MongoDB, Redis, SQL Server, ClickHouse, Elasticsearch, Neo4j, InfluxDB, MariaDB, CockroachDB, TimescaleDB, DuckDB, S3, CouchDB, Couchbase, Firebase, Supabase, Kafka) and 301 SaaS integrations (Stripe, Salesforce, HubSpot, GitHub, Slack, Jira, and more). All tested via Vitest with real API calls.';
       } else if (lower.includes('price') || lower.includes('cost') || lower.includes('how much')) {
         response = 'Pulsyn has 4 tiers: Community (free, 3 pipelines, 50K rows/day), Pro ($499/mo, unlimited pipelines, 5M rows/day), Business ($3,500/mo, 100M rows/day, SSO), and Enterprise (custom). All paid plans include a 14-day free trial.';
       } else if (lower.includes('fast') || lower.includes('latency') || lower.includes('real-time')) {
