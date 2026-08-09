@@ -15,8 +15,9 @@ export async function GET() {
     );
     return NextResponse.json({ data: result.rows, total: result.rowCount });
   } catch (err: any) {
+    console.error('[Connectors] Fetch error:', err.message);
     return NextResponse.json(
-      { error: `Failed to fetch connectors: ${err.message}`, code: 'CONNECTORS_FETCH_FAILED' },
+      { error: 'Failed to fetch connectors', code: 'CONNECTORS_FETCH_FAILED' },
       { status: 500 }
     );
   }
@@ -75,8 +76,9 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
+    console.error('[Connectors] Create error:', err.message);
     return NextResponse.json(
-      { error: `Failed to create connector: ${err.message}`, code: 'CONNECTOR_CREATE_FAILED' },
+      { error: 'Failed to create connector', code: 'CONNECTOR_CREATE_FAILED' },
       { status: 500 }
     );
   }

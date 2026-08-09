@@ -17,17 +17,18 @@ export async function POST(request: NextRequest) {
 
     let event: any;
 
-    if (process.env.STRIPE_WEBHOOK_SECRET) {
-      try {
-        const Stripe = (await import('stripe')).default;
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-        event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
-      } catch (err: any) {
-        console.error('[Webhook] Signature verification failed:', err.message);
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-      }
-    } else {
-      event = JSON.parse(body);
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      console.error('[Webhook] STRIPE_WEBHOOK_SECRET not configured — rejecting all webhooks');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+
+    try {
+      const Stripe = (await import('stripe')).default;
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (err: any) {
+      console.error('[Webhook] Signature verification failed:', err.message);
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     switch (event.type) {
