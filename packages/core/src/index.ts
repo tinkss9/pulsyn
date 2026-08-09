@@ -29,7 +29,9 @@ export { PulsynApiClient, ApiError } from './api-client';
 // Benchmark
 export { DEFAULT_SUITE, CERTIFICATION_THRESHOLDS, calculateScore, runBenchmark } from './benchmark/engine';
 export { generateReportSummary, generateReportMarkdown } from './benchmark/runner';
+export { runRealBenchmark, quickBenchmark } from './benchmark/real-runner';
 export type { BenchmarkConfig, BenchmarkSuite, BenchmarkTest, BenchmarkTestResult, BenchmarkReport, CertificationLevel } from './benchmark/engine';
+export type { RealBenchmarkConfig, RealBenchmarkRunOptions } from './benchmark/real-runner';
 
 // Events (DMS-ported)
 export { createEvent, eventKey, eventToDict, dictToEvent } from './events';
