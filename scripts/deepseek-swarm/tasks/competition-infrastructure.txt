@@ -1,0 +1,76 @@
+# Task: Build Competition Infrastructure
+
+## Objective
+Build the real competition infrastructure for the Pulsyn Replication Race — real benchmark engine, Docker-based isolation, transparent metrics.
+
+## Current State
+- Competition page exists at `packages/web/src/app/competition/page.tsx` (now shows "Coming Soon")
+- Benchmark engine exists at `packages/core/src/benchmark/engine.ts` (simulated)
+- No real competition infrastructure
+
+## What Needs to Be Built
+
+### 1. Real Benchmark Runner (Already Spawned)
+- See T3 task for benchmark runner implementation
+- Must measure real throughput, latency, correctness
+
+### 2. Docker-Based Isolation
+Create `docker/competition/` directory with:
+- `docker-compose.competition.yml` — Defines isolated containers for each competitor
+- Each container gets:
+  - Source database (PostgreSQL, MySQL, or MongoDB)
+  - Target database (PostgreSQL, MySQL, or Snowflake)
+  - Pulsyn CLI installed
+  - Network isolation (can't access other containers)
+  - Resource limits (CPU, memory)
+
+### 3. Competition API
+Create `packages/web/src/app/api/competition/` routes:
+- `POST /api/competition/register` — Register for competition
+- `POST /api/competition/start` — Start a competition run
+- `GET /api/competition/status/[runId]` — Get run status
+- `GET /api/competition/leaderboard` — Get leaderboard
+- `POST /api/competition/submit` — Submit connector code
+
+### 4. Scoring System
+Create `packages/core/src/competition/scoring.ts`:
+- Throughput score (rows/sec) — 40% weight
+- Latency score (p99 ms) — 30% weight
+- Correctness score (data integrity) — 30% weight
+- Anti-cheat: verify runs happen on our infrastructure
+
+### 5. Leaderboard
+Create `packages/web/src/app/competition/leaderboard/page.tsx`:
+- Real-time leaderboard (not fabricated)
+- Show: rank, name, score, rows/sec, latency, country
+- Filter by: week, phase, connector pair
+
+## Implementation Plan
+
+### Phase 1: Docker Infrastructure (Week 1)
+1. Create Docker Compose for competition environment
+2. Create container images with Pulsyn CLI pre-installed
+3. Test isolation and resource limits
+
+### Phase 2: Competition API (Week 2)
+1. Create competition registration endpoint
+2. Create competition run endpoint
+3. Create status polling endpoint
+4. Create leaderboard endpoint
+
+### Phase 3: Scoring & Leaderboard (Week 3)
+1. Implement real scoring system
+2. Build leaderboard UI
+3. Add anti-cheat measures
+
+### Phase 4: Testing & Launch (Week 4)
+1. End-to-end testing
+2. Security audit
+3. Launch competition
+
+## Success Criteria
+- Competitors can register and start runs
+- Runs happen in isolated Docker containers
+- Metrics are real (not simulated)
+- Leaderboard shows real data
+- Anti-cheat prevents cheating

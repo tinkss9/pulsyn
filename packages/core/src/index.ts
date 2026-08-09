@@ -132,6 +132,23 @@ export { CDCEngine } from './engine/cdc-engine';
 export { CertificationEngine } from './certification/engine';
 export type { CertificationLevel as ConnectorCertLevel, TestResult as ConnectorTestResult, CertificationReport as ConnectorCertReport } from './certification/engine';
 
+// Competition Scoring
+export {
+  calculateCompetitionScore,
+  scoreThroughput,
+  scoreLatency,
+  scoreCorrectness,
+  rankLeaderboard,
+  COMPETITION_TIERS,
+} from './competition/scoring';
+export type {
+  CompetitionMetrics,
+  CompetitionScore,
+  CompetitionTier,
+  CompetitionTierThresholds,
+  LeaderboardEntry,
+} from './competition/scoring';
+
 // Checkpoint
 export { CheckpointManager } from './checkpoint/checkpoint-manager';
 export { WatermarkTracker } from './checkpoint/watermark';

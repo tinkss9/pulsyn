@@ -1,0 +1,70 @@
+# Task: Certify Top SaaS Connectors with Real API Tests
+
+## Objective
+Certify Stripe, Salesforce, and HubSpot connectors with real API integration tests against sandbox/test environments.
+
+## Current State
+- These connectors exist in `packages/core/src/connectors/` (stripe.ts, salesforce.ts, hubspot.ts)
+- They use the SaaSConnector base class which handles auth, pagination, rate limiting, CDC polling
+- They have real API endpoints defined but haven't been tested against live APIs
+- The cert-matrix.json shows them as "CERTIFIED" but with Lane A (SaaS) classification
+
+## What Needs to Be Done
+
+### 1. Stripe (Easiest — has test mode)
+- Stripe has a test mode with test API keys
+- Create test at `packages/core/src/__tests__/connectors/stripe.test.ts`
+- Test: connect, getTables, getTableSchema, extractFull (customers, charges, invoices)
+- Use Stripe test API key: `sk_test_...`
+- Verify: pagination works, rate limiting works, CDC polling works
+
+### 2. Salesforce (Has sandbox)
+- Salesforce has Developer Edition (free) and sandbox environments
+- Create test at `packages/core/src/__tests__/connectors/salesforce.test.ts`
+- Test: connect via OAuth2, getTables, getTableSchema, extractFull (accounts, contacts, opportunities)
+- Use Salesforce sandbox credentials
+- Verify: SOQL queries work, pagination works
+
+### 3. HubSpot (Has test portal)
+- HubSpot has a free test portal with API access
+- Create test at `packages/core/src/__tests__/connectors/hubspot.test.ts`
+- Test: connect, getTables, getTableSchema, extractFull (contacts, companies, deals)
+- Use HubSpot test API key
+- Verify: CRM API works, pagination works
+
+## Implementation Plan
+
+### Phase 1: Create Test Infrastructure
+1. Create `packages/core/src/__tests__/connectors/saas-test-helpers.ts`
+   - Helper functions for SaaS connector testing
+   - Environment variable handling for API keys
+   - Cleanup utilities
+
+2. Update `packages/core/src/__tests__/conformance/test-all-connectors.test.ts`
+   - Add SaaS connector test suite
+   - Mock HTTP responses for CI/CD
+   - Real API tests when credentials available
+
+### Phase 2: Implement Tests
+1. Stripe test suite
+2. Salesforce test suite  
+3. HubSpot test suite
+
+### Phase 3: Update Certification
+1. Run tests against real APIs
+2. Update cert-matrix.json with real pass rates
+3. Publish results on certification page
+
+## Environment Variables Needed
+```
+STRIPE_TEST_API_KEY=sk_test_...
+SALESFORCE_SANDBOX_URL=https://test.salesforce.com
+SALESFORCE_SANDBOX_TOKEN=...
+HUBSPOT_TEST_API_KEY=...
+```
+
+## Success Criteria
+- All three connectors pass connect, getTables, getTableSchema, extractFull
+- Pass rate >= 90% for each connector
+- Results published in cert-matrix.json
+- Certification page updated with real test results

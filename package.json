@@ -6,7 +6,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "description": "The AI-Native CDC Platform \u2014 Real-time change data capture without the complexity",
+  "description": "The AI-Native CDC Platform — Real-time change data capture without the complexity",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -39,8 +39,8 @@
     "keys:validate": "npx tsx scripts/setup-test-keys.ts --validate"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.1096.0",
-    "@aws-sdk/client-dynamodb-streams": "^3.1096.0",
+    "@aws-sdk/client-dynamodb": "^3.1106.0",
+    "@aws-sdk/client-dynamodb-streams": "^3.1106.0",
     "@aws-sdk/util-dynamodb": "^3.996.7",
     "@clickhouse/client": "^1.23.1",
     "@databricks/sql": "^2.0.0",
@@ -76,6 +76,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.10.0",
     "@playwright/test": "^1.62.0",
     "mongodb": "^7.5.0",
     "mssql": "^12.7.0",

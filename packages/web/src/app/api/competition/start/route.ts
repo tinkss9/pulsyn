@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { execSync, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import { randomUUID } from 'crypto';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-
-// In-memory run store (replace with database in production)
-const runs: Map<string, {
-  runId: string;
-  competitorId: string;
-  status: 'pending' | 'starting' | 'running' | 'completed' | 'failed';
-  startedAt: string;
-  completedAt?: string;
-  composeProject: string;
-  resultsFile?: string;
-  error?: string;
-}> = new Map();
+import { competitionRuns, CompetitionRun } from '../state';
 
 const COMPOSE_FILE = join(process.cwd(), '..', '..', 'docker', 'competition', 'docker-compose.competition.yml');
 const RESULTS_BASE = join(process.cwd(), '..', '..', 'docker', 'competition', 'results');
@@ -32,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing active run
-    const existingRun = Array.from(runs.values())
+    const existingRun = Array.from(competitionRuns.values())
       .find(r => r.competitorId === competitorId && (r.status === 'running' || r.status === 'starting'));
 
     if (existingRun) {
@@ -52,32 +41,29 @@ export async function POST(request: NextRequest) {
       mkdirSync(resultsDir, { recursive: true });
     }
 
-    // Store run metadata
-    runs.set(runId, {
+    const resultsFile = join(resultsDir, `${runId}.json`);
+
+    // Create run record
+    const run: CompetitionRun = {
       runId,
       competitorId,
       status: 'starting',
       startedAt: new Date().toISOString(),
-      composeProject,
-      resultsFile: join(resultsDir, 'results.json'),
-    });
+      resultsFile,
+    };
+    competitionRuns.set(runId, run);
 
-    // Start competition containers in background
+    // Start Docker Compose in background
     const env = {
       ...process.env,
-      RUN_ID: runId,
-      DURATION: String(durationSeconds || 300),
-      BATCH_SIZE: String(batchSize || 1000),
-      TOTAL_ROWS: String(totalRows || 100000),
+      COMPETITION_RUN_ID: runId,
+      COMPETITION_COMPETITOR_ID: competitorId,
+      COMPETITION_DISPLAY_NAME: displayName || competitorId,
+      COMPETITION_TOTAL_ROWS: String(totalRows || 10000),
+      COMPETITION_BATCH_SIZE: String(batchSize || 1000),
+      COMPETITION_DURATION_SECONDS: String(durationSeconds || 60),
+      COMPETITION_RESULTS_FILE: resultsFile,
     };
-
-    // Use docker compose to start only this competitor's services
-    const competitorNum = 1; // Map competitorId to slot in future
-    const services = [
-      `competitor-${competitorNum}-source`,
-      `competitor-${competitorNum}-target`,
-      `competitor-${competitorNum}-runner`,
-    ];
 
     const child = spawn('docker', [
       'compose',
@@ -85,75 +71,48 @@ export async function POST(request: NextRequest) {
       '-p', composeProject,
       'up',
       '--abort-on-container-exit',
-      '--exit-code-from', `competitor-${competitorNum}-runner`,
-      ...services,
     ], {
       env,
       detached: true,
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: 'ignore',
     });
 
     child.unref();
 
-    // Track completion
-    const runData = runs.get(runId)!;
-    child.on('close', (code) => {
-      runData.status = code === 0 ? 'completed' : 'failed';
-      runData.completedAt = new Date().toISOString();
-      if (code !== 0) {
-        runData.error = `Container exited with code ${code}`;
+    // Update status to running
+    run.status = 'running';
+
+    // Monitor completion in background
+    child.on('exit', (code) => {
+      if (code === 0) {
+        run.status = 'completed';
+        run.completedAt = new Date().toISOString();
+      } else {
+        run.status = 'failed';
+        run.error = `Docker exited with code ${code}`;
+        run.completedAt = new Date().toISOString();
       }
     });
 
     child.on('error', (err) => {
-      runData.status = 'failed';
-      runData.completedAt = new Date().toISOString();
-      runData.error = err.message;
+      run.status = 'failed';
+      run.error = err.message;
+      run.completedAt = new Date().toISOString();
     });
-
-    // Update status to running after a brief delay
-    setTimeout(() => {
-      if (runData.status === 'starting') {
-        runData.status = 'running';
-      }
-    }, 3000);
 
     return NextResponse.json({
       success: true,
       data: {
         runId,
-        competitorId,
-        displayName: displayName || competitorId,
-        status: 'starting',
-        startedAt: runData.startedAt,
+        status: run.status,
         pollUrl: `/api/competition/status/${runId}`,
+        startedAt: run.startedAt,
       },
-    }, { status: 201 });
-
+    });
   } catch (error) {
-    console.error('[Competition Start] Error:', error);
     return NextResponse.json(
-      { error: 'Failed to start competition run' },
+      { error: error instanceof Error ? error.message : 'Failed to start competition run' },
       { status: 500 }
     );
   }
 }
-
-export async function GET() {
-  const activeRuns = Array.from(runs.values())
-    .filter(r => r.status === 'running' || r.status === 'starting')
-    .map(r => ({
-      runId: r.runId,
-      competitorId: r.competitorId,
-      status: r.status,
-      startedAt: r.startedAt,
-    }));
-
-  return NextResponse.json({
-    activeRuns,
-    total: activeRuns.length,
-  });
-}
-
-// Export runs map for status endpoint
-export { runs };

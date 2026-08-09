@@ -1,0 +1,70 @@
+# Task: Get 10 Beta Users with PostgreSQL + Snowflake
+
+## Objective
+Acquire 10 beta users who have the PostgreSQL → Snowflake use case for Pulsyn.
+
+## Target Customer Profile
+- **Company:** Startups or mid-size companies
+- **Use Case:** Real-time CDC from PostgreSQL to Snowflake
+- **Budget:** $500-2,000/month
+- **Pain Point:** Current tools (Fivetran, Airbyte) are too expensive or too slow
+- **Technical Level:** Data engineers or backend developers
+
+## Acquisition Strategy
+
+### 1. Direct Outreach (Week 1-2)
+- **Target:** Companies using PostgreSQL + Snowflake (find on LinkedIn, Twitter, GitHub)
+- **Message:** "We're building real-time CDC for PostgreSQL → Snowflake. Sub-second latency, $499/mo flat. Want to beta test?"
+- **Channel:** LinkedIn DM, Twitter DM, email
+- **Goal:** 5 beta users
+
+### 2. Community Engagement (Week 2-3)
+- **Target:** Data engineering communities
+- **Channels:**
+  - Reddit: r/dataengineering, r/snowflake, r/postgresql
+  - Hacker News: Show HN post
+  - Discord: dbt, Snowflake, PostgreSQL communities
+  - Slack: Data engineering groups
+- **Message:** "We built a CDC tool that's 10x cheaper than Fivetran. Looking for beta testers."
+- **Goal:** 3 beta users
+
+### 3. Content Marketing (Week 3-4)
+- **Content:**
+  - Blog post: "Why We Built Pulsyn" (technical deep dive)
+  - Comparison: "Pulsyn vs Fivetran: Real-time CDC at 1/10th the Cost"
+  - Tutorial: "Setting Up PostgreSQL → Snowflake CDC in 5 Minutes"
+- **Channels:** Dev.to, Medium, company blog
+- **Goal:** 2 beta users
+
+### 4. Product Hunt Launch (Week 4)
+- **Preparation:**
+  - Create Product Hunt page
+  - Prepare demo video
+  - Get 10 upvotes from friends
+- **Launch:** "Pulsyn — Real-time CDC without Kafka"
+- **Goal:** 5+ signups, 2 beta users
+
+## Beta User Benefits
+- **Free Pro access** for 3 months
+- **Direct Slack channel** with founding team
+- **Priority support** — we'll fix bugs for you
+- **Influence roadmap** — tell us what connectors to build next
+- **Early access** to competition
+
+## Beta User Requirements
+- Must have PostgreSQL database (production or staging)
+- Must have Snowflake account (any tier)
+- Must be willing to provide feedback (1 call + weekly survey)
+- Must allow us to use their logo (with permission)
+
+## Success Metrics
+- 10 beta users signed up
+- 5 beta users actively replicating data
+- 3 beta users providing feedback
+- 1 beta user willing to be case study
+
+## Timeline
+- Week 1-2: Direct outreach (5 users)
+- Week 2-3: Community engagement (3 users)
+- Week 3-4: Content marketing (2 users)
+- Week 4: Product Hunt launch (bonus)

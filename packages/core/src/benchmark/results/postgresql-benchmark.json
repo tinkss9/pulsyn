@@ -1,0 +1,108 @@
+{
+  "id": "real-bench-1786269094346",
+  "connectorPair": {
+    "source": "postgresql",
+    "target": "postgresql"
+  },
+  "timestamp": "2026-08-09T09:51:34.347Z",
+  "config": {
+    "source": {
+      "engine": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "testdb",
+      "user": "test",
+      "password": "test"
+    },
+    "target": {
+      "engine": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "testdb",
+      "user": "test",
+      "password": "test"
+    },
+    "test": {
+      "durationSeconds": 60,
+      "batchSize": 1000,
+      "concurrency": 1,
+      "totalRows": 50000,
+      "tablePrefix": "pulsyn_bench"
+    },
+    "bulkRowCount": 50000,
+    "bulkBatchSize": 1000,
+    "streamingRowCount": 2000,
+    "latencyIterations": 500,
+    "checkpointRowCount": 5000,
+    "cleanup": true
+  },
+  "results": [
+    {
+      "testId": "real-throughput-bulk",
+      "passed": true,
+      "metrics": {
+        "rowsPerSecond": 34530,
+        "totalRows": 50000,
+        "durationMs": 1448,
+        "avgLatencyMs": 28.96,
+        "p50LatencyMs": 22.92,
+        "p95LatencyMs": 63.72,
+        "p99LatencyMs": 112.79
+      },
+      "details": "50000 rows in 50 batches of 1000 — 34,530 rows/sec"
+    },
+    {
+      "testId": "real-throughput-streaming",
+      "passed": true,
+      "metrics": {
+        "rowsPerSecond": 278,
+        "totalRows": 2000,
+        "durationMs": 7184,
+        "avgLatencyMs": 3.59,
+        "p50LatencyMs": 3.5,
+        "p95LatencyMs": 4.45,
+        "p99LatencyMs": 5.31
+      },
+      "details": "2000 single-row inserts — 278 rows/sec"
+    },
+    {
+      "testId": "real-latency-single",
+      "passed": true,
+      "metrics": {
+        "avgLatencyMs": 3.53,
+        "p50LatencyMs": 3.41,
+        "p95LatencyMs": 4.52,
+        "p99LatencyMs": 5.64,
+        "totalRows": 500,
+        "durationMs": 1764
+      },
+      "details": "p50=3.41ms  p95=4.52ms  p99=5.64ms"
+    },
+    {
+      "testId": "real-recovery-checkpoint",
+      "passed": true,
+      "metrics": {
+        "totalRows": 5000,
+        "durationMs": 9190
+      },
+      "details": "Resumed from checkpoint (row 200002499). Total rows: 5000. Resume took 9190ms."
+    },
+    {
+      "testId": "real-correctness-integrity",
+      "passed": true,
+      "metrics": {
+        "totalRows": 1000,
+        "errorRate": 0
+      },
+      "details": "1000/1000 rows structurally valid (100.00%)"
+    }
+  ],
+  "summary": {
+    "overallScore": 74,
+    "throughputScore": 35,
+    "latencyScore": 100,
+    "correctnessScore": 100,
+    "certification": "uncertified"
+  },
+  "duration": 29024
+}
