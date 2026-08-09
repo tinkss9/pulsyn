@@ -1,105 +1,95 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { calculateCompetitionScore } from '@pulsyn/core';
-import type { CompetitionMetrics } from '@pulsyn/core';
+import { competitionRuns } from '../../state';
 
-// Shared run store (imported from start endpoint — in production, use a database)
-// For now, maintain a local mirror that the start endpoint populates
-const runs: Map<string, {
-  runId: string;
-  competitorId: string;
-  status: 'pending' | 'starting' | 'running' | 'completed' | 'failed';
-  startedAt: string;
-  completedAt?: string;
-  resultsFile?: string;
-  error?: string;
-}> = new Map();
+// Inline scoring to avoid @pulsyn/core import (not built on Vercel)
+interface CompetitionMetrics {
+  throughput: { rowsPerSecond: number };
+  latency: { p99Ms: number; p50Ms: number };
+  correctness: { dataIntegrity: number; eventOrdering: number };
+}
 
-// Import shared runs from start endpoint
-try {
-  const startModule = await import('../start/route');
-  if (startModule.runs) {
-    for (const [key, value] of startModule.runs) {
-      runs.set(key, value);
+function calculateCompetitionScore(metrics: CompetitionMetrics) {
+  const weights = { throughput: 0.4, latency: 0.3, correctness: 0.3 };
+
+  // Throughput: log scale, 100 rows/s = 0, 500K rows/s = 100
+  const throughputScore = Math.min(100,
+    Math.max(0, (Math.log10(Math.max(1, metrics.throughput.rowsPerSecond)) - 2) / (Math.log10(500000) - 2)) * 100
+  );
+
+  // Latency: linear, 0.1ms = 100, 5000ms = 0
+  const latencyScore = Math.min(100,
+    Math.max(0, ((5000 - metrics.latency.p99Ms) / 5000) * 100)
+  );
+
+  // Correctness: exponential penalty below 100%
+  const avgCorrectness = (metrics.correctness.dataIntegrity + metrics.correctness.eventOrdering) / 2;
+  const correctnessScore = avgCorrectness >= 100 ? 100 :
+    avgCorrectness >= 99.9 ? 95 :
+    avgCorrectness >= 99 ? 80 :
+    Math.max(0, avgCorrectness * 0.8);
+
+  const overallScore = Math.round(
+    throughputScore * weights.throughput +
+    latencyScore * weights.latency +
+    correctnessScore * weights.correctness
+  );
+
+  const tier = overallScore >= 90 ? 'platinum' :
+    overallScore >= 75 ? 'gold' :
+    overallScore >= 60 ? 'silver' :
+    overallScore >= 40 ? 'bronze' : 'uncertified';
+
+  return { overallScore, throughputScore: Math.round(throughputScore), latencyScore: Math.round(latencyScore), correctnessScore: Math.round(correctnessScore), tier };
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { runId: string } }
+) {
+  try {
+    const { runId } = params;
+
+    const run = competitionRuns.get(runId);
+    if (!run) {
+      return NextResponse.json(
+        { error: 'Competition run not found' },
+        { status: 404 }
+      );
     }
-  }
-} catch {
-  // Module not loaded yet — runs will be empty until populated
-}
 
-interface RouteParams {
-  params: Promise<{ runId: string }>;
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { runId } = await params;
-
-  const run = runs.get(runId);
-  if (!run) {
-    return NextResponse.json(
-      { error: 'Run not found', runId },
-      { status: 404 }
-    );
-  }
-
-  // Build base response
-  const response: Record<string, unknown> = {
-    runId: run.runId,
-    competitorId: run.competitorId,
-    status: run.status,
-    startedAt: run.startedAt,
-    completedAt: run.completedAt,
-    elapsedMs: Date.now() - new Date(run.startedAt).getTime(),
-  };
-
-  // If completed, try to load and score results
-  if (run.status === 'completed' && run.resultsFile && existsSync(run.resultsFile)) {
-    try {
-      const raw = readFileSync(run.resultsFile, 'utf-8');
-      const results = JSON.parse(raw);
-
-      const metrics: CompetitionMetrics = {
-        replicateRowsPerSecond: results.metrics?.replicateRowsPerSecond || 0,
-        avgLatencyMs: results.metrics?.avgLatencyMs || 0,
-        correctnessPercent: results.metrics?.correctnessPercent || 0,
-        totalRows: results.metrics?.totalRows || results.config?.totalRows,
-        replicateDurationMs: results.metrics?.replicateDurationMs,
-        sourceRowCount: results.metrics?.sourceRowCount,
-        targetRowCount: results.metrics?.targetRowCount,
-        matchedRowCount: results.metrics?.matchedRowCount,
-      };
-
+    // If completed, load results and calculate score
+    if (run.status === 'completed' && run.resultsFile && existsSync(run.resultsFile)) {
+      const resultsData = JSON.parse(readFileSync(run.resultsFile, 'utf-8'));
+      const metrics: CompetitionMetrics = resultsData.metrics || resultsData;
       const score = calculateCompetitionScore(metrics);
 
-      response.results = {
-        metrics,
-        score: {
-          overall: score.overallScore,
-          throughput: score.throughputScore,
-          latency: score.latencyScore,
-          correctness: score.correctnessScore,
-          tier: score.tier,
-          breakdown: score.breakdown,
+      return NextResponse.json({
+        success: true,
+        data: {
+          ...run,
+          metrics,
+          score,
         },
-        config: results.config,
-      };
-    } catch (err) {
-      response.resultsError = 'Failed to parse results file';
+      });
     }
-  }
 
-  // If failed, include error
-  if (run.status === 'failed' && run.error) {
-    response.error = run.error;
+    // Return current status
+    return NextResponse.json({
+      success: true,
+      data: {
+        runId: run.runId,
+        competitorId: run.competitorId,
+        status: run.status,
+        startedAt: run.startedAt,
+        completedAt: run.completedAt,
+        error: run.error,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to get competition status' },
+      { status: 500 }
+    );
   }
-
-  // Estimate progress for running status
-  if (run.status === 'running') {
-    const elapsed = Date.now() - new Date(run.startedAt).getTime();
-    const estimatedDuration = 300_000; // 5 min default
-    response.progress = Math.min(95, Math.round((elapsed / estimatedDuration) * 100));
-  }
-
-  return NextResponse.json(response);
 }
