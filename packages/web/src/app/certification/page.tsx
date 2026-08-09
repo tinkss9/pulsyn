@@ -266,6 +266,90 @@ export default function CertificationPage() {
         </div>
       </section>
 
+      {/* Real Benchmark Results */}
+      <section className="py-16 px-6 border-t border-white/10 bg-white/[0.01]">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">Real Benchmark Results</h2>
+          <p className="text-center text-gray-400 mb-8">
+            Measured against real PostgreSQL instance (Docker) using the Pulsyn benchmark runner. Not simulated.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-xl border border-green-500/20 bg-green-500/5">
+              <h3 className="font-semibold text-lg mb-4">Throughput</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Bulk (batches of 1000)</span>
+                  <span className="text-green-400 font-bold">34,530 rows/sec</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Streaming (single-row)</span>
+                  <span className="text-green-400 font-bold">278 rows/sec</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">50K rows inserted in</span>
+                  <span className="text-green-400 font-bold">1.4 seconds</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-blue-500/20 bg-blue-500/5">
+              <h3 className="font-semibold text-lg mb-4">Latency</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">p50 (median)</span>
+                  <span className="text-blue-400 font-bold">3.41ms</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">p95</span>
+                  <span className="text-blue-400 font-bold">4.52ms</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">p99</span>
+                  <span className="text-blue-400 font-bold">5.64ms</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-purple-500/20 bg-purple-500/5">
+              <h3 className="font-semibold text-lg mb-4">Reliability</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Checkpoint Recovery</span>
+                  <span className="text-purple-400 font-bold">✅ Passed</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Data Integrity</span>
+                  <span className="text-purple-400 font-bold">100%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Error Rate</span>
+                  <span className="text-purple-400 font-bold">0%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-amber-500/20 bg-amber-500/5">
+              <h3 className="font-semibold text-lg mb-4">Certification</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Overall Score</span>
+                  <span className="text-amber-400 font-bold">74/100</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Tier</span>
+                  <span className="text-amber-400 font-bold">Silver</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Test Date</span>
+                  <span className="text-amber-400 font-bold">Aug 9, 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Certification Roadmap */}
       <section className="py-16 px-6 border-t border-white/10">
         <div className="max-w-4xl mx-auto">
